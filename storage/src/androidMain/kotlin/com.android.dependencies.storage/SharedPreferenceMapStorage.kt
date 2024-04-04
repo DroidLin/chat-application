@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.android.dependencies.common.ComponentFacade
 import com.android.dependencies.common.android.IContext
-import kotlin.concurrent.read
 
 /**
  * @author liuzhongao
@@ -20,23 +19,10 @@ internal open class SharedPreferenceMapStorage(
 
     override val all: Map<String, Any?> get() = this.sharedPreference.all
 
+    override val byteArray: ByteArray
+        get() = throw UnsupportedOperationException("unsupported operation in shared preference storage.")
     override val absolutePath: String = ""
     override val storageName: String = fileName
-
-    override fun get(key: String, default: Any?): Any? {
-        return when (default) {
-            is Int -> this.getInt(key, default)
-            is Long -> this.getLong(key, default)
-            is Float -> this.getFloat(key, default)
-            is Double -> this.getDouble(key, default)
-            is Boolean -> this.getBoolean(key, default)
-            is Byte -> this.getByte(key, default)
-            is Char -> this.getChar(key, default)
-            is Short -> this.getShort(key, default)
-            is String -> this.getString(key, default)
-            else -> default
-        }
-    }
 
     override fun contains(key: String): Boolean {
         return this.sharedPreference.contains(key)

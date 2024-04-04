@@ -6,6 +6,9 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.RandomAccessFile
+import java.nio.channels.FileChannel
+import java.nio.channels.FileLock
+import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
@@ -22,24 +25,21 @@ internal open class JvmJSONObjectMapStorage(
     private val fileSystemFile: File = File(filePath, fileName)
     private val randomAccessFile = RandomAccessFile(this.fileSystemFile, "rw")
 
-    protected val innerMutableMap = LinkedHashMap<String, Any?>()
+    protected val innerMutableMap = HashMap<String, Any?>()
     protected val reentrantLock = ReentrantReadWriteLock()
 
     private var lastFileModifiedTimestamp: Long = fileSystemFile.lastModified()
 
     override val absolutePath: String = filePath
     override val storageName: String = fileName
+
+    override val byteArray: ByteArray
+        get() = this.readByteArray()
     override val all: Map<String, Any?>
         get() {
             this.trySyncStorageFromFileSystem()
             return this.innerMutableMap.toMap()
         }
-
-    override fun get(key: String, default: Any?): Any? = keepLatest {
-        this.reentrantLock.read {
-            this.innerMutableMap[key] ?: default
-        }
-    }
 
     override fun contains(key: String): Boolean {
         this.trySyncStorageFromFileSystem()
@@ -115,7 +115,6 @@ internal open class JvmJSONObjectMapStorage(
                     val jsonMapStringContent = JSONObject(this.innerMutableMap).toString()
                     fileOutputStream.write(jsonMapStringContent.toByteArray())
                     fileOutputStream.flush()
-                    this.lastFileModifiedTimestamp = this.fileSystemFile.lastModified()
                 }
             }
         }

@@ -9,4 +9,9 @@ interface Storage {
     val absolutePath: String
 
     val storageName: String
+
+    fun interface Factory {
+
+        fun storageCreate(directoryPath: String, storageName: String, storageType: StorageType): Storage
+    }
 }

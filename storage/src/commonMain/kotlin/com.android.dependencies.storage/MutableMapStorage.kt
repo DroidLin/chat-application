@@ -6,8 +6,6 @@ package com.android.dependencies.storage
  */
 interface MutableMapStorage : MapStorage {
 
-    fun put(key: String, value: Any?)
-
     fun putInt(key: String, value: Int)
 
     fun putLong(key: String, value: Long)

@@ -9,6 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/android-only-module" />
+            <option value="$PROJECT_DIR$/jvm-only-module" />
             <option value="$PROJECT_DIR$/storage" />
           </set>
         </option>

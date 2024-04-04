@@ -13,25 +13,6 @@ internal class SharedPreferenceMutableMapStorage(
     @Volatile
     private var tempEditor: SharedPreferences.Editor? = null
 
-    override fun put(key: String, value: Any?) {
-        when (value) {
-            is Int -> this.putInt(key, value)
-            is Long -> this.putLong(key, value)
-            is Float -> this.putFloat(key, value)
-            is Double -> this.putDouble(key, value)
-            is Boolean -> this.putBoolean(key, value)
-            is Byte -> this.putByte(key, value)
-            is Char -> this.putChar(key, value)
-            is Short -> this.putShort(key, value)
-            is String -> this.putString(key, value)
-            else -> {
-                if (value == null) {
-                    this.putString(key, null)
-                } else throw UnsupportedOperationException("unsupported value: ${value}.")
-            }
-        }
-    }
-
     override fun putInt(key: String, value: Int) = this.prepareSharedPreferenceEditor {
         this.putInt(key, value)
     }

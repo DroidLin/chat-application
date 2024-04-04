@@ -12,7 +12,7 @@ fun main() {
 
     val future1 = executor.submit {
         val startTimestamp = System.currentTimeMillis()
-        for (index in 0 until 1000) {
+        for (index in 0 until 100) {
             storage.putInt("key_extra_${index}", index)
         }
         storage.flush()
@@ -20,16 +20,7 @@ fun main() {
     }
     val future2 = executor.submit {
         val startTimestamp = System.currentTimeMillis()
-        for (index in 1000 until 2000) {
-            storage.putInt("key_extra_${index}", index)
-        }
-        storage.flush()
-        println("future2 cost: ${System.currentTimeMillis() - startTimestamp}ms")
-    }
-
-    val future3 = executor.submit {
-        val startTimestamp = System.currentTimeMillis()
-        for (index in 2000 until 3000) {
+        for (index in 100 until 200) {
             storage.putInt("key_extra_${index}", index)
         }
         storage.flush()
@@ -38,6 +29,5 @@ fun main() {
 
     future1.get()
     future2.get()
-    future3.get()
     executor.shutdown()
 }

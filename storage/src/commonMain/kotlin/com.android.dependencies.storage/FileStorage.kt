@@ -10,6 +10,4 @@ interface FileStorage : Storage {
      * blocking call, may block current thread execution if local file changed.
      */
     val byteArray: ByteArray
-
-    fun write(byteArray: ByteArray)
 }
