@@ -33,25 +33,20 @@ kotlin {
     sourceSets {
         val commonMain by getting
         commonMain.dependencies {
-            api("com.github.DroidLin.common:common-jvm:1.0.3")
         }
 
         val jvmMain by getting
         jvmMain.dependencies {
-            implementation("org.json:json:20240303")
-            implementation("com.github.DroidLin.statistic:statistic-interfaces:1.0.4")
-            implementation("com.github.DroidLin.statistic:core-statistic:1.0.4")
         }
 
         val androidMain by getting
         androidMain.dependencies {
-            implementation("com.github.DroidLin.common:common-android:1.0.3")
         }
     }
 }
 
 android {
-    namespace = "com.android.dependencies.storage.android"
+    namespace = "com.android.dependencies.multiplatform.android"
     compileSdk = 34
     defaultConfig {
         minSdk = 21

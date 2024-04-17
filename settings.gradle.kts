@@ -18,7 +18,7 @@ dependencyResolutionManagement {
 }
 
 
-rootProject.name = "storage"
+rootProject.name = "template"
 include(":android-only-module")
-include(":storage")
 include(":jvm-only-module")
+include(":multiplatform-module")
