@@ -1,0 +1,15 @@
+{
+    "type": 1,
+    "ext": {
+      "content": ""
+    },
+    "receiver": {
+        "sessionId": "",
+        "accountId": ""
+    },
+    "sender": {
+        "sessionId": "",
+        "accountId": ""
+    },
+    "timestamp": 0
+}

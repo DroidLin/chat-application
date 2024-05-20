@@ -4,14 +4,16 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="testRunner" value="GRADLE" />
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleJvm" value="jbr-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/android-only-module" />
+            <option value="$PROJECT_DIR$/app-channel-client" />
+            <option value="$PROJECT_DIR$/app-channel-core" />
+            <option value="$PROJECT_DIR$/app-channel-message" />
+            <option value="$PROJECT_DIR$/app-channel-server" />
             <option value="$PROJECT_DIR$/jvm-only-module" />
             <option value="$PROJECT_DIR$/multiplatform-module" />
           </set>

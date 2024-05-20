@@ -18,7 +18,12 @@ dependencyResolutionManagement {
 }
 
 
-rootProject.name = "template"
+rootProject.name = "chat-channel"
 include(":android-only-module")
 include(":jvm-only-module")
 include(":multiplatform-module")
+
+include(":app-channel-core")
+include(":app-channel-client")
+include(":app-channel-server")
+include(":app-channel-message")

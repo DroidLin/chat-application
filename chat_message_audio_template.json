@@ -1,0 +1,20 @@
+{
+  "type": 3,
+  "ext": {
+    "content": {
+      "duration": 30,
+      "resourceUrl": "",
+      "mimeType": "",
+      "md5": ""
+    }
+  },
+  "receiver": {
+    "sessionId": "",
+    "accountId": ""
+  },
+  "sender": {
+    "sessionId": "",
+    "accountId": ""
+  },
+  "timestamp": 0
+}
