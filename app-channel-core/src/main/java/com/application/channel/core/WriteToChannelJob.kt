@@ -19,6 +19,13 @@ class WriteToChannelJob(
 ) : Runnable {
 
     override fun run() {
+        val anyChannelConnected = this.channelGroup.filter { channel ->
+            channel != null && this.channelMatcher.match(channel.channelContext)
+        }.any { it.isActive }
+        if (!anyChannelConnected) {
+            this.listener?.onFailure(NotConnectedException("none of any channel is connected."))
+            return
+        }
         val channelGroupFutureListener = object : ChannelGroupFutureListener {
             override fun operationComplete(future: ChannelGroupFuture?) {
                 if (future == null) return
@@ -34,6 +41,5 @@ class WriteToChannelJob(
                 return this@WriteToChannelJob.channelMatcher.match(channelContext)
             }
         }).addListener(channelGroupFutureListener)
-            .forEach { it.channel() }
     }
 }

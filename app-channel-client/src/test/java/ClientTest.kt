@@ -1,7 +1,9 @@
 import com.application.channel.core.ChannelContextMatcher
 import com.application.channel.core.ChannelEventListener
+import com.application.channel.core.Factory
 import com.application.channel.core.Listener
 import com.application.channel.core.client.ChatClient
+import com.application.channel.core.client.ConnectListener
 import com.application.channel.core.handler.encoder.MessageByteArrayToMessageStringDecoder
 import com.application.channel.core.handler.encoder.MessageByteArrayToRawByteBufArrayEncoder
 import com.application.channel.core.handler.encoder.MessageStringToMessageByteArrayEncoder
@@ -29,13 +31,13 @@ fun main() {
         channelEventListener = channelEventListener,
         maxReConnectCount = 3,
         initAdapter = initAdapter {
-            this.dataTransformEncoderFactory = {
+            this.dataTransformEncoderFactory = Factory {
                 listOf(
                     MessageStringToMessageByteArrayEncoder(),
                     MessageByteArrayToRawByteBufArrayEncoder(),
                 )
             }
-            this.dataTransformDecoderFactory = {
+            this.dataTransformDecoderFactory = Factory {
                 listOf(
                     RawByteBufArrayToMessageByteArrayDecoder(),
                     MessageByteArrayToMessageStringDecoder(),
@@ -43,17 +45,20 @@ fun main() {
             }
         }
     )
-    val initConfig = simpleSocketInitConfigV1
-    val chatClient = ChatClient(initConfig)
-    chatClient.start {
-        chatClient.writeValue(
-            value = "Hello World!".toByteArray(),
-            channelContextMatcher = ChannelContextMatcher { channelContext ->
-                channelContext.channelRemoteAddress == simpleSocketInitConfigV1.socketAddress
-            },
-            listener = SimpleWriteResultListener()
-        )
-    }
+    val chatClient = ChatClient(simpleSocketInitConfigV1)
+    chatClient.start(
+        object : ConnectListener {
+            override fun onConnected(initConfig: SimpleSocketInitConfig) {
+                chatClient.writeValue(
+                    value = "Hello World!".toByteArray(),
+                    channelContextMatcher = ChannelContextMatcher { channelContext ->
+                        channelContext.channelRemoteAddress == simpleSocketInitConfigV1.socketAddress
+                    },
+                    listener = SimpleWriteResultListener()
+                )
+            }
+        }
+    )
 //        remoteExecutor.shutDown()
 }
 

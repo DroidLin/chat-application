@@ -26,6 +26,7 @@ data class SimpleSocketInitConfig @JvmOverloads constructor(
 ) : InitConfig {
 
     var nowReConnectCount: Int = 0
+    var isRunning: Boolean = false
 
     val socketAddress: SocketAddress by lazy {
         val uri = URI.create(this.remoteAddress)

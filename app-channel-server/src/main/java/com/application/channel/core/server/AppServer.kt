@@ -27,15 +27,6 @@ internal class AppServer(private val initConfig: InitConfig) {
 
     val channelGroup: ChannelGroup get() = this._channelGroup
 
-    private val _channelEventListener by lazy {
-        when (this.initConfig) {
-            is SimpleSocketInitConfig -> ChannelEventListener(raw = this.initConfig.channelEventListener)
-            is MultiInitConfig -> ChannelEventListener(this.initConfig)
-
-            else -> throw IllegalArgumentException("unsupported initConfig type: ${this.initConfig.javaClass.name}")
-        }
-    }
-
     init {
         this._serverBootstrap.group(this._parentEventLoop, this._childEventLoop)
             .channel(NioServerSocketChannel::class.java)

@@ -6,22 +6,26 @@ package com.application.channel.core
  */
 interface InitAdapter {
 
-    val dataTransformEncoderFactory: () -> List<DataTransformEncoder<*, *>>?
-    val dataTransformDecoderFactory: () -> List<DataTransformDecoder<*, *>>?
+    val dataTransformEncoderFactory: Factory<List<DataTransformEncoder<*, *>>?>
+    val dataTransformDecoderFactory: Factory<List<DataTransformDecoder<*, *>>?>
 
-    val dataHandler: () -> List<DataHandler<*>>?
+    val dataHandler: Factory<List<DataHandler<*>>?>
 }
 
 fun initAdapter(function: InitialAdapterBuilder.() -> Unit): InitAdapter {
     val builder = InitialAdapterBuilder().apply(function)
     return object : InitAdapter {
-        override val dataTransformEncoderFactory: () -> List<DataTransformEncoder<*, *>>? =
+        override val dataTransformEncoderFactory: Factory<List<DataTransformEncoder<*, *>>?> =
             builder.dataTransformEncoderFactory
-        override val dataTransformDecoderFactory: () -> List<DataTransformDecoder<*, *>>? =
+        override val dataTransformDecoderFactory: Factory<List<DataTransformDecoder<*, *>>?> =
             builder.dataTransformDecoderFactory
 
-        override val dataHandler: () -> List<DataHandler<*>>? = builder.dataHandlerFactory
+        override val dataHandler: Factory<List<DataHandler<*>>?> = builder.dataHandlerFactory
     }
+}
+
+fun interface Factory<T> {
+    fun instantiate(): T
 }
 
 @DslMarker
@@ -30,8 +34,8 @@ annotation class InitialAdapterScope
 @InitialAdapterScope
 class InitialAdapterBuilder {
 
-    var dataTransformEncoderFactory: () -> List<DataTransformEncoder<*, *>>? = { null }
-    var dataTransformDecoderFactory: () -> List<DataTransformDecoder<*, *>>? = { null }
+    var dataTransformEncoderFactory: Factory<List<DataTransformEncoder<*, *>>?> = Factory { null }
+    var dataTransformDecoderFactory: Factory<List<DataTransformDecoder<*, *>>?> = Factory { null }
 
-    var dataHandlerFactory: () -> List<DataHandler<*>>? = { null }
+    var dataHandlerFactory: Factory<List<DataHandler<*>>?> = Factory { null }
 }

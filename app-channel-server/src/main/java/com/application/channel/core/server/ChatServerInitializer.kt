@@ -31,17 +31,17 @@ internal class ChatServerInitializer(
         // custom
         val decoderList = this.initAdapter
             ?.dataTransformDecoderFactory
-            ?.invoke()
+            ?.instantiate()
         decoderList?.forEach(channelPipeline::addLast)
 
         val encoderList = this.initAdapter
             ?.dataTransformEncoderFactory
-            ?.invoke()
+            ?.instantiate()
         encoderList?.forEach(channelPipeline::addLast)
 
         val dataHandlerList = this.initAdapter
             ?.dataHandler
-            ?.invoke()
+            ?.instantiate()
         dataHandlerList?.forEach(channelPipeline::addLast)
     }
 }
