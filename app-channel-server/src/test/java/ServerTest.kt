@@ -1,13 +1,14 @@
 import com.application.channel.core.ChannelEventListener
 import com.application.channel.core.DataHandler
 import com.application.channel.core.Factory
-import com.application.channel.core.handler.encoder.MessageByteArrayToMessageStringDecoder
-import com.application.channel.core.handler.encoder.MessageByteArrayToRawByteBufArrayEncoder
-import com.application.channel.core.handler.encoder.MessageStringToMessageByteArrayEncoder
-import com.application.channel.core.handler.encoder.RawByteBufArrayToMessageByteArrayDecoder
+import com.application.channel.core.handler.encoder.ByteArrayToStringDecoder
+import com.application.channel.core.handler.encoder.ByteArrayToByteBufEncoder
+import com.application.channel.core.handler.encoder.StringToByteArrayEncoder
+import com.application.channel.core.handler.encoder.ByteBufToByteArrayDecoder
 import com.application.channel.core.initAdapter
 import com.application.channel.core.model.ChannelContext
-import com.application.channel.core.model.SimpleSocketInitConfig
+import com.application.channel.core.model.SocketChannelInitConfig
+import com.application.channel.core.model.socketInitConfig
 import com.application.channel.core.server.ChatServer
 
 /**
@@ -15,34 +16,27 @@ import com.application.channel.core.server.ChatServer
  * @since 2024/5/8 22:24
  */
 fun main() {
-    val channelEventListener = object : ChannelEventListener {
-        override fun handleValueRead(ctx: ChannelContext, value: Any?) {
-            println("receive data from: ${ctx.channelRemoteAddress}, data: ${value}")
+    val initConfig = socketInitConfig {
+        remoteAddress = "http://127.0.0.1:9123"
+        maxReconnectCount = 3
+        afterNewValueRead { channelContext, any ->
+            println("receive data from: ${channelContext.channelRemoteAddress}, data: $any")
+        }
+        initAdapter {
+            encoderFactories(
+                StringToByteArrayEncoder(),
+                ByteArrayToByteBufEncoder()
+            )
+            decoderFactories(
+                ByteBufToByteArrayDecoder(),
+                ByteArrayToStringDecoder()
+            )
+            handlerFactories(
+                StringDataHandler(this@socketInitConfig.channelEventListener)
+            )
         }
     }
-    val simpleSocketInitConfigV1 = SimpleSocketInitConfig(
-        remoteAddress = "http://127.0.0.1:9123",
-        channelEventListener = channelEventListener,
-        maxReConnectCount = 3,
-        initAdapter = initAdapter {
-            this.dataTransformEncoderFactory = Factory {
-                listOf(
-                    MessageStringToMessageByteArrayEncoder(),
-                    MessageByteArrayToRawByteBufArrayEncoder()
-                )
-            }
-            this.dataTransformDecoderFactory = Factory {
-                listOf(
-                    RawByteBufArrayToMessageByteArrayDecoder(),
-                    MessageByteArrayToMessageStringDecoder()
-                )
-            }
-            this.dataHandlerFactory = Factory {
-                listOf(StringDataHandler(channelEventListener))
-            }
-        }
-    )
-    val chatServer = ChatServer(simpleSocketInitConfigV1)
+    val chatServer = ChatServer(initConfig)
     chatServer.start()
 }
 

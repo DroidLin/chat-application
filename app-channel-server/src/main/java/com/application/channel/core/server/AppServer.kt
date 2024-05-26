@@ -1,9 +1,9 @@
 package com.application.channel.core.server
 
-import com.application.channel.core.ChannelEventListener
+import com.application.channel.core.initializer.ChannelInitializerFactory
 import com.application.channel.core.model.InitConfig
 import com.application.channel.core.model.MultiInitConfig
-import com.application.channel.core.model.SimpleSocketInitConfig
+import com.application.channel.core.model.SocketChannelInitConfig
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelOption
 import io.netty.channel.group.ChannelGroup
@@ -35,31 +35,13 @@ internal class AppServer(private val initConfig: InitConfig) {
     }
 
     fun run() {
-        when (this.initConfig) {
-            is SimpleSocketInitConfig -> {
-                val childChannelInitializer = ChatServerInitializer(
-                    channelGroup = this.channelGroup,
-                    initAdapter = this.initConfig.initAdapter
-                )
-                val socketAddress = this.initConfig.socketAddress
-                this._serverBootstrap
-                    .childHandler(childChannelInitializer)
-                    .bind(socketAddress).sync()
-            }
-            is MultiInitConfig -> {
-                this.initConfig.initConfigList.forEach { simpleInitConfig ->
-                    val childChannelInitializer = ChatServerInitializer(
-                        channelGroup = this.channelGroup,
-                        initAdapter = simpleInitConfig.initAdapter
-                    )
-                    val socketAddress = simpleInitConfig.socketAddress
-                    this._serverBootstrap
-                        .childHandler(childChannelInitializer)
-                        .bind(socketAddress).sync()
+        ChannelInitializerFactory.create(this._channelGroup, this.initConfig)
+            .initialize(this._serverBootstrap) { serverBootstrap, initConfig ->
+                if (initConfig is SocketChannelInitConfig) {
+                    val socketAddress = initConfig.socketAddress
+                    serverBootstrap.bind(socketAddress).sync()
                 }
             }
-            else -> {}
-        }
     }
 
     fun scheduleInEventLoop(job: () -> Unit) {

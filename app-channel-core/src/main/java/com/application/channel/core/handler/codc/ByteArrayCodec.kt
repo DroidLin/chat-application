@@ -3,7 +3,6 @@ package com.application.channel.core.handler.codc
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageCodec
-import io.netty.util.ReferenceCountUtil
 import java.io.ByteArrayOutputStream
 
 /**
@@ -19,7 +18,7 @@ class ByteArrayCodec : MessageToMessageCodec<ByteBuf, ByteArray>() {
             byteBuf.writeInt(msg.size)
             byteBuf.writeBytes(msg)
         }
-        out += ReferenceCountUtil.retain(byteBuf)
+        out += byteBuf
     }
 
     override fun decode(ctx: ChannelHandlerContext?, msg: ByteBuf?, out: MutableList<Any>?) {
@@ -40,7 +39,7 @@ class ByteArrayCodec : MessageToMessageCodec<ByteBuf, ByteArray>() {
                     }
                 }
                 if (byteArray != null) {
-                    out += ReferenceCountUtil.retain(byteArray)
+                    out += byteArray
                 } else shouldResetReaderIndex = true
             } else shouldResetReaderIndex = true
 

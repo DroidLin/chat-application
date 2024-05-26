@@ -4,7 +4,6 @@ import com.application.channel.core.ChannelContextMatcher
 import com.application.channel.core.Listener
 import com.application.channel.core.WriteToChannelJob
 import com.application.channel.core.model.InitConfig
-import com.application.channel.core.model.SimpleSocketInitConfig
 
 /**
  * @author liuzhongao
@@ -17,7 +16,7 @@ interface ChatClient {
 
     val initConfig: InitConfig
 
-    fun start(connectListener: ConnectListener)
+    fun start(doOnConnected: (InitConfig) -> Unit)
     fun writeValue(value: Any?)
     fun writeValue(value: Any?, listener: Listener?)
     fun writeValue(value: Any?, channelContextMatcher: ChannelContextMatcher)
@@ -29,8 +28,8 @@ private class ChatClientImpl(override val initConfig: InitConfig) : ChatClient {
 
     private val _clientApp: AppClient = AppClient(this.initConfig)
 
-    override fun start(connectListener: ConnectListener) {
-        this._clientApp.run(connectListener)
+    override fun start(doOnConnected: (InitConfig) -> Unit) {
+        this._clientApp.run(doOnConnected)
     }
 
     override fun writeValue(value: Any?) {

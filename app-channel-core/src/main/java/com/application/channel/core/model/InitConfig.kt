@@ -12,7 +12,25 @@ import java.net.URI
  */
 sealed interface InitConfig
 
-data class SimpleSocketInitConfig @JvmOverloads constructor(
+data class DatagramChannelInitConfig @JvmOverloads constructor(
+    val remoteAddress: String,
+    val maxReConnectCount: Int = Int.MAX_VALUE,
+    val channelEventListener: ChannelEventListener? = null,
+    val initAdapter: InitAdapter? = null
+) : InitConfig {
+
+    val socketAddress: SocketAddress by lazy {
+        val uri = URI.create(this.remoteAddress)
+        val host: String? = uri.host
+        val port = uri.port
+        if (host.isNullOrBlank() || port == -1) {
+            throw IllegalArgumentException("illegal remote address: ${this.remoteAddress}")
+        }
+        InetSocketAddress(host, port)
+    }
+}
+
+data class SocketChannelInitConfig @JvmOverloads constructor(
     val remoteAddress: String,
     val maxReConnectCount: Int = Int.MAX_VALUE,
     /**
@@ -26,6 +44,7 @@ data class SimpleSocketInitConfig @JvmOverloads constructor(
 ) : InitConfig {
 
     var nowReConnectCount: Int = 0
+
     var isRunning: Boolean = false
 
     val socketAddress: SocketAddress by lazy {
@@ -40,5 +59,5 @@ data class SimpleSocketInitConfig @JvmOverloads constructor(
 }
 
 data class MultiInitConfig constructor(
-    val initConfigList: List<SimpleSocketInitConfig>
+    val initConfigList: List<InitConfig>
 ) : InitConfig

@@ -6,22 +6,14 @@ package com.application.channel.core
  */
 interface InitAdapter {
 
-    val dataTransformEncoderFactory: Factory<List<DataTransformEncoder<*, *>>?>
-    val dataTransformDecoderFactory: Factory<List<DataTransformDecoder<*, *>>?>
+    val dataTransformEncoderFactory: Factory<Array<DataTransformEncoder<*, *>>?>
+    val dataTransformDecoderFactory: Factory<Array<DataTransformDecoder<*, *>>?>
 
-    val dataHandler: Factory<List<DataHandler<*>>?>
+    val dataHandler: Factory<Array<DataHandler<*>>?>
 }
 
 fun initAdapter(function: InitialAdapterBuilder.() -> Unit): InitAdapter {
-    val builder = InitialAdapterBuilder().apply(function)
-    return object : InitAdapter {
-        override val dataTransformEncoderFactory: Factory<List<DataTransformEncoder<*, *>>?> =
-            builder.dataTransformEncoderFactory
-        override val dataTransformDecoderFactory: Factory<List<DataTransformDecoder<*, *>>?> =
-            builder.dataTransformDecoderFactory
-
-        override val dataHandler: Factory<List<DataHandler<*>>?> = builder.dataHandlerFactory
-    }
+    return InitialAdapterBuilder().apply(function).build()
 }
 
 fun interface Factory<T> {
@@ -32,10 +24,33 @@ fun interface Factory<T> {
 annotation class InitialAdapterScope
 
 @InitialAdapterScope
-class InitialAdapterBuilder {
+class InitialAdapterBuilder internal constructor() {
 
-    var dataTransformEncoderFactory: Factory<List<DataTransformEncoder<*, *>>?> = Factory { null }
-    var dataTransformDecoderFactory: Factory<List<DataTransformDecoder<*, *>>?> = Factory { null }
+    private var dataTransformEncoderFactory: Factory<Array<DataTransformEncoder<*, *>>?> = Factory { null }
+    private var dataTransformDecoderFactory: Factory<Array<DataTransformDecoder<*, *>>?> = Factory { null }
 
-    var dataHandlerFactory: Factory<List<DataHandler<*>>?> = Factory { null }
+    private var dataHandlerFactory: Factory<Array<DataHandler<*>>?> = Factory { null }
+
+    fun encoderFactories(vararg encoder: DataTransformEncoder<*, *>) {
+        this.dataTransformEncoderFactory = Factory { encoder as Array<DataTransformEncoder<*, *>>? }
+    }
+
+    fun decoderFactories(vararg decoder: DataTransformDecoder<*, *>) {
+        this.dataTransformDecoderFactory = Factory { decoder as Array<DataTransformDecoder<*, *>>? }
+    }
+
+    fun handlerFactories(vararg handler: DataHandler<*>) {
+        this.dataHandlerFactory = Factory { handler as Array<DataHandler<*>>? }
+    }
+
+    fun build(): InitAdapter {
+        return object : InitAdapter {
+            override val dataTransformEncoderFactory: Factory<Array<DataTransformEncoder<*, *>>?> =
+                this@InitialAdapterBuilder.dataTransformEncoderFactory
+            override val dataTransformDecoderFactory: Factory<Array<DataTransformDecoder<*, *>>?> =
+                this@InitialAdapterBuilder.dataTransformDecoderFactory
+
+            override val dataHandler: Factory<Array<DataHandler<*>>?> = this@InitialAdapterBuilder.dataHandlerFactory
+        }
+    }
 }

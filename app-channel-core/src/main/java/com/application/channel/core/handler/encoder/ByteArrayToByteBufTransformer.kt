@@ -4,7 +4,6 @@ import com.application.channel.core.DataTransformDecoder
 import com.application.channel.core.DataTransformEncoder
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
-import io.netty.util.ReferenceCountUtil
 import java.io.ByteArrayOutputStream
 
 /**
@@ -14,7 +13,7 @@ import java.io.ByteArrayOutputStream
 
 private const val FLAG_MESSAGE_BYTE_ARRAY = 0x10101
 
-class MessageByteArrayToRawByteBufArrayEncoder : DataTransformEncoder<ByteArray, ByteBuf>() {
+class ByteArrayToByteBufEncoder : DataTransformEncoder<ByteArray, ByteBuf>() {
     override fun encode(msg: ByteArray, out: MutableList<ByteBuf>) {
         out += Unpooled.buffer().also { byteBuf ->
             byteBuf.writeInt(FLAG_MESSAGE_BYTE_ARRAY)
@@ -24,7 +23,7 @@ class MessageByteArrayToRawByteBufArrayEncoder : DataTransformEncoder<ByteArray,
     }
 }
 
-class RawByteBufArrayToMessageByteArrayDecoder : DataTransformDecoder<ByteBuf, ByteArray>() {
+class ByteBufToByteArrayDecoder : DataTransformDecoder<ByteBuf, ByteArray>() {
     private val _byteArrayOutputStream = ByteArrayOutputStream()
 
     override fun decode(msg: ByteBuf, out: MutableList<ByteArray>) {
@@ -39,8 +38,8 @@ class RawByteBufArrayToMessageByteArrayDecoder : DataTransformDecoder<ByteBuf, B
             val dataCount = msg.withAvailableCount(Int.SIZE_BYTES) { this.readInt() }
             if (dataCount != null) {
                 val byteArray = msg.withAvailableCount(dataCount) {
-                    this@RawByteBufArrayToMessageByteArrayDecoder._byteArrayOutputStream.reset()
-                    this@RawByteBufArrayToMessageByteArrayDecoder._byteArrayOutputStream.use { outputStream ->
+                    this@ByteBufToByteArrayDecoder._byteArrayOutputStream.reset()
+                    this@ByteBufToByteArrayDecoder._byteArrayOutputStream.use { outputStream ->
                         for (index in 0 until dataCount) {
                             outputStream.write(this.readByte().toInt())
                         }
@@ -48,7 +47,7 @@ class RawByteBufArrayToMessageByteArrayDecoder : DataTransformDecoder<ByteBuf, B
                     }
                 }
                 if (byteArray != null) {
-                    out += ReferenceCountUtil.retain(byteArray)
+                    out += byteArray
                 } else shouldResetReaderIndex = true
             } else shouldResetReaderIndex = true
 
