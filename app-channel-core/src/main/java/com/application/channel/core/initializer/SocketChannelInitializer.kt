@@ -10,6 +10,7 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelOption
 import io.netty.channel.group.ChannelGroup
 import io.netty.channel.socket.SocketChannel
+import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
 
 /**
@@ -36,7 +37,8 @@ class SocketChannelInitializer(
                 .option(ChannelOption.SO_KEEPALIVE, true)
             init(bootstrap, this.initConfig)
         } else if (bootstrap is ServerBootstrap) {
-            bootstrap.childHandler(channelInitializer)
+            bootstrap.channel(NioServerSocketChannel::class.java)
+                .childHandler(channelInitializer)
             init(bootstrap, this.initConfig)
         }
     }

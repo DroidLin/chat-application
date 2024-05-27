@@ -17,6 +17,7 @@ interface ChatClient {
     val initConfig: InitConfig
 
     fun start(doOnConnected: (InitConfig) -> Unit)
+    fun triggerReconnect(initConfig: InitConfig, doOnConnected: (InitConfig) -> Unit)
     fun writeValue(value: Any?)
     fun writeValue(value: Any?, listener: Listener?)
     fun writeValue(value: Any?, channelContextMatcher: ChannelContextMatcher)
@@ -30,6 +31,10 @@ private class ChatClientImpl(override val initConfig: InitConfig) : ChatClient {
 
     override fun start(doOnConnected: (InitConfig) -> Unit) {
         this._clientApp.run(doOnConnected)
+    }
+
+    override fun triggerReconnect(initConfig: InitConfig, doOnConnected: (InitConfig) -> Unit) {
+        this._clientApp.run(initConfig, doOnConnected)
     }
 
     override fun writeValue(value: Any?) {

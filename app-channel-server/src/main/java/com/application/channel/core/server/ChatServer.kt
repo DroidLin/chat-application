@@ -13,9 +13,11 @@ fun ChatServer(config: InitConfig): ChatServer = ChatServerImpl(config)
 
 interface ChatServer {
 
-    val config: InitConfig
+    val initConfig: InitConfig
 
     fun start()
+
+    fun triggerReconnect(initConfig: InitConfig)
 
     fun write(value: Any?)
 
@@ -24,14 +26,21 @@ interface ChatServer {
     fun write(value: Any?, matcher: ChannelContextMatcher, listener: Listener?)
 
     fun shutDown()
+
+    fun shutDown(initConfig: InitConfig)
+
 }
 
-private class ChatServerImpl(override val config: InitConfig) : ChatServer {
+private class ChatServerImpl(override val initConfig: InitConfig) : ChatServer {
 
-    private val appServer = AppServer(this.config)
+    private val appServer = AppServer(this.initConfig)
 
     override fun start() {
         this.appServer.run()
+    }
+
+    override fun triggerReconnect(initConfig: InitConfig) {
+        this.appServer.run(initConfig)
     }
 
     override fun write(value: Any?) {
@@ -54,5 +63,9 @@ private class ChatServerImpl(override val config: InitConfig) : ChatServer {
 
     override fun shutDown() {
         this.appServer.shutDown()
+    }
+
+    override fun shutDown(initConfig: InitConfig) {
+        this.appServer.shutDown(initConfig)
     }
 }

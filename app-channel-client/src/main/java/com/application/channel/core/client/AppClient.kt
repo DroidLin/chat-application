@@ -1,18 +1,16 @@
 package com.application.channel.core.client
 
 import com.application.channel.core.initializer.ChannelInitializerFactory
+import com.application.channel.core.model.DatagramChannelInitConfig
 import com.application.channel.core.model.InitConfig
-import com.application.channel.core.model.MultiInitConfig
 import com.application.channel.core.model.SocketChannelInitConfig
 import com.application.channel.core.model.channelContext
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelFutureListener
-import io.netty.channel.ChannelOption
 import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.channel.nio.NioEventLoopGroup
-import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.util.concurrent.GlobalEventExecutor
 import java.util.concurrent.TimeUnit
 
@@ -33,32 +31,44 @@ internal class AppClient(private val initConfig: InitConfig) {
         this.bootstrap.group(this.eventLoop)
     }
 
-    fun run(doOnConnected: (InitConfig) -> Unit) {
-        val initFunction =  { bootstrap: Bootstrap, initConfig: InitConfig ->
-            if (initConfig is SocketChannelInitConfig) {
+    fun run(doOnConnected: (InitConfig) -> Unit) = this.run(this.initConfig, doOnConnected)
+
+    fun run(initConfig: InitConfig, doOnConnected: (InitConfig) -> Unit) {
+        val initFunction =  { bootstrap: Bootstrap, _initConfig: InitConfig ->
+            if (_initConfig is SocketChannelInitConfig) {
                 val channelFutureListener = object : ChannelFutureListener {
                     override fun operationComplete(future: ChannelFuture?) {
                         if (future == null) return
                         if (!future.isSuccess) {
-                            initConfig.isRunning = false
-                            initConfig.channelEventListener?.handleConnectionLoss(future.channel().channelContext)
-                            initConfig.channelEventListener?.handleException(
-                                ctx = future.channel().channelContext,
-                                throwable = future.cause()
-                            )
+                            _initConfig.isRunning = false
+                            _initConfig.socketChannelEventListener?.handleConnectionLoss(future.channel().channelContext)
+                            _initConfig.socketChannelEventListener?.handleException(future.channel().channelContext, future.cause())
                         } else {
-                            initConfig.isRunning = true
-                            initConfig.nowReConnectCount = 0
+                            _initConfig.isRunning = true
+                            _initConfig.nowReConnectCount = 0
                             doOnConnected(initConfig)
                         }
                     }
                 }
-                val socketAddress = initConfig.socketAddress
-                bootstrap.connect(socketAddress)
+                bootstrap.connect(_initConfig.socketAddress)
+                    .addListener(channelFutureListener)
+            } else if (_initConfig is DatagramChannelInitConfig) {
+                val channelFutureListener = object : ChannelFutureListener {
+                    override fun operationComplete(future: ChannelFuture?) {
+                        if (future == null) return
+                        if (!future.isSuccess) {
+                            _initConfig.datagramChannelEventListener?.handleException(future.channel().channelContext, future.cause())
+                        } else {
+                            doOnConnected(initConfig)
+                        }
+                    }
+                }
+                bootstrap.bind()
                     .addListener(channelFutureListener)
             }
+            Unit
         }
-        ChannelInitializerFactory.create(this._channelGroup, this.initConfig)
+        ChannelInitializerFactory.create(this._channelGroup, initConfig)
             .initialize(this.bootstrap, initFunction)
     }
 

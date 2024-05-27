@@ -1,8 +1,6 @@
 package com.application.channel.core
 
-import java.net.Inet4Address
-import java.net.InetAddress
-import java.net.NetworkInterface
+import java.net.*
 
 val deviceAvailableIpAddress: InetAddress
     get() {
@@ -24,3 +22,13 @@ private val NetworkInterface.isValid: Boolean
 
 private val InetAddress.isValid: Boolean
     get() = this is Inet4Address && this.isSiteLocalAddress && !this.isLoopbackAddress
+
+fun parseNetworkAddress(address: String): SocketAddress {
+    val uri = URI.create(address)
+    val host: String? = uri.host
+    val port = uri.port
+    if (host.isNullOrBlank() || port == -1) {
+        throw IllegalArgumentException("illegal remote address: $address")
+    }
+    return InetSocketAddress(host, port)
+}

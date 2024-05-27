@@ -1,10 +1,10 @@
 package com.application.channel.core.model
 
-import com.application.channel.core.ChannelEventListener
+import com.application.channel.core.DatagramChannelEventListener
 import com.application.channel.core.InitAdapter
-import java.net.InetSocketAddress
+import com.application.channel.core.SocketChannelEventListener
+import com.application.channel.core.parseNetworkAddress
 import java.net.SocketAddress
-import java.net.URI
 
 /**
  * @author liuzhongao
@@ -13,21 +13,15 @@ import java.net.URI
 sealed interface InitConfig
 
 data class DatagramChannelInitConfig @JvmOverloads constructor(
+    val localAddress: String,
     val remoteAddress: String,
-    val maxReConnectCount: Int = Int.MAX_VALUE,
-    val channelEventListener: ChannelEventListener? = null,
+    val broadcast: Boolean = false,
+    val datagramChannelEventListener: DatagramChannelEventListener? = null,
     val initAdapter: InitAdapter? = null
 ) : InitConfig {
 
-    val socketAddress: SocketAddress by lazy {
-        val uri = URI.create(this.remoteAddress)
-        val host: String? = uri.host
-        val port = uri.port
-        if (host.isNullOrBlank() || port == -1) {
-            throw IllegalArgumentException("illegal remote address: ${this.remoteAddress}")
-        }
-        InetSocketAddress(host, port)
-    }
+    val localSocketAddress: SocketAddress by lazy { parseNetworkAddress(this.localAddress) }
+    val remoteSocketAddress: SocketAddress by lazy { parseNetworkAddress(this.localAddress) }
 }
 
 data class SocketChannelInitConfig @JvmOverloads constructor(
@@ -38,7 +32,7 @@ data class SocketChannelInitConfig @JvmOverloads constructor(
      */
     val reConnectTimeInterval: Long = 5000L,
 
-    val channelEventListener: ChannelEventListener? = null,
+    val socketChannelEventListener: SocketChannelEventListener? = null,
 
     val initAdapter: InitAdapter? = null
 ) : InitConfig {
@@ -47,15 +41,7 @@ data class SocketChannelInitConfig @JvmOverloads constructor(
 
     var isRunning: Boolean = false
 
-    val socketAddress: SocketAddress by lazy {
-        val uri = URI.create(this.remoteAddress)
-        val host: String? = uri.host
-        val port = uri.port
-        if (host.isNullOrBlank() || port == -1) {
-            throw IllegalArgumentException("illegal remote address: ${this.remoteAddress}")
-        }
-        InetSocketAddress(host, port)
-    }
+    val socketAddress: SocketAddress by lazy { parseNetworkAddress(this.remoteAddress) }
 }
 
 data class MultiInitConfig constructor(

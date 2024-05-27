@@ -3,9 +3,9 @@ package com.application.channel.core
 import com.application.channel.core.model.ChannelContext
 
 
-infix operator fun ChannelEventListener?.plus(other: ChannelEventListener?): ChannelEventListener? {
+infix operator fun SocketChannelEventListener?.plus(other: SocketChannelEventListener?): SocketChannelEventListener? {
     return if (this != null && other != null) {
-        object : ChannelEventListener {
+        object : SocketChannelEventListener {
             override fun handleValueRead(ctx: ChannelContext, value: Any?) {
                 this@plus.handleValueRead(ctx, value)
                 other.handleValueRead(ctx, value)

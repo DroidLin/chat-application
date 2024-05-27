@@ -1,5 +1,6 @@
 package com.application.channel.core.initializer
 
+import com.application.channel.core.model.DatagramChannelInitConfig
 import com.application.channel.core.model.InitConfig
 import com.application.channel.core.model.MultiInitConfig
 import com.application.channel.core.model.SocketChannelInitConfig
@@ -15,6 +16,7 @@ object ChannelInitializerFactory {
         return when (initConfig) {
             is SocketChannelInitConfig -> SocketChannelInitializer(channelGroup, initConfig)
             is MultiInitConfig -> MultiChannelInitializer(channelGroup, initConfig)
+            is DatagramChannelInitConfig -> DatagramChannelInitializer(channelGroup, initConfig)
             else -> throw IllegalArgumentException("unrecognized init config type: ${initConfig.javaClass.name}")
         }
     }

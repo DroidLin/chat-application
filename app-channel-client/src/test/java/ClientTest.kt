@@ -13,8 +13,8 @@ import com.application.channel.core.model.socketInitConfig
  */
 fun main() {
     val initConfig = socketInitConfig {
-        remoteAddress = "http://127.0.0.1:9123"
-        maxReconnectCount = 3
+        remoteAddress("http://127.0.0.1:9123")
+        maxReconnectCount(3)
         afterNewValueRead { channelContext, any ->
             println("receive data from: ${channelContext.channelRemoteAddress}, data: ${any}")
         }
@@ -43,14 +43,4 @@ fun main() {
         )
     }
 //        remoteExecutor.shutDown()
-}
-
-private class SimpleWriteResultListener : Listener {
-    override fun onSuccess() {
-        println("send message success.")
-    }
-
-    override fun onFailure(cause: Throwable) {
-        println("failure sending message.")
-    }
 }

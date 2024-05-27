@@ -6,7 +6,7 @@ import com.application.channel.core.model.ChannelContext
  * @author liuzhongao
  * @since 2024/5/15 23:45
  */
-interface ChannelEventListener {
+interface SocketChannelEventListener {
 
     fun handleConnectionEstablished(ctx: ChannelContext) {}
 

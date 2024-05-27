@@ -1,16 +1,16 @@
 package com.application.channel.core.server
 
 import com.application.channel.core.initializer.ChannelInitializerFactory
-import com.application.channel.core.model.InitConfig
-import com.application.channel.core.model.MultiInitConfig
-import com.application.channel.core.model.SocketChannelInitConfig
+import com.application.channel.core.model.*
+import io.netty.bootstrap.AbstractBootstrap
+import io.netty.bootstrap.Bootstrap
 import io.netty.bootstrap.ServerBootstrap
-import io.netty.channel.ChannelOption
+import io.netty.channel.ChannelFuture
 import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.channel.nio.NioEventLoopGroup
-import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.util.concurrent.GlobalEventExecutor
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 /**
@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit
 internal class AppServer(private val initConfig: InitConfig) {
 
     private val _channelGroup = DefaultChannelGroup(GlobalEventExecutor.INSTANCE)
+    private val _initConfigFutureMap = ConcurrentHashMap<InitConfig, ChannelFuture>()
 
     private val _serverBootstrap = ServerBootstrap()
     private val _parentEventLoop = NioEventLoopGroup()
@@ -29,19 +30,25 @@ internal class AppServer(private val initConfig: InitConfig) {
 
     init {
         this._serverBootstrap.group(this._parentEventLoop, this._childEventLoop)
-            .channel(NioServerSocketChannel::class.java)
-            .option(ChannelOption.SO_BACKLOG, 128)
-            .childOption(ChannelOption.SO_KEEPALIVE, true)
     }
 
-    fun run() {
-        ChannelInitializerFactory.create(this._channelGroup, this.initConfig)
-            .initialize(this._serverBootstrap) { serverBootstrap, initConfig ->
-                if (initConfig is SocketChannelInitConfig) {
-                    val socketAddress = initConfig.socketAddress
-                    serverBootstrap.bind(socketAddress).sync()
-                }
+    fun run() = this.run(this.initConfig)
+
+    fun run(initConfig: InitConfig) {
+        val initFunction = { bootstrap: AbstractBootstrap<*, *>, _initConfig: InitConfig ->
+            if (_initConfig is SocketChannelInitConfig) {
+                val socketAddress = _initConfig.socketAddress
+                val channelFuture = bootstrap.bind(socketAddress).sync()
+                this._initConfigFutureMap[_initConfig] = channelFuture
+            } else if (_initConfig is DatagramChannelInitConfig) {
+                val socketAddress = _initConfig.localSocketAddress
+                val channelFuture = bootstrap.localAddress(socketAddress).bind().sync()
+                this._initConfigFutureMap[initConfig] = channelFuture
             }
+        }
+        ChannelInitializerFactory.create(this._channelGroup, initConfig)
+            .also { initializer -> initializer.initialize(ServerBootstrap().group(this._parentEventLoop, this._childEventLoop), initFunction) }
+            .also { initializer -> initializer.initialize(Bootstrap().group(this._parentEventLoop), initFunction) }
     }
 
     fun scheduleInEventLoop(job: () -> Unit) {
@@ -53,5 +60,9 @@ internal class AppServer(private val initConfig: InitConfig) {
         this._childEventLoop.shutdownGracefully()
         this._channelGroup.close().sync()
         this._channelGroup.clear()
+    }
+
+    fun shutDown(initConfig: InitConfig) {
+        this._initConfigFutureMap.remove(initConfig)?.channel()?.close()?.sync()
     }
 }
