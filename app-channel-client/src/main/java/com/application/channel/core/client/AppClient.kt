@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
  * @author liuzhongao
  * @since 2024/5/10 00:32
  */
-internal class AppClient(private val initConfig: InitConfig) {
+internal class AppClient {
 
     private val _channelGroup = DefaultChannelGroup(GlobalEventExecutor.INSTANCE)
 
@@ -30,8 +30,6 @@ internal class AppClient(private val initConfig: InitConfig) {
     init {
         this.bootstrap.group(this.eventLoop)
     }
-
-    fun run(doOnConnected: (InitConfig) -> Unit) = this.run(this.initConfig, doOnConnected)
 
     fun run(initConfig: InitConfig, doOnConnected: (InitConfig) -> Unit) {
         val initFunction =  { bootstrap: Bootstrap, _initConfig: InitConfig ->
@@ -63,8 +61,7 @@ internal class AppClient(private val initConfig: InitConfig) {
                         }
                     }
                 }
-                bootstrap.bind()
-                    .addListener(channelFutureListener)
+                bootstrap.bind().addListener(channelFutureListener)
             }
             Unit
         }

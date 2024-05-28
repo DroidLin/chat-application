@@ -20,8 +20,8 @@ data class DatagramChannelInitConfig @JvmOverloads constructor(
     val initAdapter: InitAdapter? = null
 ) : InitConfig {
 
-    val localSocketAddress: SocketAddress by lazy { parseNetworkAddress(this.localAddress) }
-    val remoteSocketAddress: SocketAddress by lazy { parseNetworkAddress(this.localAddress) }
+    val localSocketAddress: SocketAddress? by lazy { parseNetworkAddress(this.localAddress) }
+    val remoteSocketAddress: SocketAddress? by lazy { parseNetworkAddress(this.remoteAddress) }
 }
 
 data class SocketChannelInitConfig @JvmOverloads constructor(
@@ -41,7 +41,7 @@ data class SocketChannelInitConfig @JvmOverloads constructor(
 
     var isRunning: Boolean = false
 
-    val socketAddress: SocketAddress by lazy { parseNetworkAddress(this.remoteAddress) }
+    val socketAddress: SocketAddress? by lazy { parseNetworkAddress(this.remoteAddress) }
 }
 
 data class MultiInitConfig constructor(

@@ -13,58 +13,73 @@ import java.io.ByteArrayOutputStream
 
 private const val FLAG_MESSAGE_BYTE_ARRAY = 0x10101
 
+val ByteArray.byteBuf: ByteBuf
+    get() = Unpooled.buffer().also { byteBuf ->
+        byteBuf.writeInt(FLAG_MESSAGE_BYTE_ARRAY)
+        byteBuf.writeInt(this.size)
+        byteBuf.writeBytes(this)
+    }
+
 class ByteArrayToByteBufEncoder : DataTransformEncoder<ByteArray, ByteBuf>() {
     override fun encode(msg: ByteArray, out: MutableList<ByteBuf>) {
-        out += Unpooled.buffer().also { byteBuf ->
-            byteBuf.writeInt(FLAG_MESSAGE_BYTE_ARRAY)
-            byteBuf.writeInt(msg.size)
-            byteBuf.writeBytes(msg)
-        }
+        out += msg.byteBuf
     }
 }
 
-class ByteBufToByteArrayDecoder : DataTransformDecoder<ByteBuf, ByteArray>() {
-    private val _byteArrayOutputStream = ByteArrayOutputStream()
+private val threadLocalOutputStream = object : ThreadLocal<ByteArrayOutputStream>() {
+    override fun initialValue(): ByteArrayOutputStream = ByteArrayOutputStream()
+}
 
-    override fun decode(msg: ByteBuf, out: MutableList<ByteArray>) {
-        while (msg.isReadable) {
+val ByteBuf.byteArray: ByteArray?
+    get() {
+        var byteArray: ByteArray? = null
+        val outputStream: ByteArrayOutputStream = threadLocalOutputStream.get()
+        while (this.isReadable) {
             var shouldResetReaderIndex = false
-            val readerIndex = msg.readerIndex()
-            val dataType = msg.withAvailableCount(Int.SIZE_BYTES) { this.readInt() }
+            val readerIndex = this.readerIndex()
+            val dataType = this.withAvailableCount(Int.SIZE_BYTES) { this.readInt() }
             if (dataType != FLAG_MESSAGE_BYTE_ARRAY) {
-                msg.readerIndex(readerIndex)
+                this.readerIndex(readerIndex)
                 break
             }
-            val dataCount = msg.withAvailableCount(Int.SIZE_BYTES) { this.readInt() }
+            val dataCount = this.withAvailableCount(Int.SIZE_BYTES) { this.readInt() }
             if (dataCount != null) {
-                val byteArray = msg.withAvailableCount(dataCount) {
-                    this@ByteBufToByteArrayDecoder._byteArrayOutputStream.reset()
-                    this@ByteBufToByteArrayDecoder._byteArrayOutputStream.use { outputStream ->
+                val _byteArray = this.withAvailableCount(dataCount) {
+                    outputStream.reset()
+                    outputStream.use { outputStream ->
                         for (index in 0 until dataCount) {
                             outputStream.write(this.readByte().toInt())
                         }
                         outputStream.toByteArray()
                     }
                 }
-                if (byteArray != null) {
-                    out += byteArray
+                if (_byteArray != null) {
+                    byteArray = _byteArray
                 } else shouldResetReaderIndex = true
             } else shouldResetReaderIndex = true
 
             if (shouldResetReaderIndex) {
-                msg.readerIndex(readerIndex)
+                this.readerIndex(readerIndex)
             }
         }
+        return byteArray
     }
 
-    private inline fun <T : Any> ByteBuf.withAvailableCount(count: Int, function: ByteBuf.() -> T): T? {
-        this.markReaderIndex()
-        val readableCount = this.readableBytes()
-        if (readableCount >= count) {
-            return function()
-        }
-        this.resetReaderIndex()
-        return null
-    }
+class ByteBufToByteArrayDecoder : DataTransformDecoder<ByteBuf, ByteArray>() {
 
+    override fun decode(msg: ByteBuf, out: MutableList<ByteArray>) {
+        val byteArray = msg.byteArray ?: return
+        out += byteArray
+    }
+}
+
+
+private inline fun <T : Any> ByteBuf.withAvailableCount(count: Int, function: ByteBuf.() -> T): T? {
+    this.markReaderIndex()
+    val readableCount = this.readableBytes()
+    if (readableCount >= count) {
+        return function()
+    }
+    this.resetReaderIndex()
+    return null
 }

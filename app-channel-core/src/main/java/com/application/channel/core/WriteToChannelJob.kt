@@ -1,5 +1,6 @@
 package com.application.channel.core
 
+import com.application.channel.core.model.Writable
 import com.application.channel.core.model.channelContext
 import io.netty.channel.Channel
 import io.netty.channel.group.ChannelGroup
@@ -13,7 +14,7 @@ import io.netty.channel.group.ChannelMatcher
  */
 class WriteToChannelJob(
     private val channelGroup: ChannelGroup,
-    private val value: Any?,
+    private val value: Writable,
     private val channelMatcher: ChannelContextMatcher,
     private val listener: Listener?
 ) : Runnable {

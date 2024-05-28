@@ -22,21 +22,16 @@ internal class AppServer(private val initConfig: InitConfig) {
     private val _channelGroup = DefaultChannelGroup(GlobalEventExecutor.INSTANCE)
     private val _initConfigFutureMap = ConcurrentHashMap<InitConfig, ChannelFuture>()
 
-    private val _serverBootstrap = ServerBootstrap()
     private val _parentEventLoop = NioEventLoopGroup()
     private val _childEventLoop = NioEventLoopGroup()
 
     val channelGroup: ChannelGroup get() = this._channelGroup
 
-    init {
-        this._serverBootstrap.group(this._parentEventLoop, this._childEventLoop)
-    }
-
     fun run() = this.run(this.initConfig)
 
     fun run(initConfig: InitConfig) {
         val initFunction = { bootstrap: AbstractBootstrap<*, *>, _initConfig: InitConfig ->
-            if (_initConfig is SocketChannelInitConfig) {
+            if (_initConfig is SocketChannelInitConfig && bootstrap is ServerBootstrap) {
                 val socketAddress = _initConfig.socketAddress
                 val channelFuture = bootstrap.bind(socketAddress).sync()
                 this._initConfigFutureMap[_initConfig] = channelFuture

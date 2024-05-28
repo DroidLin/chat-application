@@ -4,52 +4,46 @@ import com.application.channel.core.ChannelContextMatcher
 import com.application.channel.core.Listener
 import com.application.channel.core.WriteToChannelJob
 import com.application.channel.core.model.InitConfig
+import com.application.channel.core.model.Writable
 
 /**
  * @author liuzhongao
  * @since 2024/5/11 01:06
  */
 
-fun ChatClient(initConfig: InitConfig): ChatClient = ChatClientImpl(initConfig)
+fun ChatClient(): ChatClient = ChatClientImpl()
 
 interface ChatClient {
 
-    val initConfig: InitConfig
-
-    fun start(doOnConnected: (InitConfig) -> Unit)
-    fun triggerReconnect(initConfig: InitConfig, doOnConnected: (InitConfig) -> Unit)
-    fun writeValue(value: Any?)
-    fun writeValue(value: Any?, listener: Listener?)
-    fun writeValue(value: Any?, channelContextMatcher: ChannelContextMatcher)
-    fun writeValue(value: Any?, channelContextMatcher: ChannelContextMatcher, listener: Listener?)
+    fun start(initConfig: InitConfig, doOnConnected: (InitConfig) -> Unit)
+    fun writeValue(value: Writable)
+    fun writeValue(value: Writable, listener: Listener?)
+    fun writeValue(value: Writable, channelContextMatcher: ChannelContextMatcher)
+    fun writeValue(value: Writable, channelContextMatcher: ChannelContextMatcher, listener: Listener?)
     fun shutDown()
 }
 
-private class ChatClientImpl(override val initConfig: InitConfig) : ChatClient {
+private class ChatClientImpl : ChatClient {
 
-    private val _clientApp: AppClient = AppClient(this.initConfig)
+    private val _clientApp: AppClient = AppClient()
 
-    override fun start(doOnConnected: (InitConfig) -> Unit) {
-        this._clientApp.run(doOnConnected)
-    }
-
-    override fun triggerReconnect(initConfig: InitConfig, doOnConnected: (InitConfig) -> Unit) {
+    override fun start(initConfig: InitConfig, doOnConnected: (InitConfig) -> Unit) {
         this._clientApp.run(initConfig, doOnConnected)
     }
 
-    override fun writeValue(value: Any?) {
+    override fun writeValue(value: Writable) {
         this.writeValue(value, ChannelContextMatcher.all())
     }
 
-    override fun writeValue(value: Any?, listener: Listener?) {
+    override fun writeValue(value: Writable, listener: Listener?) {
         this.writeValue(value, ChannelContextMatcher.all(), listener)
     }
 
-    override fun writeValue(value: Any?, channelContextMatcher: ChannelContextMatcher) {
+    override fun writeValue(value: Writable, channelContextMatcher: ChannelContextMatcher) {
         this.writeValue(value, channelContextMatcher, null)
     }
 
-    override fun writeValue(value: Any?, channelContextMatcher: ChannelContextMatcher, listener: Listener?) {
+    override fun writeValue(value: Writable, channelContextMatcher: ChannelContextMatcher, listener: Listener?) {
         val writeToChannelJob = WriteToChannelJob(
             channelGroup = this._clientApp.channelGroup,
             value = value,

@@ -1,11 +1,13 @@
 import com.application.channel.core.ChannelContextMatcher
-import com.application.channel.core.Listener
 import com.application.channel.core.client.ChatClient
 import com.application.channel.core.handler.encoder.ByteArrayToStringDecoder
 import com.application.channel.core.handler.encoder.ByteArrayToByteBufEncoder
 import com.application.channel.core.handler.encoder.StringToByteArrayEncoder
 import com.application.channel.core.handler.encoder.ByteBufToByteArrayDecoder
+import com.application.channel.core.model.ByteArrayWritable
 import com.application.channel.core.model.socketInitConfig
+import io.netty.channel.ChannelHandlerContext
+import io.netty.handler.codec.MessageToMessageEncoder
 
 /**
  * @author liuzhongao
@@ -22,20 +24,30 @@ fun main() {
             throwable?.printStackTrace()
         }
         initAdapter {
-            encoderFactories(
-                ByteArrayToByteBufEncoder(),
-                StringToByteArrayEncoder()
-            )
-            decoderFactories(
-                ByteBufToByteArrayDecoder(),
-                ByteArrayToStringDecoder(),
-            )
+            encoderFactories {
+                arrayOf(
+                    ByteArrayToByteBufEncoder(),
+                    StringToByteArrayEncoder(),
+                    object : MessageToMessageEncoder<ByteArrayWritable>() {
+                        override fun encode(ctx: ChannelHandlerContext?, msg: ByteArrayWritable?, out: MutableList<Any>?) {
+                            if(ctx == null || msg == null || out == null) return
+                            out += msg.value
+                        }
+                    }
+                )
+            }
+            decoderFactories {
+                arrayOf(
+                    ByteBufToByteArrayDecoder(),
+                    ByteArrayToStringDecoder(),
+                )
+            }
         }
     }
-    val chatClient = ChatClient(initConfig)
-    chatClient.start {
+    val chatClient = ChatClient()
+    chatClient.start(initConfig) {
         chatClient.writeValue(
-            value = "Hello World!".toByteArray(),
+            value = ByteArrayWritable("Hello World!".toByteArray()),
             channelContextMatcher = ChannelContextMatcher { channelContext ->
                 channelContext.channelRemoteAddress == initConfig.socketAddress
             },

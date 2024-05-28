@@ -20,17 +20,23 @@ fun main() {
             println("receive data from: ${channelContext.channelRemoteAddress}, data: $any")
         }
         initAdapter {
-            encoderFactories(
-                StringToByteArrayEncoder(),
-                ByteArrayToByteBufEncoder()
-            )
-            decoderFactories(
-                ByteBufToByteArrayDecoder(),
-                ByteArrayToStringDecoder()
-            )
-            handlerFactories(
-                StringDataHandler(this@socketInitConfig.socketChannelEventListener)
-            )
+            encoderFactories {
+                arrayOf(
+                    StringToByteArrayEncoder(),
+                    ByteArrayToByteBufEncoder()
+                )
+            }
+            decoderFactories {
+                arrayOf(
+                    ByteBufToByteArrayDecoder(),
+                    ByteArrayToStringDecoder()
+                )
+            }
+            handlerFactories {
+                arrayOf(
+                    StringDataHandler(this@socketInitConfig.socketChannelEventListener)
+                )
+            }
         }
     }
     val chatServer = ChatServer(initConfig)

@@ -1,7 +1,5 @@
-import com.application.channel.core.handler.encoder.ByteArrayToByteBufEncoder
-import com.application.channel.core.handler.encoder.ByteArrayToStringDecoder
-import com.application.channel.core.handler.encoder.ByteBufToByteArrayDecoder
-import com.application.channel.core.handler.encoder.StringToByteArrayEncoder
+import com.application.channel.core.handler.encoder.*
+import com.application.channel.core.model.DatagramWritable
 import com.application.channel.core.model.channelContext
 import com.application.channel.core.model.datagramInitConfig
 import com.application.channel.core.server.ChatServer
@@ -20,7 +18,8 @@ import java.net.InetSocketAddress
  */
 fun main() {
     val initConfig = datagramInitConfig {
-        localAddress("http://127.0.0.1:9123")
+        localAddress("http://0.0.0.0:9123")
+        broadcast(true)
         afterNewValueRead { channelContext, any ->
             println("receive data from: ${channelContext.channelRemoteAddress}, data: ${any}")
         }
@@ -28,40 +27,39 @@ fun main() {
             throwable?.printStackTrace()
         }
         initAdapter {
-            encoderFactories(
-                DatagramPacketEncoder<ByteBuf>(
-                    object : MessageToMessageEncoder<ByteBuf>() {
-                        override fun encode(ctx: ChannelHandlerContext?, msg: ByteBuf?, out: MutableList<Any>?) {
-                            if (ctx == null || msg == null || out == null) return
-                            out += msg.copy()
+            encoderFactories {
+                arrayOf(
+                    DatagramPacketEncoder(
+                        object : MessageToMessageEncoder<DatagramWritable>() {
+                            override fun encode(ctx: ChannelHandlerContext?, msg: DatagramWritable?, out: MutableList<Any>?) {
+                                if (ctx == null || msg == null || out == null) return
+                                out += msg.value.byteBuf
+                            }
+                        }
+                    ),
+                    DatagramWritableToByteArrayEncoder()
+                )
+            }
+            decoderFactories {
+                arrayOf(
+                    DatagramPacketDecoder(ByteBufToByteArrayDecoder()),
+                    ByteArrayToStringDecoder(),
+                )
+            }
+            handlerFactories {
+                arrayOf(
+                    object : SimpleChannelInboundHandler<String>() {
+                        override fun channelRead0(ctx: ChannelHandlerContext?, msg: String?) {
+                            if (ctx == null || msg == null) return
+
+                            val channelContext = ctx.channel().channelContext
+                            println("receive: $msg from: ${channelContext}")
+
+                            ctx.channel().writeAndFlush(DatagramWritable("Hello Client!".toByteArray(), "255.255.255.255", 9124))
                         }
                     }
-                ),
-                object : MessageToMessageEncoder<ByteBuf>() {
-                    override fun encode(ctx: ChannelHandlerContext?, msg: ByteBuf?, out: MutableList<Any>?) {
-                        if (ctx == null || msg == null || out == null) return
-                        out += DatagramPacket(msg.copy(), InetSocketAddress("255.255.255.255", 9124))
-                    }
-                },
-                ByteArrayToByteBufEncoder(),
-                StringToByteArrayEncoder()
-            )
-            decoderFactories(
-                DatagramPacketDecoder(ByteBufToByteArrayDecoder()),
-                ByteArrayToStringDecoder(),
-            )
-            handlerFactories(
-                object : SimpleChannelInboundHandler<String>() {
-                    override fun channelRead0(ctx: ChannelHandlerContext?, msg: String?) {
-                        if (ctx == null || msg == null) return
-
-                        val channelContext = ctx.channel().channelContext
-                        println("receive: $msg from: ${channelContext}")
-
-                        ctx.channel().writeAndFlush("Hello Client!")
-                    }
-                }
-            )
+                )
+            }
         }
     }
     val chatClient = ChatServer(initConfig)

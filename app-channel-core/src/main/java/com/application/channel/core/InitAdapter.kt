@@ -35,16 +35,16 @@ class InitialAdapterBuilder internal constructor() {
 
     private var dataHandlerFactory: Factory<Array<ChannelHandler>?> = Factory { null }
 
-    fun encoderFactories(vararg encoder: MessageToMessageEncoder<*>) {
-        this.dataTransformEncoderFactory = Factory { encoder as Array<MessageToMessageEncoder<*>>? }
+    fun encoderFactories(function: Factory<Array<MessageToMessageEncoder<*>>?>) {
+        this.dataTransformEncoderFactory = function
     }
 
-    fun decoderFactories(vararg decoder: MessageToMessageDecoder<*>) {
-        this.dataTransformDecoderFactory = Factory { decoder as Array<MessageToMessageDecoder<*>>? }
+    fun decoderFactories(function: Factory<Array<MessageToMessageDecoder<*>>?>) {
+        this.dataTransformDecoderFactory = function
     }
 
-    fun handlerFactories(vararg handler: ChannelHandler) {
-        this.dataHandlerFactory = Factory { handler as Array<ChannelHandler>? }
+    fun handlerFactories(function: Factory<Array<ChannelHandler>?>) {
+        this.dataHandlerFactory = function
     }
 
     fun build(): InitAdapter {

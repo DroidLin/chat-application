@@ -106,8 +106,8 @@ fun datagramInitConfig(function: DatagramInitScope.() -> Unit): DatagramChannelI
 
 class DatagramInitScope internal constructor() {
 
-    private lateinit var localAddress: String
-    private lateinit var remoteAddress: String
+    private var localAddress: String = ""
+    private var remoteAddress: String = ""
     private var initAdapter: InitAdapter? = null
     private var broadcast: Boolean = false
 

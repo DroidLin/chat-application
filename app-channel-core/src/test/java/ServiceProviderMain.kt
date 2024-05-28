@@ -2,12 +2,14 @@ import com.application.channel.core.handler.encoder.ByteArrayToByteBufEncoder
 import com.application.channel.core.handler.encoder.ByteArrayToStringDecoder
 import com.application.channel.core.handler.encoder.ByteBufToByteArrayDecoder
 import com.application.channel.core.handler.encoder.StringToByteArrayEncoder
+import com.application.channel.core.model.DatagramWritable
 import com.application.channel.core.model.channelContext
 import io.netty.bootstrap.Bootstrap
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
+import io.netty.channel.DefaultAddressedEnvelope
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.DatagramChannel
@@ -32,9 +34,9 @@ fun main() {
                 override fun initChannel(ch: DatagramChannel?) {
                     val pipeline = ch?.pipeline() ?: return
                     pipeline.addLast(
-                        DatagramPacketEncoder<ByteBuf>(
-                            object : MessageToMessageEncoder<ByteBuf>() {
-                                override fun encode(ctx: ChannelHandlerContext?, msg: ByteBuf?, out: MutableList<Any>?) {
+                        DatagramPacketEncoder<DatagramWritable>(
+                            object : MessageToMessageEncoder<DatagramWritable>() {
+                                override fun encode(ctx: ChannelHandlerContext?, msg: DatagramWritable?, out: MutableList<Any>?) {
                                     if (ctx == null || msg == null || out == null) return
                                     out += msg.copy()
                                 }

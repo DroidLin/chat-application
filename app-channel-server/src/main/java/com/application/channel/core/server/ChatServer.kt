@@ -4,6 +4,7 @@ import com.application.channel.core.ChannelContextMatcher
 import com.application.channel.core.Listener
 import com.application.channel.core.WriteToChannelJob
 import com.application.channel.core.model.InitConfig
+import com.application.channel.core.model.Writable
 
 /**
  * @author liuzhongao
@@ -19,11 +20,11 @@ interface ChatServer {
 
     fun triggerReconnect(initConfig: InitConfig)
 
-    fun write(value: Any?)
+    fun write(value: Writable)
 
-    fun write(value: Any?, matcher: ChannelContextMatcher)
+    fun write(value: Writable, matcher: ChannelContextMatcher)
 
-    fun write(value: Any?, matcher: ChannelContextMatcher, listener: Listener?)
+    fun write(value: Writable, matcher: ChannelContextMatcher, listener: Listener?)
 
     fun shutDown()
 
@@ -43,15 +44,15 @@ private class ChatServerImpl(override val initConfig: InitConfig) : ChatServer {
         this.appServer.run(initConfig)
     }
 
-    override fun write(value: Any?) {
+    override fun write(value: Writable) {
         this.write(value, ChannelContextMatcher.all())
     }
 
-    override fun write(value: Any?, matcher: ChannelContextMatcher) {
+    override fun write(value: Writable, matcher: ChannelContextMatcher) {
         this.write(value, matcher, null)
     }
 
-    override fun write(value: Any?, matcher: ChannelContextMatcher, listener: Listener?) {
+    override fun write(value: Writable, matcher: ChannelContextMatcher, listener: Listener?) {
         val writeToChannelJob = WriteToChannelJob(
             channelGroup = this.appServer.channelGroup,
             value = value,
