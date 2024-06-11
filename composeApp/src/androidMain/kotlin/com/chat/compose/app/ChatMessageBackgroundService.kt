@@ -18,6 +18,7 @@ class ChatMessageBackgroundService : Service() {
     private val userSessionId = "liuzhongao"
     private val chatService = ChatService(
         initConfig = ChatServiceInitConfig(
+            remoteAddress = "",
             messageDatabase = AppMessageDatabase(
                 context = this,
                 sessionId = this.userSessionId
