@@ -25,7 +25,7 @@ data class DatagramChannelInitConfig @JvmOverloads constructor(
 }
 
 data class SocketChannelInitConfig @JvmOverloads constructor(
-    val remoteAddress: String,
+    val address: String,
     val maxReConnectCount: Int = Int.MAX_VALUE,
     /**
      * interval between failure and next reconnect.
@@ -41,7 +41,7 @@ data class SocketChannelInitConfig @JvmOverloads constructor(
 
     var isRunning: Boolean = false
 
-    val socketAddress: SocketAddress? by lazy { parseNetworkAddress(this.remoteAddress) }
+    val socketAddress: SocketAddress? by lazy { parseNetworkAddress(this.address) }
 }
 
 data class MultiInitConfig constructor(

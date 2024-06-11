@@ -1,10 +1,11 @@
 import com.application.channel.core.ChannelContextMatcher
-import com.application.channel.core.client.ChatClient
+import com.application.channel.core.client.ChannelClient
 import com.application.channel.core.handler.encoder.ByteArrayToStringDecoder
 import com.application.channel.core.handler.encoder.ByteArrayToByteBufEncoder
 import com.application.channel.core.handler.encoder.StringToByteArrayEncoder
 import com.application.channel.core.handler.encoder.ByteBufToByteArrayDecoder
 import com.application.channel.core.model.ByteArrayWritable
+import com.application.channel.core.model.StringWritable
 import com.application.channel.core.model.socketInitConfig
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageEncoder
@@ -15,7 +16,7 @@ import io.netty.handler.codec.MessageToMessageEncoder
  */
 fun main() {
     val initConfig = socketInitConfig {
-        remoteAddress("http://127.0.0.1:9123")
+        address("http://127.0.0.1:8325")
         maxReconnectCount(3)
         afterNewValueRead { channelContext, any ->
             println("receive data from: ${channelContext.channelRemoteAddress}, data: ${any}")
@@ -25,7 +26,7 @@ fun main() {
         }
         initAdapter {
             encoderFactories {
-                arrayOf(
+                listOf(
                     ByteArrayToByteBufEncoder(),
                     StringToByteArrayEncoder(),
                     object : MessageToMessageEncoder<ByteArrayWritable>() {
@@ -33,21 +34,27 @@ fun main() {
                             if(ctx == null || msg == null || out == null) return
                             out += msg.value
                         }
+                    },
+                    object : MessageToMessageEncoder<StringWritable>() {
+                        override fun encode(ctx: ChannelHandlerContext?, msg: StringWritable?, out: MutableList<Any>?) {
+                            if(ctx == null || msg == null || out == null) return
+                            out += msg.value
+                        }
                     }
                 )
             }
             decoderFactories {
-                arrayOf(
+                listOf(
                     ByteBufToByteArrayDecoder(),
                     ByteArrayToStringDecoder(),
                 )
             }
         }
     }
-    val chatClient = ChatClient()
+    val chatClient = ChannelClient()
     chatClient.start(initConfig) {
         chatClient.writeValue(
-            value = ByteArrayWritable("Hello World!".toByteArray()),
+            value = StringWritable("Hello World!"),
             channelContextMatcher = ChannelContextMatcher { channelContext ->
                 channelContext.channelRemoteAddress == initConfig.socketAddress
             },

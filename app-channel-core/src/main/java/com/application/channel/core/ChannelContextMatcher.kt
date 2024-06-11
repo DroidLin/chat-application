@@ -11,7 +11,7 @@ fun interface ChannelContextMatcher {
     fun match(channelContext: ChannelContext): Boolean
 
     companion object {
-        @JvmStatic
-        fun all(): ChannelContextMatcher = ChannelContextMatcher { true }
+        @JvmField
+        val all = ChannelContextMatcher { true }
     }
 }

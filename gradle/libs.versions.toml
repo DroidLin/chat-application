@@ -1,0 +1,45 @@
+[versions]
+agp = "8.1.1"
+kotlinVersion = "1.9.0"
+roomVersion = "2.7.0-alpha03"
+kspVersion = "1.9.0-1.0.13"
+compose-plugin = "1.6.0"
+dagger-version = "2.51.1"
+netty-version = "4.1.108.Final"
+sqlite-budnel-version = "2.5.0-alpha03"
+org-json-version = "20240303"
+compose = "1.6.2"
+androidx-activityCompose = "1.8.2"
+activityKtx = "1.9.0"
+paging-version = "3.3.0"
+
+[libraries]
+dagger-runtime = { group = "com.google.dagger", name = "dagger", version.ref = "dagger-version" }
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger-version" }
+netty-all = { group = "io.netty", name = "netty-all", version.ref = "netty-version" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomVersion" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
+androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "roomVersion" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
+androidx-sqlite = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite-budnel-version" }
+org-json = { group = "org.json", name = "json", version.ref = "org-json-version" }
+androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "paging-version" }
+androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging-version" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging-version" }
+
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
+
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+roomGradlePlugin = { id = "androidx.room", version.ref = "roomVersion" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlinVersion" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

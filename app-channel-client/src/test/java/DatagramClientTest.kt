@@ -1,18 +1,13 @@
-import com.application.channel.core.ChannelContextMatcher
-import com.application.channel.core.client.ChatClient
+import com.application.channel.core.client.ChannelClient
 import com.application.channel.core.handler.encoder.*
 import com.application.channel.core.model.DatagramWritable
 import com.application.channel.core.model.channelContext
 import com.application.channel.core.model.datagramInitConfig
-import io.netty.buffer.ByteBuf
-import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
-import io.netty.channel.socket.DatagramPacket
 import io.netty.handler.codec.DatagramPacketDecoder
 import io.netty.handler.codec.DatagramPacketEncoder
 import io.netty.handler.codec.MessageToMessageEncoder
-import java.net.InetSocketAddress
 
 /**
  * @author liuzhongao
@@ -31,7 +26,7 @@ fun main() {
         }
         initAdapter {
             encoderFactories {
-                arrayOf(
+                listOf(
                     DatagramPacketEncoder(
                         object : MessageToMessageEncoder<DatagramWritable>() {
                             override fun encode(ctx: ChannelHandlerContext?, msg: DatagramWritable?, out: MutableList<Any>?) {
@@ -44,13 +39,13 @@ fun main() {
                 )
             }
             decoderFactories {
-                arrayOf(
+                listOf(
                     DatagramPacketDecoder(ByteBufToByteArrayDecoder()),
                     ByteArrayToStringDecoder(),
                 )
             }
             handlerFactories {
-                arrayOf(
+                listOf(
                     object : SimpleChannelInboundHandler<String>() {
                         override fun channelRead0(ctx: ChannelHandlerContext?, msg: String?) {
                             if (ctx == null || msg == null) return
@@ -65,7 +60,7 @@ fun main() {
             }
         }
     }
-    val chatClient = ChatClient()
+    val chatClient = ChannelClient()
     chatClient.start(initConfig) {
         chatClient.writeValue(
             value = DatagramWritable(

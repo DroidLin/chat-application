@@ -12,13 +12,17 @@
             <option value="$PROJECT_DIR$/android-only-module" />
             <option value="$PROJECT_DIR$/app-channel-client" />
             <option value="$PROJECT_DIR$/app-channel-core" />
-            <option value="$PROJECT_DIR$/app-channel-message" />
+            <option value="$PROJECT_DIR$/app-channel-database" />
+            <option value="$PROJECT_DIR$/app-channel-im" />
+            <option value="$PROJECT_DIR$/app-channel-message-client" />
+            <option value="$PROJECT_DIR$/app-channel-message-core" />
+            <option value="$PROJECT_DIR$/app-channel-message-server" />
             <option value="$PROJECT_DIR$/app-channel-server" />
+            <option value="$PROJECT_DIR$/composeApp" />
             <option value="$PROJECT_DIR$/jvm-only-module" />
             <option value="$PROJECT_DIR$/multiplatform-module" />
           </set>
         </option>
-        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

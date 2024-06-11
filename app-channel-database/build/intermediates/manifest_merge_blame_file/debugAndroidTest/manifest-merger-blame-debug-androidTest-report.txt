@@ -1,0 +1,45 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.android.dependencies.channel.database.android.test" >
+4
+5    <uses-sdk
+5-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:5:5-74
+6        android:minSdkVersion="21"
+6-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:5:15-41
+7        android:targetSdkVersion="34" />
+7-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:5:42-71
+8
+9    <instrumentation
+9-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:11:5-15:104
+10        android:name="android.test.InstrumentationTestRunner"
+10-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:11:22-75
+11        android:functionalTest="false"
+11-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:14:22-52
+12        android:handleProfiling="false"
+12-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:13:22-53
+13        android:label="Tests for com.android.dependencies.channel.database.android.test"
+13-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:15:22-102
+14        android:targetPackage="com.android.dependencies.channel.database.android.test" />
+14-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:12:22-100
+15
+16    <application
+16-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:7:5-9:19
+17        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+17-->[androidx.core:core:1.7.0] /Users/liuzhongao/.gradle/caches/transforms-3/1a8cad34cb357cdaf98b2f3068a079c2/transformed/core-1.7.0/AndroidManifest.xml:24:18-86
+18        android:debuggable="true"
+19        android:extractNativeLibs="true" >
+20        <uses-library android:name="android.test.runner" />
+20-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:8:9-60
+20-->/Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest10925236071125454793.xml:8:23-57
+21
+22        <service
+22-->[androidx.room:room-runtime-android:2.7.0-alpha03] /Users/liuzhongao/.gradle/caches/transforms-3/09f0f3324ae343b6a491304b48b79998/transformed/room-runtime-release/AndroidManifest.xml:24:9-28:63
+23            android:name="androidx.room.MultiInstanceInvalidationService"
+23-->[androidx.room:room-runtime-android:2.7.0-alpha03] /Users/liuzhongao/.gradle/caches/transforms-3/09f0f3324ae343b6a491304b48b79998/transformed/room-runtime-release/AndroidManifest.xml:25:13-74
+24            android:directBootAware="true"
+24-->[androidx.room:room-runtime-android:2.7.0-alpha03] /Users/liuzhongao/.gradle/caches/transforms-3/09f0f3324ae343b6a491304b48b79998/transformed/room-runtime-release/AndroidManifest.xml:26:13-43
+25            android:exported="false" />
+25-->[androidx.room:room-runtime-android:2.7.0-alpha03] /Users/liuzhongao/.gradle/caches/transforms-3/09f0f3324ae343b6a491304b48b79998/transformed/room-runtime-release/AndroidManifest.xml:27:13-37
+26    </application>
+27
+28</manifest>

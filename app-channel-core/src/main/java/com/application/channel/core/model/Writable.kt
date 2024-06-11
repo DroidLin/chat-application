@@ -38,5 +38,6 @@ data class ByteArrayWritable(val value: ByteArray) : Writable {
     override fun hashCode(): Int {
         return value.contentHashCode()
     }
-
 }
+
+data class StringWritable(val value: String) : Writable

@@ -8,6 +8,7 @@ import io.netty.bootstrap.AbstractBootstrap
 import io.netty.bootstrap.Bootstrap
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelOption
+import io.netty.channel.WriteBufferWaterMark
 import io.netty.channel.group.ChannelGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
@@ -35,10 +36,18 @@ class SocketChannelInitializer(
                 .handler(channelInitializer)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000)
                 .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.SO_REUSEADDR, true)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.SO_SNDBUF, 4096)
+                .option(ChannelOption.SO_RCVBUF, 4096)
+                .option(ChannelOption.WRITE_BUFFER_WATER_MARK, WriteBufferWaterMark(8 * 1024, 32 * 1024))
             init(bootstrap, this.initConfig)
         } else if (bootstrap is ServerBootstrap) {
             bootstrap.channel(NioServerSocketChannel::class.java)
                 .childHandler(channelInitializer)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK, WriteBufferWaterMark(8 * 1024, 32 * 1024))
             init(bootstrap, this.initConfig)
         }
     }
@@ -58,15 +67,15 @@ class SocketChannelInitializer(
             // custom
             this.initAdapter?.dataTransformDecoderFactory
                 ?.instantiate()
-                ?.also { decoders -> pipeline.addLast(*decoders) }
+                ?.also { decoders -> pipeline.addLast(*decoders.toTypedArray()) }
 
             this.initAdapter?.dataTransformEncoderFactory
                 ?.instantiate()
-                ?.also { encoders -> pipeline.addLast(*encoders) }
+                ?.also { encoders -> pipeline.addLast(*encoders.toTypedArray()) }
 
             this.initAdapter?.dataHandler
                 ?.instantiate()
-                ?.also { handlers -> pipeline.addLast(*handlers) }
+                ?.also { handlers -> pipeline.addLast(*handlers.toTypedArray()) }
         }
     }
 

@@ -1,0 +1,16 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml:2:13-83
+INJECTED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml:2:13-83
+	package
+		INJECTED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml
+	xmlns:android
+		ADDED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml:2:23-81
+uses-sdk
+INJECTED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml reason: use-sdk injection requested
+INJECTED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml
+INJECTED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml
+	android:targetSdkVersion
+		INJECTED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml
+	android:minSdkVersion
+		INJECTED from /Users/liuzhongao/jvm-repositories/chat-channel-application/app-channel-database/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest16356293235632261650.xml

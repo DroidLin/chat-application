@@ -34,13 +34,13 @@ class SocketChannelInitScope internal constructor() {
         }
     }
 
-    private lateinit var remoteAddress: String
+    private lateinit var address: String
     private var maxReconnectCount: Int = Int.MAX_VALUE
     private var reConnectTimeInterval: Long = 5000L
     private var initAdapter: InitAdapter? = null
 
-    fun remoteAddress(remoteAddress: String) {
-        this.remoteAddress = remoteAddress
+    fun address(remoteAddress: String) {
+        this.address = remoteAddress
     }
 
     fun maxReconnectCount(number: Int) {
@@ -59,7 +59,7 @@ class SocketChannelInitScope internal constructor() {
         this.functionOnNewValueArrived = function
     }
 
-    fun onRemoteConnectionLoss(function: (ChannelContext) -> Unit) {
+    fun onConnectionLoss(function: (ChannelContext) -> Unit) {
         this.functionConnectionLoss = function
     }
 
@@ -73,7 +73,7 @@ class SocketChannelInitScope internal constructor() {
 
     fun build(): SocketChannelInitConfig {
         return SocketChannelInitConfig(
-            remoteAddress = this.remoteAddress,
+            address = this.address,
             maxReConnectCount = this.maxReconnectCount,
             reConnectTimeInterval = this.reConnectTimeInterval,
             socketChannelEventListener = this.socketChannelEventListener,

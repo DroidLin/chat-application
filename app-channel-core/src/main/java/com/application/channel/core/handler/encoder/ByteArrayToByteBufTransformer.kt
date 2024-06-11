@@ -4,7 +4,9 @@ import com.application.channel.core.DataTransformDecoder
 import com.application.channel.core.DataTransformEncoder
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import io.netty.channel.ChannelHandler.Sharable
 import java.io.ByteArrayOutputStream
+import javax.inject.Inject
 
 /**
  * @author liuzhongao
@@ -20,7 +22,8 @@ val ByteArray.byteBuf: ByteBuf
         byteBuf.writeBytes(this)
     }
 
-class ByteArrayToByteBufEncoder : DataTransformEncoder<ByteArray, ByteBuf>() {
+@Sharable
+class ByteArrayToByteBufEncoder @Inject constructor() : DataTransformEncoder<ByteArray, ByteBuf>() {
     override fun encode(msg: ByteArray, out: MutableList<ByteBuf>) {
         out += msg.byteBuf
     }
@@ -65,7 +68,8 @@ val ByteBuf.byteArray: ByteArray?
         return byteArray
     }
 
-class ByteBufToByteArrayDecoder : DataTransformDecoder<ByteBuf, ByteArray>() {
+@Sharable
+class ByteBufToByteArrayDecoder @Inject constructor() : DataTransformDecoder<ByteBuf, ByteArray>() {
 
     override fun decode(msg: ByteBuf, out: MutableList<ByteArray>) {
         val byteArray = msg.byteArray ?: return

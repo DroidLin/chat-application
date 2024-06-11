@@ -1,6 +1,5 @@
 package com.application.channel.core
 
-import com.application.channel.core.model.ChannelContext
 import com.application.channel.core.model.channelContext
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
@@ -9,7 +8,7 @@ import io.netty.channel.SimpleChannelInboundHandler
  * @author liuzhongao
  * @since 2024/5/21 01:08
  */
-abstract class DataHandler<T : Any?> : SimpleChannelInboundHandler<T>() {
+abstract class DataHandler<T : Any?> : SimpleChannelInboundHandler<T>(), SocketChannelEventListener {
 
     final override fun handlerAdded(ctx: ChannelHandlerContext?) {
         super.handlerAdded(ctx)
@@ -74,12 +73,4 @@ abstract class DataHandler<T : Any?> : SimpleChannelInboundHandler<T>() {
         ctx ?: return
         this.handleException(ctx.channel().channelContext, cause)
     }
-
-    abstract fun handleConnectionEstablished(ctx: ChannelContext)
-
-    abstract fun handleValueRead(ctx: ChannelContext, value: T?)
-
-    abstract fun handleConnectionLoss(ctx: ChannelContext)
-
-    abstract fun handleException(ctx: ChannelContext, throwable: Throwable?)
 }

@@ -1,6 +1,7 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
+    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.ksp)
     id("maven-publish")
 }
 
@@ -19,8 +20,8 @@ java {
 }
 
 dependencies {
-    implementation("io.netty:netty-all:4.1.108.Final")
     implementation(project(":app-channel-core"))
+    ksp("com.google.dagger:dagger-compiler:2.51.1")
 }
 
 publishing {

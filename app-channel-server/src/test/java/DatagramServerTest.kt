@@ -2,15 +2,12 @@ import com.application.channel.core.handler.encoder.*
 import com.application.channel.core.model.DatagramWritable
 import com.application.channel.core.model.channelContext
 import com.application.channel.core.model.datagramInitConfig
-import com.application.channel.core.server.ChatServer
-import io.netty.buffer.ByteBuf
+import com.application.channel.core.server.ChannelServer
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
-import io.netty.channel.socket.DatagramPacket
 import io.netty.handler.codec.DatagramPacketDecoder
 import io.netty.handler.codec.DatagramPacketEncoder
 import io.netty.handler.codec.MessageToMessageEncoder
-import java.net.InetSocketAddress
 
 /**
  * @author liuzhongao
@@ -28,7 +25,7 @@ fun main() {
         }
         initAdapter {
             encoderFactories {
-                arrayOf(
+                listOf(
                     DatagramPacketEncoder(
                         object : MessageToMessageEncoder<DatagramWritable>() {
                             override fun encode(ctx: ChannelHandlerContext?, msg: DatagramWritable?, out: MutableList<Any>?) {
@@ -41,13 +38,13 @@ fun main() {
                 )
             }
             decoderFactories {
-                arrayOf(
+                listOf(
                     DatagramPacketDecoder(ByteBufToByteArrayDecoder()),
                     ByteArrayToStringDecoder(),
                 )
             }
             handlerFactories {
-                arrayOf(
+                listOf(
                     object : SimpleChannelInboundHandler<String>() {
                         override fun channelRead0(ctx: ChannelHandlerContext?, msg: String?) {
                             if (ctx == null || msg == null) return
@@ -62,6 +59,6 @@ fun main() {
             }
         }
     }
-    val chatClient = ChatServer(initConfig)
-    chatClient.start()
+    val chatClient = ChannelServer()
+    chatClient.start(initConfig)
 }

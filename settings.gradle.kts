@@ -16,14 +16,21 @@ dependencyResolutionManagement {
         maven { url = uri("https://jitpack.io") }
     }
 }
-
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "chat-channel"
-include(":android-only-module")
 include(":jvm-only-module")
+include(":android-only-module")
 include(":multiplatform-module")
 
 include(":app-channel-core")
 include(":app-channel-client")
 include(":app-channel-server")
-include(":app-channel-message")
+include(":app-channel-im")
+include(":app-channel-message-core")
+include(":app-channel-message-client")
+include(":app-channel-message-server")
+
+include(":app-channel-database")
+
+include(":composeApp")

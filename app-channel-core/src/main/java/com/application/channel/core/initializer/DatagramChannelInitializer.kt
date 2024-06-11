@@ -48,15 +48,15 @@ class DatagramChannelInitializer(
             // custom
             this.initAdapter?.dataTransformDecoderFactory
                 ?.instantiate()
-                ?.also { decoders -> pipeline.addLast(*decoders) }
+                ?.also { decoders -> pipeline.addLast(*decoders.toTypedArray()) }
 
             this.initAdapter?.dataTransformEncoderFactory
                 ?.instantiate()
-                ?.also { encoders -> pipeline.addLast(*encoders) }
+                ?.also { encoders -> pipeline.addLast(*encoders.toTypedArray()) }
 
             this.initAdapter?.dataHandler
                 ?.instantiate()
-                ?.also { handlers -> pipeline.addLast(*handlers) }
+                ?.also { handlers -> pipeline.addLast(*handlers.toTypedArray()) }
         }
     }
 }

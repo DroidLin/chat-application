@@ -6,7 +6,7 @@ import com.application.channel.core.handler.encoder.StringToByteArrayEncoder
 import com.application.channel.core.handler.encoder.ByteBufToByteArrayDecoder
 import com.application.channel.core.model.ChannelContext
 import com.application.channel.core.model.socketInitConfig
-import com.application.channel.core.server.ChatServer
+import com.application.channel.core.server.ChannelServer
 
 /**
  * @author liuzhongao
@@ -14,33 +14,33 @@ import com.application.channel.core.server.ChatServer
  */
 fun main() {
     val initConfig = socketInitConfig {
-        remoteAddress("http://127.0.0.1:9123")
+        address("http://127.0.0.1:8325")
         maxReconnectCount(3)
         afterNewValueRead { channelContext, any ->
             println("receive data from: ${channelContext.channelRemoteAddress}, data: $any")
         }
         initAdapter {
             encoderFactories {
-                arrayOf(
-                    StringToByteArrayEncoder(),
-                    ByteArrayToByteBufEncoder()
+                listOf(
+                    ByteArrayToByteBufEncoder(),
+                    StringToByteArrayEncoder()
                 )
             }
             decoderFactories {
-                arrayOf(
+                listOf(
                     ByteBufToByteArrayDecoder(),
                     ByteArrayToStringDecoder()
                 )
             }
             handlerFactories {
-                arrayOf(
+                listOf(
                     StringDataHandler(this@socketInitConfig.socketChannelEventListener)
                 )
             }
         }
     }
-    val chatServer = ChatServer(initConfig)
-    chatServer.start()
+    val chatServer = ChannelServer()
+    chatServer.start(initConfig)
 }
 
 class StringDataHandler(private val socketChannelEventListener: SocketChannelEventListener) : DataHandler<String>() {
@@ -48,7 +48,7 @@ class StringDataHandler(private val socketChannelEventListener: SocketChannelEve
         this.socketChannelEventListener.handleConnectionEstablished(ctx)
     }
 
-    override fun handleValueRead(ctx: ChannelContext, value: String?) {
+    override fun handleValueRead(ctx: ChannelContext, value: Any?) {
         this.socketChannelEventListener.handleValueRead(ctx, value)
     }
 
