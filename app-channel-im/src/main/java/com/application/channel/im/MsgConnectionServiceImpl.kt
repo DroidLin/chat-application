@@ -51,7 +51,7 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
         val availableDatabase = initConfig.factory.databaseCreate(sessionId)
         val chatServiceInitConfig = ChatServiceInitConfig(
             remoteAddress = initConfig.remoteAddress,
-            messageDatabase = availableDatabase
+            messageDatabase = availableDatabase,
         )
         val chatService = ChatService(chatServiceInitConfig)
         chatService.addMessageReceivedListener(this.globalMessageReceiveListener)

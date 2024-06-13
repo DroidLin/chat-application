@@ -2,6 +2,7 @@ package com.application.channel.im
 
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
+import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
 import com.application.channel.message.metadata.SessionContact
@@ -34,6 +35,7 @@ interface MsgService {
 
     // Messages
     suspend fun insertMessage(message: Message)
+    suspend fun insertMessages(messageList: List<Message>)
     suspend fun updateMessage(message: Message)
     suspend fun deleteMessage(message: Message)
     suspend fun deleteMessage(uuid: String, sessionType: SessionType)
@@ -53,7 +55,7 @@ interface MsgService {
         limit: Int = 20
     ): Flow<List<Message>>
 
-    suspend fun fetchPagedMessages(
+    fun fetchPagedMessages(
         chatterSessionId: String,
         sessionType: SessionType,
         timestamp: Long = Long.MAX_VALUE,
@@ -65,5 +67,7 @@ interface MsgService {
     suspend fun markMessageAsRead(uuid: String, sessionType: SessionType)
     suspend fun clearUnreadCount(sessionId: String, sessionType: SessionType)
 
+
+    fun addObserver(observer: OnTableChangedObserver)
 
 }

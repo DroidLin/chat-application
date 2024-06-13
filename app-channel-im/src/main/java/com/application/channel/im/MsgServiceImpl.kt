@@ -1,7 +1,7 @@
 package com.application.channel.im
 
 import androidx.paging.PagingSource
-import androidx.paging.PagingState
+import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.MessageRepository
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
@@ -77,6 +77,10 @@ private class MsgServiceImpl : MsgService {
         TODO("Not yet implemented")
     }
 
+    override suspend fun insertMessages(messageList: List<Message>) {
+        this.messageRepository.insertMessages(messageList)
+    }
+
     override suspend fun updateMessage(message: Message) {
         TODO("Not yet implemented")
     }
@@ -86,7 +90,7 @@ private class MsgServiceImpl : MsgService {
     }
 
     override suspend fun deleteMessage(uuid: String, sessionType: SessionType) {
-        TODO("Not yet implemented")
+        this.messageRepository.deleteMessage(uuid, sessionType)
     }
 
     override suspend fun fetchMessages(
@@ -114,76 +118,19 @@ private class MsgServiceImpl : MsgService {
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchPagedMessages(
+    override fun fetchPagedMessages(
         chatterSessionId: String,
         sessionType: SessionType,
         timestamp: Long,
         limit: Int
     ): PagingSource<Long, Message> {
-        return object : PagingSource<Long, Message>() {
-
-            private val observer = InvalidationTableObserver(
-                tables = listOf(),
-                onInvalidation = this::invalidate
-            )
-
-            override fun getRefreshKey(state: PagingState<Long, Message>): Long? {
-                return timestamp
-            }
-
-            override suspend fun load(params: LoadParams<Long>): LoadResult<Long, Message> {
-                val messageRepository = this@MsgServiceImpl.messageRepository
-                this.observer.registerIfNecessary(messageRepository)
-                return when (params) {
-                    is LoadParams.Refresh -> {
-                        val historyList = messageRepository.fetchMessages(
-                            chatterSessionId = chatterSessionId,
-                            sessionType = sessionType,
-                            timestamp = params.key ?: timestamp,
-                            limit = params.loadSize,
-                            further = true
-                        )
-                        LoadResult.Page(
-                            data = historyList,
-                            prevKey = historyList.firstOrNull()?.timestamp,
-                            nextKey = historyList.lastOrNull()?.timestamp
-                        )
-                    }
-
-                    is LoadParams.Prepend -> {
-                        val historyList = messageRepository.fetchMessages(
-                            chatterSessionId = chatterSessionId,
-                            sessionType = sessionType,
-                            timestamp = params.key,
-                            limit = params.loadSize,
-                            further = false
-                        )
-                        LoadResult.Page(
-                            data = historyList,
-                            prevKey = historyList.firstOrNull()?.timestamp,
-                            nextKey = null
-                        )
-                    }
-
-                    is LoadParams.Append -> {
-                        val historyList = messageRepository.fetchMessages(
-                            chatterSessionId = chatterSessionId,
-                            sessionType = sessionType,
-                            timestamp = params.key,
-                            limit = params.loadSize,
-                            further = true
-                        )
-                        LoadResult.Page(
-                            data = historyList,
-                            prevKey = null,
-                            nextKey = historyList.lastOrNull()?.timestamp
-                        )
-                    }
-
-                    else -> LoadResult.Error(Throwable("invalid load params: ${params.javaClass.name}"))
-                }
-            }
-        }
+        return MessageLimitTimestampPagingSource(
+            chatterSessionId = chatterSessionId,
+            sessionType = sessionType,
+            timestamp = timestamp,
+            limit = limit,
+            messageRepository = this.messageRepository
+        )
     }
 
     override suspend fun markMessageAsRead(message: Message) {
@@ -196,5 +143,9 @@ private class MsgServiceImpl : MsgService {
 
     override suspend fun clearUnreadCount(sessionId: String, sessionType: SessionType) {
         TODO("Not yet implemented")
+    }
+
+    override fun addObserver(observer: OnTableChangedObserver) {
+        this.messageRepository.addObserver(observer)
     }
 }

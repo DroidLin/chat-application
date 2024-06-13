@@ -22,8 +22,8 @@ java {
 dependencies {
     api(project(":app-channel-core"))
     api(project(":app-channel-message-core"))
-    implementation(project(":app-channel-client"))
-    implementation(project(":app-channel-database"))
+    api(project(":app-channel-client"))
+    api(project(":app-channel-database"))
     ksp(libs.dagger.compiler)
 }
 

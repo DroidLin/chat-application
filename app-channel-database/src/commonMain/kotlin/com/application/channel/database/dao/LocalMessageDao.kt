@@ -66,5 +66,8 @@ interface LocalMessageDao {
     ): LocalMessage?
 
     @Delete
+    suspend fun deleteMessages(vararg messages: LocalMessage)
+
+    @Delete
     suspend fun deleteMessages(messagesToDelete: List<LocalMessage>)
 }

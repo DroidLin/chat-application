@@ -1,6 +1,7 @@
 package com.chat.compose.app
 
 import android.app.Application
+import android.content.Context
 
 /**
  * @author liuzhongao
@@ -8,7 +9,13 @@ import android.app.Application
  */
 class App : Application() {
 
-    override fun onCreate() {
-        super.onCreate()
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        app = this
+    }
+
+    companion object {
+        private var app: App? = null
+        val applicationContext: Context get() = requireNotNull(this.app)
     }
 }

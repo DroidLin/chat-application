@@ -40,7 +40,7 @@ data class TextMessage internal constructor(
         }
 
         override fun parse(message: Message): Message? {
-            if (message.msgType != MsgType.Image) return null
+            if (message.msgType != MsgType.Text) return null
             return TextMessage(message)
         }
     }

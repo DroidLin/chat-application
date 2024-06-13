@@ -14,6 +14,7 @@ import com.application.channel.message.encryptor.DecryptorDecoder
 import com.application.channel.message.encryptor.EncryptorEncoder
 import com.application.channel.message.meta.Message
 import com.application.channel.message.meta.MessageParser
+import com.application.channel.message.modules.MessageDatabaseModule
 import com.application.channel.message.transformer.ByteArrayToObjectDecoder
 import com.application.channel.message.transformer.JSONObjectToMessageDecoder
 import com.application.channel.message.transformer.ObjectToByteArrayEncoder
@@ -47,6 +48,7 @@ fun ChatService(
     return DaggerChatServiceClientComponent
         .builder()
         .messageParserModule(MessageParserModule(initConfig.messageParserList))
+        .messageDatabaseModule(MessageDatabaseModule(initConfig.messageDatabase))
         .channelClientComponent(DaggerChannelClientComponent.create())
         .build()
         .chatService()

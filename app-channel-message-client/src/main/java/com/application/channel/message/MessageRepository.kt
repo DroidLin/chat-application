@@ -39,6 +39,10 @@ interface MessageRepository {
         further: Boolean
     ): List<Message>
 
+    suspend fun insertMessages(messageList: List<Message>)
+
+    suspend fun deleteMessage(uuid: String, sessionType: SessionType)
+
     fun addObserver(observer: OnTableChangedObserver)
 
 }
@@ -109,6 +113,18 @@ internal class MessageRepositoryImpl @Inject constructor(
             limit = limit,
             further = further,
         )
+    }
+
+    override suspend fun insertMessages(messageList: List<Message>) {
+        messageList.forEach { message ->
+            this.databaseProvider.messageDatabaseApi.insertMessage(message)
+        }
+//        this.databaseProvider.withTransaction {
+//        }
+    }
+
+    override suspend fun deleteMessage(uuid: String, sessionType: SessionType) {
+        this.databaseProvider.messageDatabaseApi.deleteMessage(uuid, sessionType)
     }
 
     override fun addObserver(observer: OnTableChangedObserver) {

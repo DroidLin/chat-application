@@ -39,8 +39,8 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.ktx)
             implementation(libs.androidx.activity.compose)
-            implementation(project(":app-channel-message-client"))
-            implementation(project(":app-channel-database"))
+            implementation(libs.androidx.paging.compose)
+            implementation(project(":app-channel-im"))
         }
         val desktopMain by getting
         desktopMain.dependencies {
@@ -64,6 +64,17 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/license.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/notice.txt"
+            excludes += "META-INF/ASL2.0"
+            excludes += "META-INF/*.kotlin_module"
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
         }
     }
     buildTypes {

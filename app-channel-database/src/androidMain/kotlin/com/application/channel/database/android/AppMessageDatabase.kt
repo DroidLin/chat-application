@@ -15,6 +15,7 @@ fun AppMessageDatabase(context: Context, sessionId: String): AppMessageDatabase 
     val databaseFile = context.getDatabasePath("app_message_database_${sessionId}.db")
     val instance = Room.databaseBuilder<MessageDatabase>(context.applicationContext, databaseFile.absolutePath)
         .setDriver(BundledSQLiteDriver())
+        .fallbackToDestructiveMigrationOnDowngrade(false)
         .addMigrations(*databaseMigrations)
         .build()
     return AppMessageDatabase(sessionId, instance)
