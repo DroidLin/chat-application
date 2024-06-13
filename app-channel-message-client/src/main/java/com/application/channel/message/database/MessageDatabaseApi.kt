@@ -27,6 +27,7 @@ interface MessageDatabaseApi {
     ): List<Message>
 
     suspend fun insertMessage(message: Message)
+    suspend fun insertMessage(messageList: List<Message>)
 
     suspend fun deleteMessage(uuid: String, sessionType: SessionType)
     suspend fun deleteMessagesAboutSomeone(chatterSessionId: String, sessionType: SessionType)
@@ -89,6 +90,11 @@ private class MessageDatabaseApiImpl(
     override suspend fun insertMessage(message: Message) {
         val database = this.database ?: return
         database.messageDao.upsertMessage(message.toLocalMessage())
+    }
+
+    override suspend fun insertMessage(messageList: List<Message>) {
+        val database = this.database ?: return
+        database.messageDao.upsertMessages(messageList.map { it.toLocalMessage() })
     }
 
     override suspend fun deleteMessage(uuid: String, sessionType: SessionType) {

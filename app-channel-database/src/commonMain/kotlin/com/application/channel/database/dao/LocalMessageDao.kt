@@ -13,6 +13,9 @@ interface LocalMessageDao {
     @Upsert
     suspend fun upsertMessage(message: LocalMessage)
 
+    @Upsert
+    suspend fun upsertMessages(messageList: List<LocalMessage>)
+
     @Update
     suspend fun updateMessage(message: LocalMessage)
 
@@ -23,7 +26,7 @@ interface LocalMessageDao {
         "select * from table_message_record where ((message_sender_session_id = :sessionId and message_receiver_session_id = :chatterSessionId) or (message_sender_session_id = :chatterSessionId and message_receiver_session_id = :sessionId)) " +
                 "and message_session_type_code = :sessionTypeCode " +
                 "and message_timestamp < :timestamp " +
-                "order by message_timestamp desc limit :limit"
+                "order by message_timestamp desc, message_id desc limit :limit"
     )
     suspend fun fetchMessages(
         sessionId: String,
@@ -37,7 +40,7 @@ interface LocalMessageDao {
         "select * from (select * from table_message_record where ((message_sender_session_id = :sessionId and message_receiver_session_id = :chatterSessionId) or (message_sender_session_id = :chatterSessionId and message_receiver_session_id = :sessionId)) " +
                 "and message_session_type_code = :sessionTypeCode " +
                 "and message_timestamp > :timestamp " +
-                "order by message_timestamp limit :limit) order by message_timestamp desc"
+                "order by message_timestamp, message_id limit :limit) order by message_timestamp desc, message_id desc"
     )
     suspend fun fetchMessagesDesc(
         sessionId: String,

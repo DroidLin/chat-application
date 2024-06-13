@@ -4,6 +4,7 @@ interface LocalMessageTable {
     companion object {
         const val TABLE_NAME = "table_message_record"
 
+        const val MESSAGE_ID = "message_id"
         const val MESSAGE_UUID = "message_uuid"
         const val MESSAGE_SESSION_TYPE_CODE = "message_session_type_code"
         const val MESSAGE_STATE_USER_CONSUMED = "message_state_user_consumed"

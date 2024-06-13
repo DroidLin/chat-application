@@ -22,12 +22,12 @@ class MessageListViewModel : ViewModel() {
     private val chatService: MsgService get() = MsgClient.getService(MsgService::class.java)
 
     val flow = Pager(
-        config = PagingConfig(pageSize = 20)
+        config = PagingConfig(pageSize = 20, prefetchDistance = 1, enablePlaceholders = false, initialLoadSize = 20),
     ) {
         LimitTimestampPagingSource(
             chatterSessionId = "111111",
             sessionType = SessionType.P2P,
-            timestamp = System.currentTimeMillis(),
+            timestamp = 20,
             limit = 20,
             msgService = this.chatService
         )

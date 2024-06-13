@@ -44,6 +44,7 @@ interface MessageRepository {
     suspend fun deleteMessage(uuid: String, sessionType: SessionType)
 
     fun addObserver(observer: OnTableChangedObserver)
+    fun removeObserver(observer: OnTableChangedObserver)
 
 }
 
@@ -116,11 +117,9 @@ internal class MessageRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertMessages(messageList: List<Message>) {
-        messageList.forEach { message ->
-            this.databaseProvider.messageDatabaseApi.insertMessage(message)
+        this.databaseProvider.withTransaction {
+            this.databaseProvider.messageDatabaseApi.insertMessage(messageList)
         }
-//        this.databaseProvider.withTransaction {
-//        }
     }
 
     override suspend fun deleteMessage(uuid: String, sessionType: SessionType) {
@@ -129,5 +128,9 @@ internal class MessageRepositoryImpl @Inject constructor(
 
     override fun addObserver(observer: OnTableChangedObserver) {
         this.databaseProvider.addTableChangedObserver(observer)
+    }
+
+    override fun removeObserver(observer: OnTableChangedObserver) {
+        this.databaseProvider.removeTableChangedObserver(observer)
     }
 }

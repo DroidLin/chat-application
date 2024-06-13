@@ -21,19 +21,28 @@ class LimitTimestampPagingSource(
 
     init {
         this.registerInvalidatedCallback {
-
+            this.observer.unregisterIfNecessary(this.msgService)
         }
     }
 
     override fun getRefreshKey(state: PagingState<Long, UiMessage>): Long? {
-        return this.timestamp
+        val anchorPosition = state.anchorPosition ?: return this.timestamp
+        val pageList = state.pages.flatMap { it.data }
+        return pageList.getOrNull(anchorPosition)?.timestamp ?: return this.timestamp
     }
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, UiMessage> {
         this.observer.registerIfNecessary(this.msgService)
         return when (params) {
             is LoadParams.Refresh -> {
-                val historyList = this.msgService.fetchMessages(
+                val backwardHistoryList = this.msgService.fetchMessages(
+                    chatterSessionId = this.chatterSessionId,
+                    sessionType = this.sessionType,
+                    timestamp = params.key ?: timestamp,
+                    limit = params.loadSize,
+                    further = false
+                ).map(::convertMessageToUiMessage)
+                val furtherHistoryList = this.msgService.fetchMessages(
                     chatterSessionId = this.chatterSessionId,
                     sessionType = this.sessionType,
                     timestamp = params.key ?: timestamp,
@@ -41,9 +50,9 @@ class LimitTimestampPagingSource(
                     further = true
                 ).map(::convertMessageToUiMessage)
                 LoadResult.Page(
-                    data = historyList,
-                    prevKey = historyList.firstOrNull()?.timestamp,
-                    nextKey = historyList.lastOrNull()?.timestamp
+                    data = backwardHistoryList + furtherHistoryList,
+                    prevKey = backwardHistoryList.firstOrNull()?.timestamp,
+                    nextKey = furtherHistoryList.lastOrNull()?.timestamp
                 )
             }
 

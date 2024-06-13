@@ -84,7 +84,7 @@ internal class ChatServiceImpl @Inject constructor(
         this.authorization.setLoginResultMessage(null)
 
         // schedule next reconnect and login
-        if (this.globalReconnectCount >= 10) {
+        if (this.globalReconnectCount >= 3) {
             return@block
         }
         val account = this.authorization.contact ?: return@block

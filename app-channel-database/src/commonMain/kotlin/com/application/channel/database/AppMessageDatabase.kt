@@ -2,14 +2,11 @@ package com.application.channel.database
 
 import androidx.room.InvalidationTracker
 import androidx.room.immediateTransaction
-import androidx.room.useReaderConnection
 import androidx.room.useWriterConnection
 import com.application.channel.database.dao.LocalMessageDao
 import com.application.channel.database.dao.LocalSessionContactDao
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import java.lang.ref.WeakReference
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author liuzhongao
@@ -26,6 +23,7 @@ interface AppMessageDatabase {
     suspend fun withTransaction(block: suspend () -> Unit)
 
     fun addTableObserver(observer: OnTableChangedObserver)
+    fun removeTableObserver(observer: OnTableChangedObserver)
 
     fun interface Factory {
 
@@ -41,10 +39,11 @@ private class AppMessageDatabaseImpl(
     override val userSessionId: String,
     private val database: MessageDatabase
 ) : AppMessageDatabase {
+
     override val sessionContactDao: LocalSessionContactDao = this.database.sessionDao
     override val messageDao: LocalMessageDao = this.database.messageDao
 
-    private val mutex = Mutex()
+    private val observerMapping: MutableMap<OnTableChangedObserver, InvalidationTracker.Observer> = ConcurrentHashMap()
 
     override suspend fun withTransaction(block: suspend () -> Unit) {
         this.database.useWriterConnection<Unit> { transactor ->
@@ -55,26 +54,33 @@ private class AppMessageDatabaseImpl(
     }
 
     override fun addTableObserver(observer: OnTableChangedObserver) {
+        if (this.observerMapping.contains(observer)) {
+            return
+        }
         runBlocking {
             val invalidationTracker = this@AppMessageDatabaseImpl.database.invalidationTracker
-            val weakObserver = WeakObserver(invalidationTracker, this@AppMessageDatabaseImpl.mutex, observer)
-            invalidationTracker.subscribe(weakObserver)
+            val trackerObserverAdapter = TrackerObserverAdapter(observer)
+            invalidationTracker.subscribe(trackerObserverAdapter)
+            this@AppMessageDatabaseImpl.observerMapping[observer] = trackerObserverAdapter
         }
     }
 
-    class WeakObserver(
-        private val invalidationTracker: InvalidationTracker,
-        private val mutex: Mutex,
-        observer: OnTableChangedObserver
+    override fun removeTableObserver(observer: OnTableChangedObserver) {
+        if (!this.observerMapping.contains(observer)) {
+            return
+        }
+        runBlocking {
+            val invalidationTracker = this@AppMessageDatabaseImpl.database.invalidationTracker
+            val trackerObserverAdapter = this@AppMessageDatabaseImpl.observerMapping.remove(observer) ?: return@runBlocking
+            invalidationTracker.unsubscribe(trackerObserverAdapter)
+        }
+    }
+
+    class TrackerObserverAdapter(
+        private val observer: OnTableChangedObserver
     ) : InvalidationTracker.Observer(tables = observer.tables.toTypedArray()) {
-        private val weakReference = WeakReference(observer)
         override fun onInvalidated(tables: Set<String>) {
-            val observer = this.weakReference.get()
-            if (observer == null) {
-                runBlocking {
-                    this@WeakObserver.invalidationTracker.unsubscribe(this@WeakObserver)
-                }
-            } else observer.onTableChanged(tableNames = tables)
+            this.observer.onTableChanged(tableNames = tables)
         }
     }
 }

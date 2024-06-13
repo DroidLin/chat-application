@@ -29,6 +29,20 @@ object Messages {
     }
 
     @JvmStatic
+    fun buildTextMessage(content: String, sessionType: SessionType, timestamp: Long): TextMessage {
+        val extensions = mapOf(KEY_CONTENT to content)
+        val textMessage = TextMessage(
+            uuid = UUID.randomUUID().toString(),
+            sessionType = sessionType,
+            sender = Account.default,
+            receiver = Account.default,
+            timestamp = timestamp,
+            ext = extensions
+        )
+        return textMessage
+    }
+
+    @JvmStatic
     fun buildLoginMessage(sessionId: String, accountId: String): LoginMessage {
         val extensions = mapOf(
             KEY_CONTENT to mapOf(

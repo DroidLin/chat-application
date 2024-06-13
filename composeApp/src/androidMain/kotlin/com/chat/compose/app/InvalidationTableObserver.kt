@@ -25,4 +25,10 @@ class InvalidationTableObserver(
             msgService.addObserver(this)
         }
     }
+
+    fun unregisterIfNecessary(msgService: MsgService) {
+        if (this.registered.compareAndSet(true, false)) {
+            msgService.removeObserver(this)
+        }
+    }
 }

@@ -69,5 +69,6 @@ interface MsgService {
 
 
     fun addObserver(observer: OnTableChangedObserver)
+    fun removeObserver(observer: OnTableChangedObserver)
 
 }

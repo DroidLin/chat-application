@@ -22,6 +22,7 @@ interface DBProvider {
     suspend fun withTransaction(function: suspend () -> Unit)
 
     fun addTableChangedObserver(observer: OnTableChangedObserver)
+    fun removeTableChangedObserver(observer: OnTableChangedObserver)
 }
 
 internal class DBProviderImpl @Inject constructor(
@@ -43,6 +44,10 @@ internal class DBProviderImpl @Inject constructor(
 
     override fun addTableChangedObserver(observer: OnTableChangedObserver) {
         this.database?.addTableObserver(observer)
+    }
+
+    override fun removeTableChangedObserver(observer: OnTableChangedObserver) {
+        this.database?.removeTableObserver(observer)
     }
 
 }

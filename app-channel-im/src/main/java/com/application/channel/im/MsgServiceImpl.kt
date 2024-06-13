@@ -148,4 +148,8 @@ private class MsgServiceImpl : MsgService {
     override fun addObserver(observer: OnTableChangedObserver) {
         this.messageRepository.addObserver(observer)
     }
+
+    override fun removeObserver(observer: OnTableChangedObserver) {
+        this.messageRepository.removeObserver(observer)
+    }
 }

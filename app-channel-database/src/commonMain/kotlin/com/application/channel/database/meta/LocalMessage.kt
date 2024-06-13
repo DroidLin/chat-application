@@ -13,7 +13,8 @@ import com.application.channel.database.LocalMessageTable
     tableName = LocalMessageTable.TABLE_NAME,
 )
 data class LocalMessage(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = LocalMessageTable.MESSAGE_ID, index = true) val id: Int = 0,
     @ColumnInfo(name = LocalMessageTable.MESSAGE_UUID, index = true) val uuid: String,
     @ColumnInfo(name = LocalMessageTable.MESSAGE_SESSION_TYPE_CODE, index = true) val sessionTypeCode: Int,
     @ColumnInfo(name = LocalMessageTable.MESSAGE_STATE_USER_CONSUMED) val stateUserConsumed: Boolean = false,
