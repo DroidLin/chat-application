@@ -1,4 +1,0 @@
-com.android.dependencies.chat.android.test.composeApp-androidTest-0 /Users/liuzhongao/jvm-repositories/chat-channel-application/composeApp/build/generated/res/resValues/androidTest/debug
-com.android.dependencies.chat.android.test.composeApp-mergeDebugAndroidTestResources-1 /Users/liuzhongao/jvm-repositories/chat-channel-application/composeApp/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
-com.android.dependencies.chat.android.test.composeApp-mergeDebugAndroidTestResources-2 /Users/liuzhongao/jvm-repositories/chat-channel-application/composeApp/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
-com.android.dependencies.chat.android.test.composeApp-merged_res-3 /Users/liuzhongao/jvm-repositories/chat-channel-application/composeApp/build/intermediates/merged_res/debugAndroidTest
