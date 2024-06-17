@@ -33,9 +33,14 @@ internal abstract class AbstractChatSession(
             .fetchMessages(this.sessionId, this.sessionType, timestamp, limit)
     }
 
-    override suspend fun historyMessageSource(timestamp: Long, limit: Int): PagingSource<Long, Message> {
+    override fun historyMessageSource(timestamp: Long, limit: Int): PagingSource<Long, Message> {
         return MsgClient.getService(MsgService::class.java)
             .fetchPagedMessages(this.sessionId, this.sessionType, timestamp, limit)
+    }
+
+    override fun historyMessageSource(anchorMessage: Message?, limit: Int): PagingSource<Message, Message> {
+        return MsgClient.getService(MsgService::class.java)
+            .fetchPagedMessages(this.sessionId, this.sessionType, anchorMessage)
     }
 
     override suspend fun saveDraftContent(content: String) {

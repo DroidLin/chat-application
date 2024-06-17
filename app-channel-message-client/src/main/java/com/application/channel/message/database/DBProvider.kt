@@ -19,10 +19,10 @@ interface DBProvider {
 
     val messageDatabaseApi: MessageDatabaseApi
 
-    suspend fun withTransaction(function: suspend () -> Unit)
-
     fun addTableChangedObserver(observer: OnTableChangedObserver)
     fun removeTableChangedObserver(observer: OnTableChangedObserver)
+
+    fun release()
 }
 
 internal class DBProviderImpl @Inject constructor(
@@ -36,12 +36,6 @@ internal class DBProviderImpl @Inject constructor(
     override val sessionContactDatabaseApi: SessionContactDatabaseApi = SessionContactDatabaseApi(database)
     override val messageDatabaseApi: MessageDatabaseApi = MessageDatabaseApi(database, messageParser)
 
-    override suspend fun withTransaction(function: suspend () -> Unit) {
-        this.database?.withTransaction {
-            function()
-        }
-    }
-
     override fun addTableChangedObserver(observer: OnTableChangedObserver) {
         this.database?.addTableObserver(observer)
     }
@@ -50,4 +44,7 @@ internal class DBProviderImpl @Inject constructor(
         this.database?.removeTableObserver(observer)
     }
 
+    override fun release() {
+        this.database?.release()
+    }
 }

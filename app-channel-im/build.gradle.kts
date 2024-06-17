@@ -22,6 +22,8 @@ dependencies {
     api(project(":app-channel-message-client"))
     api(project(":app-channel-database"))
     api(libs.androidx.paging.common)
+    api(libs.droidlin.common.jvm)
+    api(libs.droidlin.storage)
 }
 
 publishing {

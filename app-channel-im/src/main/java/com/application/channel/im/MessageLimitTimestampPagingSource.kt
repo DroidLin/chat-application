@@ -24,15 +24,35 @@ class MessageLimitTimestampPagingSource(
         onInvalidation = this::invalidate
     )
 
+    init {
+        this.registerInvalidatedCallback {
+            this.observer.unregisterIfNecessary(this.messageRepository)
+        }
+    }
+
     override fun getRefreshKey(state: PagingState<Long, Message>): Long? {
-        return this.timestamp
+        val anchorPosition = state.anchorPosition ?: return this.timestamp
+        val pageList = state.pages.flatMap { it.data }
+        return pageList.getOrNull(anchorPosition)?.timestamp ?: return this.timestamp
     }
 
     override suspend fun load(params: LoadParams<Long>): LoadResult<Long, Message> {
         this.observer.registerIfNecessary(this.messageRepository)
         return when (params) {
             is LoadParams.Refresh -> {
-                val historyList = this.messageRepository.fetchMessages(
+                val backwardHistoryList = this.messageRepository.fetchMessages(
+                    chatterSessionId = this.chatterSessionId,
+                    sessionType = this.sessionType,
+                    timestamp = params.key ?: timestamp,
+                    limit = params.loadSize,
+                    further = false
+                )
+                val middleHistoryList = this.messageRepository.fetchMessagesAtTime(
+                    chatterSessionId = this.chatterSessionId,
+                    sessionType = this.sessionType,
+                    timestamp = params.key ?: timestamp,
+                )
+                val furtherHistoryList = this.messageRepository.fetchMessages(
                     chatterSessionId = this.chatterSessionId,
                     sessionType = this.sessionType,
                     timestamp = params.key ?: timestamp,
@@ -40,9 +60,9 @@ class MessageLimitTimestampPagingSource(
                     further = true
                 )
                 LoadResult.Page(
-                    data = historyList,
-                    prevKey = historyList.firstOrNull()?.timestamp,
-                    nextKey = historyList.lastOrNull()?.timestamp
+                    data = backwardHistoryList + middleHistoryList + furtherHistoryList,
+                    prevKey = backwardHistoryList.firstOrNull()?.timestamp,
+                    nextKey = furtherHistoryList.lastOrNull()?.timestamp
                 )
             }
 
@@ -76,7 +96,7 @@ class MessageLimitTimestampPagingSource(
                 )
             }
 
-            else -> LoadResult.Error(Throwable("invalid load params: ${params.javaClass.name}"))
+            else -> LoadResult.Error(Throwable("invalid load params: ${params.javaClass}"))
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.chat.compose.app
 
 import androidx.compose.runtime.Immutable
+import com.android.dependencies.chat.android.R
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
 import com.application.channel.message.meta.TextMessage
@@ -32,9 +33,10 @@ fun convertMessageToUiMessage(message: Message): UiMessage {
         is TextMessage -> UiTextMessage(
             uuid = message.uuid,
             sessionType = message.sessionType,
-            textContent = message.content ?: "",
+            textContent = "${message.content ?: ""}, timestamp: ${message.timestamp}",
             timestamp = message.timestamp
         )
+
         else -> throw IllegalArgumentException("illegal message: ${message.javaClass}, message: $message")
     }
 }

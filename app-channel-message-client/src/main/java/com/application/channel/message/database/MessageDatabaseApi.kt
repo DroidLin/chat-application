@@ -1,6 +1,7 @@
 package com.application.channel.message.database
 
 import com.application.channel.database.AppMessageDatabase
+import com.application.channel.database.meta.LocalMessage
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
 import com.application.channel.message.meta.MessageParser
@@ -18,12 +19,32 @@ interface MessageDatabaseApi {
 
     suspend fun persistMessage(message: Message)
 
+    suspend fun queryMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        timestamp: Long
+    ): List<Message>
+
+    suspend fun queryMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        anchor: Message?
+    ): List<Message>
+
     suspend fun queryMessages(
         chatterSessionId: String,
         sessionType: SessionType,
         timestamp: Long,
         limit: Int,
         further: Boolean
+    ): List<Message>
+
+    suspend fun queryMessages(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        limit: Int,
+        further: Boolean,
+        anchor: Message? = null
     ): List<Message>
 
     suspend fun insertMessage(message: Message)
@@ -50,6 +71,41 @@ private class MessageDatabaseApiImpl(
         database.messageDao.upsertMessage(localMessage)
     }
 
+    override suspend fun queryMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        timestamp: Long
+    ): List<Message> {
+        val database = this.database ?: return emptyList()
+        val localMessages = database.messageDao.fetchMessagesAtTime(
+            sessionId = database.userSessionId,
+            chatterSessionId = chatterSessionId,
+            sessionTypeCode = sessionType.value,
+            timestamp = timestamp
+        )
+        return localMessages.toMessageList()
+    }
+
+    override suspend fun queryMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        anchor: Message?
+    ): List<Message> {
+        val database = this.database ?: return emptyList()
+        val localMessage = if (anchor != null) {
+            database.messageDao.fetchMessageByUUid(uuid = anchor.uuid, sessionTypeCode = sessionType.value)
+        } else null
+
+        val id = localMessage?.id ?: Int.MAX_VALUE
+        val localMessages = database.messageDao.fetchMessagesAtTimeWithId(
+            sessionId = database.userSessionId,
+            chatterSessionId = chatterSessionId,
+            sessionTypeCode = sessionType.value,
+            id = id
+        )
+        return localMessages.toMessageList()
+    }
+
     override suspend fun queryMessages(
         chatterSessionId: String,
         sessionType: SessionType,
@@ -58,8 +114,6 @@ private class MessageDatabaseApiImpl(
         further: Boolean
     ): List<Message> {
         val database = this.database ?: return emptyList()
-        val messageParser = this.messageParser
-
         val localMessages = if (further) {
             database.messageDao.fetchMessages(
                 sessionId = database.userSessionId,
@@ -75,12 +129,51 @@ private class MessageDatabaseApiImpl(
             timestamp = timestamp,
             limit = limit
         )
+        return localMessages.toMessageList()
+    }
+
+    override suspend fun queryMessages(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        limit: Int,
+        further: Boolean,
+        anchor: Message?
+    ): List<Message> {
+        val database = this.database ?: return emptyList()
+        val localMessage = if (anchor != null) {
+            database.messageDao.fetchMessageByUUid(uuid = anchor.uuid, sessionTypeCode = sessionType.value)
+        } else null
+
+        val timestamp = localMessage?.timestamp ?: Long.MAX_VALUE
+        val id = localMessage?.id ?: Int.MAX_VALUE
+
+        val localMessages = if (further) {
+            database.messageDao.fetchMessagesWithId(
+                sessionId = database.userSessionId,
+                chatterSessionId = chatterSessionId,
+                sessionTypeCode = sessionType.value,
+                id = id,
+                timestamp = timestamp,
+                limit = limit
+            )
+        } else database.messageDao.fetchMessagesDescWithId(
+            sessionId = database.userSessionId,
+            chatterSessionId = chatterSessionId,
+            sessionTypeCode = sessionType.value,
+            id = id,
+            timestamp = timestamp,
+            limit = limit
+        )
+        return localMessages.toMessageList()
+    }
+
+    private suspend fun List<LocalMessage>.toMessageList(): List<Message> {
         return coroutineScope {
-            localMessages.map { localMessage ->
+            this@toMessageList.map { localMessage ->
                 async {
                     val message = localMessage.toMessage()
                     if (message != null) {
-                        messageParser.parse(message)
+                        this@MessageDatabaseApiImpl.messageParser.parse(message)
                     } else null
                 }
             }.awaitAll().filterNotNull()
@@ -89,17 +182,27 @@ private class MessageDatabaseApiImpl(
 
     override suspend fun insertMessage(message: Message) {
         val database = this.database ?: return
-        database.messageDao.upsertMessage(message.toLocalMessage())
+        val messageInDatabase = database.messageDao.fetchMessageByUUid(message.uuid, message.sessionType.value)
+        val newLocalMessage = message.toLocalMessage(messageInDatabase?.id ?: 0)
+        database.messageDao.upsertMessage(newLocalMessage)
     }
 
     override suspend fun insertMessage(messageList: List<Message>) {
         val database = this.database ?: return
-        database.messageDao.upsertMessages(messageList.map { it.toLocalMessage() })
+        messageList.groupBy { it.sessionType }.forEach { (sessionType, messageList) ->
+            val uuidList = messageList.map { it.uuid }
+            val messagesInDatabase = database.messageDao.fetchMessages(uuidList, sessionType.value)
+            val localMessages = messageList.map { message ->
+                val messageInDatabase = messagesInDatabase.find { localMessage -> localMessage.uuid == message.uuid }
+                message.toLocalMessage(messageInDatabase?.id ?: 0)
+            }
+            database.messageDao.upsertMessages(localMessages)
+        }
     }
 
     override suspend fun deleteMessage(uuid: String, sessionType: SessionType) {
         val database = this.database ?: return
-        val message = database.messageDao.fetchMessageById(uuid, sessionType.value)
+        val message = database.messageDao.fetchMessageByUUid(uuid, sessionType.value)
         if (message != null) {
             database.messageDao.deleteMessages(message)
         }
@@ -119,9 +222,7 @@ private class MessageDatabaseApiImpl(
 
     override suspend fun markMessageAsRead(uuid: String, sessionType: SessionType) {
         val database = this.database ?: return
-        database.withTransaction {
-            val message = database.messageDao.fetchMessageById(uuid, sessionType.value) ?: return@withTransaction
-            database.messageDao.updateMessage(message.copy(stateUserConsumed = true))
-        }
+        val message = database.messageDao.fetchMessageByUUid(uuid, sessionType.value) ?: return
+        database.messageDao.updateMessage(message.copy(stateUserConsumed = true))
     }
 }

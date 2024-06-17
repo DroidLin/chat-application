@@ -22,7 +22,9 @@ interface MsgConnectionService {
 
     fun closeSession(chatSession: ChatSession)
 
-    fun startService(initConfig: IMInitConfig)
+    fun initService(initConfig: IMInitConfig)
+
+    fun startService()
 
     fun stopService()
 }

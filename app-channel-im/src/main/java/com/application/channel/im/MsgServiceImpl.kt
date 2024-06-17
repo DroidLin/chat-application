@@ -74,7 +74,7 @@ private class MsgServiceImpl : MsgService {
     }
 
     override suspend fun insertMessage(message: Message) {
-        TODO("Not yet implemented")
+        this.messageRepository.insertMessage(message)
     }
 
     override suspend fun insertMessages(messageList: List<Message>) {
@@ -91,6 +91,18 @@ private class MsgServiceImpl : MsgService {
 
     override suspend fun deleteMessage(uuid: String, sessionType: SessionType) {
         this.messageRepository.deleteMessage(uuid, sessionType)
+    }
+
+    override suspend fun fetchMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        timestamp: Long
+    ): List<Message> {
+        return this.messageRepository.fetchMessagesAtTime(
+            chatterSessionId = chatterSessionId,
+            sessionType = sessionType,
+            timestamp = timestamp,
+        )
     }
 
     override suspend fun fetchMessages(
@@ -130,6 +142,19 @@ private class MsgServiceImpl : MsgService {
             timestamp = timestamp,
             limit = limit,
             messageRepository = this.messageRepository
+        )
+    }
+
+    override fun fetchPagedMessages(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        anchor: Message?,
+    ): PagingSource<Message, Message> {
+        return MessagePagingSource(
+            chatterSessionId = chatterSessionId,
+            sessionType = sessionType,
+            messageRepository = this.messageRepository,
+            anchor = anchor,
         )
     }
 

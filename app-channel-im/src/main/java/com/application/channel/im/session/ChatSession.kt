@@ -24,7 +24,12 @@ interface ChatSession {
     /**
      * fetch message history bundled with paging-source.
      */
-    suspend fun historyMessageSource(timestamp: Long = Long.MAX_VALUE, limit: Int = 20): PagingSource<Long, Message>
+    fun historyMessageSource(timestamp: Long = Long.MAX_VALUE, limit: Int = 20): PagingSource<Long, Message>
+
+    /**
+     * fetch message history bundled with paging-source.
+     */
+    fun historyMessageSource(anchorMessage: Message?, limit: Int = 20): PagingSource<Message, Message>
 
     suspend fun saveDraftContent(content: String)
 

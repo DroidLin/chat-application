@@ -20,7 +20,7 @@ java {
 }
 
 dependencies {
-    implementation(project(":app-channel-core"))
+    api(project(":app-channel-core"))
     api(libs.org.json)
     ksp(libs.dagger.compiler)
 }

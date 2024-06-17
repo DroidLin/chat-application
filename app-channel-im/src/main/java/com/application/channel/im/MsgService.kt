@@ -40,6 +40,12 @@ interface MsgService {
     suspend fun deleteMessage(message: Message)
     suspend fun deleteMessage(uuid: String, sessionType: SessionType)
 
+    suspend fun fetchMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        timestamp: Long = Long.MAX_VALUE,
+    ): List<Message>
+
     suspend fun fetchMessages(
         chatterSessionId: String,
         sessionType: SessionType,
@@ -61,6 +67,12 @@ interface MsgService {
         timestamp: Long = Long.MAX_VALUE,
         limit: Int = 20
     ): PagingSource<Long, Message>
+
+    fun fetchPagedMessages(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        anchor: Message?,
+    ): PagingSource<Message, Message>
 
     // UnreadCount
     suspend fun markMessageAsRead(message: Message)

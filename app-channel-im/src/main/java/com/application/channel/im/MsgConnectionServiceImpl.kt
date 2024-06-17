@@ -17,10 +17,12 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
 
     private val globalMessageReceiveListener = MessageReceiveListenerWrapper()
 
+    private var initConfig: IMInitConfig? = null
     private var chatService: ChatService? = null
 
     override val messageRepository: MessageRepository
-        get() = this.chatService?.messageRepository ?: throw NullPointerException("chat service not running, have you called startService yet?")
+        get() = this.chatService?.messageRepository
+            ?: throw NullPointerException("chat service not running, have you called startService yet?")
 
     override fun addListener(listener: MessageReceiveListener) {
         this.globalMessageReceiveListener.addListener(listener)
@@ -44,9 +46,8 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
         }
     }
 
-    override fun startService(initConfig: IMInitConfig) {
+    override fun initService(initConfig: IMInitConfig) {
         this.stopService()
-
         val sessionId = initConfig.token.sessionId
         val availableDatabase = initConfig.factory.databaseCreate(sessionId)
         val chatServiceInitConfig = ChatServiceInitConfig(
@@ -55,8 +56,16 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
         )
         val chatService = ChatService(chatServiceInitConfig)
         chatService.addMessageReceivedListener(this.globalMessageReceiveListener)
-        chatService.startService(account = Account(sessionId = sessionId, accountId = sessionId))
         this.chatService = chatService
+        this.initConfig = initConfig
+    }
+
+    override fun startService() {
+        val chatService = this.chatService ?: return
+        val initConfig = this.initConfig ?: return
+
+        val sessionId = initConfig.token.sessionId
+        chatService.startService(account = Account(sessionId = sessionId, accountId = sessionId))
     }
 
     override fun stopService() {

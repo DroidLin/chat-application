@@ -1,8 +1,11 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.ksp)
 }
 
 val dependenciesGroup: String by extra
@@ -24,29 +27,36 @@ kotlin {
     jvm("desktop")
 
     sourceSets {
-        val commonMain by getting
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
+            implementation(libs.precompose)
+            implementation(libs.precompose.viewmodel)
+            implementation(libs.droidlin.common.jvm)
+            implementation(project(":app-channel-im"))
+            implementation(project(":app-channel-message-core"))
         }
-
-        val androidMain by getting
         androidMain.dependencies {
             implementation(libs.androidx.activity.ktx)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.paging.compose)
-            implementation(project(":app-channel-im"))
+
+            implementation(libs.droidlin.common.android)
         }
         val desktopMain by getting
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
         }
     }
+}
+
+dependencies {
+    ksp(libs.dagger.compiler)
 }
 
 android {
@@ -58,7 +68,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 24
         targetSdk = 34
     }
     packaging {
@@ -81,9 +91,32 @@ android {
         getByName("release") {
             isMinifyEnabled = false
         }
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "com.chat.compose.app.ApplicationKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "org.mplayer.app.compose"
+            packageVersion = "1.0.0"
+            macOS {
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/AppIcon.icns"))
+            }
+            windows {
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/launcher_icon.png"))
+            }
+            linux {
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/launcher_icon.png"))
+            }
+        }
     }
 }

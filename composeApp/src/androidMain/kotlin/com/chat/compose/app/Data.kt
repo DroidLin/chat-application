@@ -2,6 +2,7 @@ package com.chat.compose.app
 
 import com.application.channel.message.Account
 import com.application.channel.message.SessionType
+import com.application.channel.message.meta.Message
 import com.application.channel.message.meta.Messages
 
 /**
@@ -14,13 +15,14 @@ val textMessageContent = mutableListOf<String>().also { list ->
     }
 }
 
-val messages = textMessageContent.mapIndexed { index, s ->
-    Messages.buildTextMessage(
-        content = s,
-        sessionType = SessionType.P2P,
-        timestamp = index.toLong(),
-    ).also { textMessage ->
-        textMessage.sender = Account(sessionId = "111111", accountId = "111111")
-        textMessage.receiver = Account(sessionId = "222222", accountId = "222222")
+val messages: List<Message>
+    get() = textMessageContent.mapIndexed { index, s ->
+        Messages.buildTextMessage(
+            content = s,
+            sessionType = SessionType.P2P,
+            timestamp = System.currentTimeMillis(),
+        ).also { textMessage ->
+            textMessage.sender = Account(sessionId = "111111", accountId = "111111")
+            textMessage.receiver = Account(sessionId = "222222", accountId = "222222")
+        }
     }
-}

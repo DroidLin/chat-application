@@ -1,8 +1,6 @@
 package com.application.channel.database
 
-import androidx.room.InvalidationTracker
-import androidx.room.immediateTransaction
-import androidx.room.useWriterConnection
+import androidx.room.*
 import com.application.channel.database.dao.LocalMessageDao
 import com.application.channel.database.dao.LocalSessionContactDao
 import kotlinx.coroutines.runBlocking
@@ -20,10 +18,13 @@ interface AppMessageDatabase {
 
     val messageDao: LocalMessageDao
 
-    suspend fun withTransaction(block: suspend () -> Unit)
+    suspend fun withTransaction(readOnly: Boolean, block: suspend () -> Unit)
 
     fun addTableObserver(observer: OnTableChangedObserver)
+
     fun removeTableObserver(observer: OnTableChangedObserver)
+
+    fun release()
 
     fun interface Factory {
 
@@ -45,12 +46,15 @@ private class AppMessageDatabaseImpl(
 
     private val observerMapping: MutableMap<OnTableChangedObserver, InvalidationTracker.Observer> = ConcurrentHashMap()
 
-    override suspend fun withTransaction(block: suspend () -> Unit) {
-        this.database.useWriterConnection<Unit> { transactor ->
+    override suspend fun withTransaction(readOnly: Boolean, block: suspend () -> Unit) {
+        val function: suspend (Transactor) -> Unit = { transactor ->
             transactor.immediateTransaction {
                 block()
             }
         }
+        if (readOnly) {
+            this.database.useReaderConnection(function)
+        } else this.database.useWriterConnection(function)
     }
 
     override fun addTableObserver(observer: OnTableChangedObserver) {
@@ -71,9 +75,14 @@ private class AppMessageDatabaseImpl(
         }
         runBlocking {
             val invalidationTracker = this@AppMessageDatabaseImpl.database.invalidationTracker
-            val trackerObserverAdapter = this@AppMessageDatabaseImpl.observerMapping.remove(observer) ?: return@runBlocking
+            val trackerObserverAdapter =
+                this@AppMessageDatabaseImpl.observerMapping.remove(observer) ?: return@runBlocking
             invalidationTracker.unsubscribe(trackerObserverAdapter)
         }
+    }
+
+    override fun release() {
+        this.database.close()
     }
 
     class TrackerObserverAdapter(

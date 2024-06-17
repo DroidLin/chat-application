@@ -24,4 +24,10 @@ class InvalidationTableObserver(
             messageRepository.addObserver(this)
         }
     }
+
+    fun unregisterIfNecessary(messageRepository: MessageRepository) {
+        if (this.registered.compareAndSet(true, false)) {
+            messageRepository.removeObserver(this)
+        }
+    }
 }

@@ -30,6 +30,17 @@ interface MessageRepository {
 
     suspend fun fetchRecentSessionContactList(limit: Int): List<SessionContact>
     suspend fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>>
+    suspend fun fetchMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        timestamp: Long
+    ): List<Message>
+
+    suspend fun fetchMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        anchor: Message?
+    ): List<Message>
 
     suspend fun fetchMessages(
         chatterSessionId: String,
@@ -39,6 +50,15 @@ interface MessageRepository {
         further: Boolean
     ): List<Message>
 
+    suspend fun fetchMessagesWithId(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        limit: Int,
+        further: Boolean,
+        anchor: Message?
+    ): List<Message>
+
+    suspend fun insertMessage(message: Message)
     suspend fun insertMessages(messageList: List<Message>)
 
     suspend fun deleteMessage(uuid: String, sessionType: SessionType)
@@ -46,6 +66,7 @@ interface MessageRepository {
     fun addObserver(observer: OnTableChangedObserver)
     fun removeObserver(observer: OnTableChangedObserver)
 
+    fun release()
 }
 
 internal class MessageRepositoryImpl @Inject constructor(
@@ -70,13 +91,10 @@ internal class MessageRepositoryImpl @Inject constructor(
         sessionType: SessionType,
         function: SessionContact.() -> SessionContact
     ) {
-        this.databaseProvider.withTransaction {
-            val sessionContact =
-                this.databaseProvider.sessionContactDatabaseApi.findSessionContact(sessionId, sessionType)
-            val updatedSessionContact = sessionContact?.run(function)
-            if (updatedSessionContact != null) {
-                this.databaseProvider.sessionContactDatabaseApi.updateSessionContact(updatedSessionContact)
-            }
+        val sessionContact = this.databaseProvider.sessionContactDatabaseApi.findSessionContact(sessionId, sessionType)
+        val updatedSessionContact = sessionContact?.run(function)
+        if (updatedSessionContact != null) {
+            this.databaseProvider.sessionContactDatabaseApi.updateSessionContact(updatedSessionContact)
         }
     }
 
@@ -100,6 +118,46 @@ internal class MessageRepositoryImpl @Inject constructor(
         return this.databaseProvider.sessionContactDatabaseApi.fetchObservableSessionContact(limit)
     }
 
+    override suspend fun fetchMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        timestamp: Long
+    ): List<Message> {
+        return this.databaseProvider.messageDatabaseApi.queryMessagesAtTime(
+            chatterSessionId = chatterSessionId,
+            sessionType = sessionType,
+            timestamp = timestamp,
+        )
+    }
+
+    override suspend fun fetchMessagesAtTime(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        anchor: Message?
+    ): List<Message> {
+        return this.databaseProvider.messageDatabaseApi.queryMessagesAtTime(
+            chatterSessionId = chatterSessionId,
+            sessionType = sessionType,
+            anchor = anchor,
+        )
+    }
+
+    override suspend fun fetchMessagesWithId(
+        chatterSessionId: String,
+        sessionType: SessionType,
+        limit: Int,
+        further: Boolean,
+        anchor: Message?
+    ): List<Message> {
+        return this.databaseProvider.messageDatabaseApi.queryMessages(
+            chatterSessionId = chatterSessionId,
+            sessionType = sessionType,
+            anchor = anchor,
+            limit = limit,
+            further = further,
+        )
+    }
+
     override suspend fun fetchMessages(
         chatterSessionId: String,
         sessionType: SessionType,
@@ -116,10 +174,12 @@ internal class MessageRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun insertMessage(message: Message) {
+        this.databaseProvider.messageDatabaseApi.insertMessage(message)
+    }
+
     override suspend fun insertMessages(messageList: List<Message>) {
-        this.databaseProvider.withTransaction {
-            this.databaseProvider.messageDatabaseApi.insertMessage(messageList)
-        }
+        this.databaseProvider.messageDatabaseApi.insertMessage(messageList)
     }
 
     override suspend fun deleteMessage(uuid: String, sessionType: SessionType) {
@@ -132,5 +192,9 @@ internal class MessageRepositoryImpl @Inject constructor(
 
     override fun removeObserver(observer: OnTableChangedObserver) {
         this.databaseProvider.removeTableChangedObserver(observer)
+    }
+
+    override fun release() {
+        this.databaseProvider.release()
     }
 }

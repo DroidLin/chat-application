@@ -16,7 +16,8 @@ internal object LocalMessageConverter {
     fun LocalMessage.toMessage(): Message? = this@LocalMessageConverter.convert(this)
 
     @JvmStatic
-    fun Message.toLocalMessage(): LocalMessage = this@LocalMessageConverter.convert(this)
+    @JvmOverloads
+    fun Message.toLocalMessage(id: Int = 0): LocalMessage = this@LocalMessageConverter.convert(this, id)
 
     @JvmStatic
     fun convert(localMessage: LocalMessage): Message? {
@@ -31,8 +32,9 @@ internal object LocalMessageConverter {
     }
 
     @JvmStatic
-    fun convert(message: Message): LocalMessage {
+    fun convert(message: Message, id: Int = 0): LocalMessage {
         return LocalMessage(
+            id = id,
             uuid = message.uuid,
             sessionTypeCode = message.sessionType.value,
             stateUserConsumed = false,
