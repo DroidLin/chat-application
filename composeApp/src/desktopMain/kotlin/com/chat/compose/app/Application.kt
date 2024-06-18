@@ -11,7 +11,7 @@ import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import com.chat.compose.app.metadata.WindowConfiguration
+import com.chat.compose.app.metadata.ApplicationConfiguration
 import com.chat.compose.app.ui.DesktopMaterialTheme
 import com.chat.compose.app.ui.screen.BasicApplication
 
@@ -22,15 +22,15 @@ import com.chat.compose.app.ui.screen.BasicApplication
 fun main() {
     application {
         val isSystemInDarkMode = isSystemInDarkTheme()
-        val windowConfiguration = remember(isSystemInDarkMode) {
-            WindowConfiguration(isDarkMode = isSystemInDarkMode)
+        val applicationConfiguration = remember(isSystemInDarkMode) {
+            ApplicationConfiguration(isDarkMode = isSystemInDarkMode)
         }
         CompositionLocalProvider(
-            LocalWindowConfiguration provides windowConfiguration
+            LocalApplicationConfiguration provides applicationConfiguration
         ) {
             Window(
                 onCloseRequest = ::exitApplication,
-                title = windowConfiguration.title,
+                title = applicationConfiguration.title,
                 undecorated = false,
                 transparent = false,
                 state = rememberWindowState(
@@ -52,4 +52,4 @@ fun main() {
 }
 
 val LocalWindow = compositionLocalOf<ComposeWindow> { error("not provided") }
-val LocalWindowConfiguration = compositionLocalOf<WindowConfiguration> { error("not provided") }
+val LocalApplicationConfiguration = compositionLocalOf<ApplicationConfiguration> { error("not provided") }

@@ -1,13 +1,13 @@
 package com.chat.compose.app.ui
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import com.chat.compose.app.LocalWindow
-import com.chat.compose.app.LocalWindowConfiguration
+import com.chat.compose.app.LocalApplicationConfiguration
+import com.chat.compose.app.di.DaggerViewModelProviderScope
 import moe.tlaster.precompose.PreComposeApp
 
 /**
@@ -17,7 +17,7 @@ import moe.tlaster.precompose.PreComposeApp
 @Composable
 fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val window = LocalWindow.current
-    val windowConfiguration = LocalWindowConfiguration.current
+    val windowConfiguration = LocalApplicationConfiguration.current
     val (light, dark) = remember { YellowTheme }
 
     val colorScheme by remember {
@@ -38,7 +38,9 @@ fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () 
         colorScheme = colorScheme,
     ) {
         PreComposeApp {
-            Surface(modifier = modifier, content = content)
+            DaggerViewModelProviderScope {
+                Surface(modifier = modifier, content = content)
+            }
         }
     }
 }

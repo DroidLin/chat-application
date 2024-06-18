@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.map
 interface SessionContactDatabaseApi {
 
     suspend fun fetchRecentSessionContact(limit: Int): List<SessionContact>
-    suspend fun fetchObservableSessionContact(limit: Int): Flow<List<SessionContact>>
+    fun fetchObservableSessionContact(limit: Int): Flow<List<SessionContact>>
 
     suspend fun accessToSessionContact(sessionId: String, sessionType: SessionType)
 
@@ -78,7 +78,7 @@ private class SessionContactDatabaseImpl(
         }
     }
 
-    override suspend fun fetchObservableSessionContact(limit: Int): Flow<List<SessionContact>> {
+    override fun fetchObservableSessionContact(limit: Int): Flow<List<SessionContact>> {
         val database = this.database ?: return flowOf(emptyList())
         return database.sessionContactDao.observableRecentSessionContacts(limit)
             .distinctUntilChanged()

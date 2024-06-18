@@ -10,9 +10,9 @@ import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
 import com.chat.compose.app.metadata.UiMessage
 import com.chat.compose.app.metadata.toUiMessage
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import moe.tlaster.precompose.viewmodel.ViewModel
+import moe.tlaster.precompose.viewmodel.viewModelScope
 import javax.inject.Inject
 
 /**
@@ -26,10 +26,7 @@ class SessionDetailViewModel @Inject constructor(
     private var chatSession: ChatSession? = null
 
     fun openSession(sessionId: String, sessionType: SessionType): Flow<PagingData<UiMessage>> {
-        val tmpChatSession = this.chatSession
-        if (tmpChatSession != null) {
-            this.msgConnectionService.closeSession(tmpChatSession)
-        }
+        this.closeSession()
         val chatSession = this.msgConnectionService.openSession(sessionId, sessionType)
         try {
             return Pager(
@@ -45,8 +42,23 @@ class SessionDetailViewModel @Inject constructor(
             ).flow.map { pagingData ->
                 pagingData.map(Message::toUiMessage)
             }
+                .distinctUntilChanged()
+                .stateIn(this.viewModelScope, SharingStarted.Lazily, PagingData.empty())
         } finally {
             this.chatSession = chatSession
         }
+    }
+
+    fun closeSession() {
+        val tmpChatSession = this.chatSession
+        if (tmpChatSession != null) {
+            this.msgConnectionService.closeSession(tmpChatSession)
+        }
+        this.chatSession = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        this.closeSession()
     }
 }

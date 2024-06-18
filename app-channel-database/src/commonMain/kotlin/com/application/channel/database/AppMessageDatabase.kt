@@ -28,7 +28,7 @@ interface AppMessageDatabase {
 
     fun interface Factory {
 
-        fun databaseCreate(sessionId: String): AppMessageDatabase
+        fun databaseCreate(sessionId: String): AppMessageDatabase?
     }
 }
 

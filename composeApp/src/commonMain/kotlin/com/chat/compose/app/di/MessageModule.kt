@@ -6,6 +6,7 @@ import com.application.channel.im.MsgConnectionService
 import com.application.channel.message.MessageRepository
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 /**
  * @author liuzhongao
@@ -14,9 +15,12 @@ import dagger.Provides
 @Module
 class MessageModule constructor(private val initConfig: IMInitConfig) {
 
+    @Singleton
     @Provides
     fun provideMsgConnectionService(): MsgConnectionService {
-        return MsgClient.getService(MsgConnectionService::class.java)
+        return MsgClient.getService(MsgConnectionService::class.java).also { service ->
+            service.initService(this.initConfig)
+        }
     }
 
     @Provides

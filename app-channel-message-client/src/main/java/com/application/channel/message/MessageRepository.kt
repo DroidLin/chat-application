@@ -29,7 +29,7 @@ interface MessageRepository {
     suspend fun fetchSessionContact(sessionId: String, sessionType: SessionType): SessionContact?
 
     suspend fun fetchRecentSessionContactList(limit: Int): List<SessionContact>
-    suspend fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>>
+    fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>>
     suspend fun fetchMessagesAtTime(
         chatterSessionId: String,
         sessionType: SessionType,
@@ -114,7 +114,7 @@ internal class MessageRepositoryImpl @Inject constructor(
         return this.databaseProvider.sessionContactDatabaseApi.fetchRecentSessionContact(limit)
     }
 
-    override suspend fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>> {
+    override fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>> {
         return this.databaseProvider.sessionContactDatabaseApi.fetchObservableSessionContact(limit)
     }
 
