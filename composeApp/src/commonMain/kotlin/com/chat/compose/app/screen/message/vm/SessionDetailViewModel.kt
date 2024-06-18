@@ -1,5 +1,6 @@
 package com.chat.compose.app.screen.message.vm
 
+import androidx.compose.runtime.Immutable
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -9,6 +10,7 @@ import com.application.channel.im.session.ChatSession
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
 import com.chat.compose.app.metadata.UiMessage
+import com.chat.compose.app.metadata.UiSessionContact
 import com.chat.compose.app.metadata.toUiMessage
 import kotlinx.coroutines.flow.*
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -19,9 +21,12 @@ import javax.inject.Inject
  * @author liuzhongao
  * @since 2024/6/17 23:55
  */
-class SessionDetailViewModel @Inject constructor(
+class SessionDetailViewModel constructor(
     private val msgConnectionService: MsgConnectionService
 ) : ViewModel() {
+
+    private val _state = MutableStateFlow(SessionDetailState())
+    val state: StateFlow<SessionDetailState> = this._state.asStateFlow()
 
     private var chatSession: ChatSession? = null
 
@@ -62,3 +67,9 @@ class SessionDetailViewModel @Inject constructor(
         this.closeSession()
     }
 }
+
+@Immutable
+data class SessionDetailState(
+    val isLoading: Boolean = false,
+    val sessionContact: UiSessionContact? = null
+)

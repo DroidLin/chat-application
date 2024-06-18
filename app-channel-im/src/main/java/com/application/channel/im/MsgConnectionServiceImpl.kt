@@ -47,6 +47,9 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
     }
 
     override fun initService(initConfig: IMInitConfig) {
+        if (this.initConfig == initConfig) {
+            return
+        }
         this.stopService()
         val sessionId = initConfig.token.sessionId
         val availableDatabase = initConfig.factory.databaseCreate(sessionId)

@@ -27,6 +27,7 @@ kotlin {
     jvm("desktop")
 
     sourceSets {
+        val commonMain by getting
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -40,13 +41,22 @@ kotlin {
             implementation(libs.droidlin.common.jvm)
             implementation(project(":app-channel-im"))
             implementation(project(":app-channel-message-core"))
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.coroutines)
+            implementation(libs.koin.compose)
         }
+        val androidMain by getting
         androidMain.dependencies {
             implementation(libs.androidx.activity.ktx)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.paging.compose)
 
             implementation(libs.droidlin.common.android)
+
+            implementation(libs.koin.android)
+            implementation(libs.koin.android.compat)
+            implementation(libs.koin.androidx.compose)
         }
         val desktopMain by getting
         desktopMain.dependencies {

@@ -19,6 +19,9 @@ droidlin-storage = "1.0.0"
 pre-compose = "1.6.0"
 material3Desktop = "1.2.1"
 
+koin = "3.6.0-wasm-alpha2"
+coil = "2.6.0"
+
 [libraries]
 dagger-runtime = { group = "com.google.dagger", name = "dagger", version.ref = "dagger-version" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger-version" }
@@ -46,6 +49,16 @@ droidlin-storage = { group = "com.github.DroidLin.storage", name = "storage", ve
 precompose = { group = "moe.tlaster", name = "precompose", version.ref = "pre-compose" }
 precompose-viewmodel = { group = "moe.tlaster", name = "precompose-viewmodel", version.ref = "pre-compose" }
 androidx-material3-desktop = { group = "androidx.compose.material3", name = "material3-desktop", version.ref = "material3Desktop" }
+
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines", version.ref = "koin" }
+koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-android-compat = { group = "io.insert-koin", name = "koin-android-compat", version.ref = "koin" }
+
+coil-core = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 
 [plugins]

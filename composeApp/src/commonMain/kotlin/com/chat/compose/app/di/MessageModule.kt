@@ -6,25 +6,26 @@ import com.application.channel.im.MsgConnectionService
 import com.application.channel.message.MessageRepository
 import dagger.Module
 import dagger.Provides
+import org.koin.dsl.module
 import javax.inject.Singleton
 
 /**
  * @author liuzhongao
  * @since 2024/6/16 21:13
  */
-@Module
-class MessageModule constructor(private val initConfig: IMInitConfig) {
 
-    @Singleton
-    @Provides
-    fun provideMsgConnectionService(): MsgConnectionService {
-        return MsgClient.getService(MsgConnectionService::class.java).also { service ->
-            service.initService(this.initConfig)
-        }
+expect fun imInitConfig(): IMInitConfig
+
+val messageModule = module {
+    factory {
+        imInitConfig()
     }
-
-    @Provides
-    fun provideMessageRepository(msgConnectionService: MsgConnectionService): MessageRepository {
-        return msgConnectionService.messageRepository
+    factory {
+        val initConfig: IMInitConfig = get()
+        MsgClient.getService(MsgConnectionService::class.java).also { it.initService(initConfig) }
+    }
+    factory {
+        val service: MsgConnectionService = get()
+        service.messageRepository
     }
 }
