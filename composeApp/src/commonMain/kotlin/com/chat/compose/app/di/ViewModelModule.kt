@@ -10,13 +10,9 @@ import org.koin.dsl.module
  */
 val viewModelModule = module {
     factory {
-        SessionListViewModel(
-            fetchSessionListUseCase = get()
-        )
+        SessionListViewModel(get())
     }
     factory {
-        SessionDetailViewModel(
-            msgConnectionService = get()
-        )
+        SessionDetailViewModel(get(), get())
     }
 }

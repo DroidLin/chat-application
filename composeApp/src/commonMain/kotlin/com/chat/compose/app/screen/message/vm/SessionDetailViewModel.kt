@@ -1,6 +1,7 @@
 package com.chat.compose.app.screen.message.vm
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.mutableStateOf
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -12,7 +13,10 @@ import com.application.channel.message.meta.Message
 import com.chat.compose.app.metadata.UiMessage
 import com.chat.compose.app.metadata.UiSessionContact
 import com.chat.compose.app.metadata.toUiMessage
+import com.chat.compose.app.usecase.CloseSessionUseCase
+import com.chat.compose.app.usecase.OpenChatSessionUseCase
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import javax.inject.Inject
@@ -22,17 +26,24 @@ import javax.inject.Inject
  * @since 2024/6/17 23:55
  */
 class SessionDetailViewModel constructor(
-    private val msgConnectionService: MsgConnectionService
+    private val openChatSessionUseCase: OpenChatSessionUseCase,
+    private val closeSessionUseCase: CloseSessionUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SessionDetailState())
     val state: StateFlow<SessionDetailState> = this._state.asStateFlow()
 
+    val inputText = mutableStateOf("")
+
     private var chatSession: ChatSession? = null
 
-    fun openSession(sessionId: String, sessionType: SessionType): Flow<PagingData<UiMessage>> {
+    fun onTextChanged(text: String) {
+        this._state.update { it.copy(inputText = text) }
+    }
+
+    fun openSession(sessionId: String, sessionType: SessionType): StateFlow<PagingData<UiMessage>> {
         this.closeSession()
-        val chatSession = this.msgConnectionService.openSession(sessionId, sessionType)
+        val chatSession = this.openChatSessionUseCase.openChatSession(sessionId, sessionType)
         try {
             return Pager(
                 config = PagingConfig(
@@ -44,9 +55,9 @@ class SessionDetailViewModel constructor(
                 pagingSourceFactory = {
                     chatSession.historyMessageSource(anchorMessage = null, limit = 20)
                 }
-            ).flow.map { pagingData ->
-                pagingData.map(Message::toUiMessage)
-            }
+            )
+                .flow
+                .map { pagingData -> pagingData.map(Message::toUiMessage) }
                 .distinctUntilChanged()
                 .stateIn(this.viewModelScope, SharingStarted.Lazily, PagingData.empty())
         } finally {
@@ -54,10 +65,18 @@ class SessionDetailViewModel constructor(
         }
     }
 
+    fun saveDraft() {
+        val inputText = this.inputText.value
+        val chatSession = this.chatSession ?: return
+        this.viewModelScope.launch {
+            chatSession.saveDraftContent(inputText)
+        }
+    }
+
     fun closeSession() {
         val tmpChatSession = this.chatSession
         if (tmpChatSession != null) {
-            this.msgConnectionService.closeSession(tmpChatSession)
+            this.closeSessionUseCase.closeSession(tmpChatSession)
         }
         this.chatSession = null
     }
@@ -71,5 +90,6 @@ class SessionDetailViewModel constructor(
 @Immutable
 data class SessionDetailState(
     val isLoading: Boolean = false,
-    val sessionContact: UiSessionContact? = null
+    val sessionContact: UiSessionContact? = null,
+    val inputText: String = "",
 )

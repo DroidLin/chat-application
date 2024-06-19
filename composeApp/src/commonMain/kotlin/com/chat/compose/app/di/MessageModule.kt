@@ -8,6 +8,7 @@ import dagger.Module
 import dagger.Provides
 import org.koin.dsl.module
 import javax.inject.Singleton
+import kotlin.system.measureTimeMillis
 
 /**
  * @author liuzhongao
@@ -21,8 +22,13 @@ val messageModule = module {
         imInitConfig()
     }
     factory {
-        val initConfig: IMInitConfig = get()
-        MsgClient.getService(MsgConnectionService::class.java).also { it.initService(initConfig) }
+        MsgClient.getService(MsgConnectionService::class.java).also { service ->
+            val times = measureTimeMillis {
+                val initConfig: IMInitConfig = get()
+                service.initService(initConfig)
+            }
+            println("cost: $times ms")
+        }
     }
     factory {
         val service: MsgConnectionService = get()

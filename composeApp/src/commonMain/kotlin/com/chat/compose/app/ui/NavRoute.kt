@@ -19,7 +19,7 @@ interface NavRoute {
         override val route: String get() = "chatMessageDetail/{sessionId}/{sessionType}"
 
         fun buildRoute(sessionId: String, sessionType: SessionType): String {
-            return "chatMessageDetail/$sessionId/$sessionType"
+            return "chatMessageDetail/$sessionId/${sessionType.value}"
         }
     }
 

@@ -11,7 +11,7 @@ import com.application.channel.database.databaseMigrations
  * @author liuzhongao
  * @since 2024/6/8 21:31
  */
-fun getDatabase(filePath: String, sessionId: String): AppMessageDatabase {
+fun AppMessageDatabase(filePath: String, sessionId: String): AppMessageDatabase {
     val instance =  Room.databaseBuilder<MessageDatabase>(name = filePath)
         .setDriver(BundledSQLiteDriver())
         .addMigrations(*databaseMigrations)

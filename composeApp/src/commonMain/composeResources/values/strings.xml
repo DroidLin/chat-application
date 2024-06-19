@@ -10,4 +10,7 @@
 		<item>item 2</item>
 		<item>item 3</item>
 	</string-array>
+
+	<string name="message_detail_text_field_place_holder">聊点什么吧！</string>
+	<string name="message_detail_send_button_hint">发送</string>
 </resources>

@@ -5,9 +5,10 @@ import androidx.compose.ui.Modifier
 import com.chat.compose.app.metadata.UiSessionContact
 
 @Composable
-expect fun SessionContactItem(
+actual fun SessionContactItem(
     value: UiSessionContact,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     onPrimaryMouseClick: () -> Unit,
-    onSecondaryMouseClick: () -> Unit,
-)
+    onSecondaryMouseClick: () -> Unit
+) {
+}

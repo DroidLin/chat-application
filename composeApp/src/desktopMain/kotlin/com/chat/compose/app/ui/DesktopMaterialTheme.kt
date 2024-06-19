@@ -10,6 +10,7 @@ import com.chat.compose.app.LocalApplicationConfiguration
 import com.chat.compose.app.di.messageModule
 import com.chat.compose.app.di.useCaseModule
 import com.chat.compose.app.di.viewModelModule
+import com.chat.compose.app.usecase.fakeUseCaseModule
 import moe.tlaster.precompose.PreComposeApp
 import org.koin.compose.KoinApplication
 import org.koin.compose.KoinContext
@@ -47,7 +48,8 @@ fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () 
                     modules(
                         viewModelModule,
                         messageModule,
-                        useCaseModule
+                        useCaseModule,
+                        fakeUseCaseModule
                     )
                 }
             ) {

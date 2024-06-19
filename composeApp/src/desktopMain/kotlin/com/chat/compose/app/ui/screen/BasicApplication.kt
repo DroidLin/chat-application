@@ -50,8 +50,9 @@ fun BasicApplication() {
                 route = route,
                 navOptions = NavOptions(
                     launchSingleTop = true,
+                    includePath = true,
                     popUpTo = PopUpTo(
-                        route = route,
+                        route = "",
                         inclusive = true
                     )
                 )
@@ -116,17 +117,25 @@ fun BasicApplication() {
                 navTransition = homeNavigationScreen
             ) {
                 SessionListScreen(
-                    backPress = routerAction::backPress
+                    backPress = routerAction::backPress,
+                    sessionItemClick = { sessionContact ->
+                        val route = NavRoute.ChatMessageDetail.buildRoute(
+                            sessionId = sessionContact.sessionId,
+                            sessionType = sessionContact.sessionType,
+                        )
+                        routerAction.navigateTo(route)
+                    }
                 )
             }
             scene(
                 route = NavRoute.ChatMessageDetail.route
             ) { backStackEntry ->
-                val sessionId: String = requireNotNull(backStackEntry.query("sessionId"))
-                val sessionType: SessionType = requireNotNull(backStackEntry.query("sessionType"))
+                val sessionId: String = requireNotNull(backStackEntry.path("sessionId"))
+                val sessionType: SessionType = SessionType.fromValue(requireNotNull(backStackEntry.path("sessionType")))
                 SessionDetailScreen(
                     sessionId = sessionId,
                     sessionType = sessionType,
+                    backPress = routerAction::backPress
                 )
             }
             scene(
