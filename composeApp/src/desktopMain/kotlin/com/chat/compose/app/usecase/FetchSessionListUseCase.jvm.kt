@@ -25,10 +25,10 @@ val fakeUseCaseModule = module {
 class FetchSessionListUseCaseImpl(private val messageRepository: MessageRepository) : FetchSessionListUseCase {
 
     init {
-        GlobalScope.launch {
-            this@FetchSessionListUseCaseImpl.messageRepository.insertSessionContact(sessionContactV1)
-            this@FetchSessionListUseCaseImpl.messageRepository.insertSessionContact(sessionContactV2)
-        }
+//        GlobalScope.launch {
+//            this@FetchSessionListUseCaseImpl.messageRepository.insertSessionContact(sessionContactV1)
+//            this@FetchSessionListUseCaseImpl.messageRepository.insertSessionContact(sessionContactV2)
+//        }
     }
 
     override val sessionList: Flow<List<UiSessionContact>> =

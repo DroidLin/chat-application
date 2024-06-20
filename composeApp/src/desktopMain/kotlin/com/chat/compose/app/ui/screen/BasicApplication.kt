@@ -46,16 +46,18 @@ fun BasicApplication() {
 
     val navigateTo = remember(routerAction.navigator) {
         { route: String ->
+            val popUpTo = PopUpTo(
+                route = "",
+                inclusive = true
+            )
+            val navOptions = NavOptions(
+                launchSingleTop = true,
+                includePath = true,
+                popUpTo = popUpTo
+            )
             routerAction.navigateTo(
                 route = route,
-                navOptions = NavOptions(
-                    launchSingleTop = true,
-                    includePath = true,
-                    popUpTo = PopUpTo(
-                        route = "",
-                        inclusive = true
-                    )
-                )
+                navOptions = navOptions
             )
         }
     }
