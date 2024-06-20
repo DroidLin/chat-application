@@ -46,7 +46,7 @@ private class SessionContactDatabaseImpl(
     override suspend fun insertSessionContact(sessionContact: SessionContact) {
         val database = this.database ?: return
         val localSessionContact = sessionContact.toLocalSessionContact()
-        database.sessionContactDao.upsertSessionContact(localSessionContact)
+        database.sessionContactDao.insertSessionContact(localSessionContact)
     }
 
     override suspend fun updateSessionContact(sessionContact: SessionContact) {
