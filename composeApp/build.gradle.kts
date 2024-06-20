@@ -45,6 +45,10 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.coroutines)
             implementation(libs.koin.compose)
+
+            implementation(libs.coil.core)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
         }
         val androidMain by getting
         androidMain.dependencies {

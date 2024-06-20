@@ -20,7 +20,7 @@ pre-compose = "1.6.0"
 material3Desktop = "1.2.1"
 
 koin = "3.6.0-wasm-alpha2"
-coil = "2.6.0"
+coil = "3.0.0-alpha06"
 
 [libraries]
 dagger-runtime = { group = "com.google.dagger", name = "dagger", version.ref = "dagger-version" }
@@ -57,8 +57,9 @@ koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compos
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-android-compat = { group = "io.insert-koin", name = "koin-android-compat", version.ref = "koin" }
 
-coil-core = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
-coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+coil-core = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor", version.ref = "coil" }
 
 
 [plugins]
