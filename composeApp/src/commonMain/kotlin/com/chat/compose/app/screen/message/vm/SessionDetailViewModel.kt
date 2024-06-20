@@ -33,8 +33,6 @@ class SessionDetailViewModel constructor(
     private val _state = MutableStateFlow(SessionDetailState())
     val state: StateFlow<SessionDetailState> = this._state.asStateFlow()
 
-    val inputText = mutableStateOf("")
-
     private var chatSession: ChatSession? = null
 
     fun onTextChanged(text: String) {
@@ -66,7 +64,7 @@ class SessionDetailViewModel constructor(
     }
 
     fun saveDraft() {
-        val inputText = this.inputText.value
+        val inputText = this._state.value.inputText
         val chatSession = this.chatSession ?: return
         this.viewModelScope.launch {
             chatSession.saveDraftContent(inputText)

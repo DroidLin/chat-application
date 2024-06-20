@@ -36,7 +36,7 @@ fun SessionDetailScreen(
     val viewModel: SessionDetailViewModel = koinViewModel()
     val uiState = viewModel.state.collectAsStateWithLifecycle()
 
-    val inputTextState = remember { viewModel.inputText }
+    val inputTextState = remember { derivedStateOf { uiState.value.inputText } }
     val lazyPagingItems = remember(sessionId, sessionType) {
         viewModel.openSession(sessionId, sessionType)
     }.collectAsLazyPagingItems()
@@ -82,7 +82,7 @@ fun SessionDetailScreen(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth().height(180.dp),
                 value = inputTextState.value,
-                onValueChange = { inputTextState.value = it },
+                onValueChange = viewModel::onTextChanged,
                 shape = MaterialTheme.shapes.large,
                 placeholder = {
                     Text(text = stringResource(Res.string.message_detail_text_field_place_holder))
