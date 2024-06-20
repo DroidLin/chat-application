@@ -36,15 +36,16 @@ fun SessionDetailScreen(
     val viewModel: SessionDetailViewModel = koinViewModel()
     val uiState = viewModel.state.collectAsStateWithLifecycle()
 
-    val inputTextState = remember { derivedStateOf { uiState.value.inputText } }
     val lazyPagingItems = remember(sessionId, sessionType) {
         viewModel.openSession(sessionId, sessionType)
-    }.collectAsLazyPagingItems()
+    }
+        .collectAsLazyPagingItems()
 
-    DisposableEffect(Unit) {
+    DisposableEffect(viewModel, sessionId, sessionType) {
+        viewModel.openSessionContact(sessionId, sessionType)
         onDispose {
             viewModel.saveDraft()
-            viewModel.closeSession()
+            viewModel.release()
         }
     }
 
@@ -53,9 +54,8 @@ fun SessionDetailScreen(
     ) {
         TopAppBar(
             title = {
-                Text(
-                    text = "title"
-                )
+                val title by remember { derivedStateOf { uiState.value.title } }
+                Text(text = title)
             },
             navigationIcon = {
                 IconButton(onClick = backPress) {
@@ -79,10 +79,11 @@ fun SessionDetailScreen(
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
+            val inputTextState = remember { derivedStateOf { uiState.value.inputText } }
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth().height(180.dp),
                 value = inputTextState.value,
-                onValueChange = viewModel::onTextChanged,
+                onValueChange = viewModel::updateInputText,
                 shape = MaterialTheme.shapes.large,
                 placeholder = {
                     Text(text = stringResource(Res.string.message_detail_text_field_place_holder))

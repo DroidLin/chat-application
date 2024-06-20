@@ -44,7 +44,8 @@ internal abstract class AbstractChatSession(
     }
 
     override suspend fun saveDraftContent(content: String) {
-        MsgClient.getService(MsgService::class.java).updateSessionContactExtensions(this.sessionId, this.sessionType) {
+        val msgService = MsgClient.getService(MsgService::class.java)
+        msgService.updateSessionContactExtensions(this.sessionId, this.sessionType) {
             this[SessionExtensions.KEY_DRAFT_MESSAGE_STRING] = content
         }
     }

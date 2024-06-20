@@ -1,7 +1,6 @@
 package com.chat.compose.app.di
 
-import com.chat.compose.app.usecase.CloseSessionUseCase
-import com.chat.compose.app.usecase.OpenChatSessionUseCase
+import com.chat.compose.app.usecase.*
 import org.koin.dsl.module
 
 /**
@@ -11,4 +10,6 @@ import org.koin.dsl.module
 val useCaseModule = module {
     factory { OpenChatSessionUseCase(get()) }
     factory { CloseSessionUseCase(get()) }
+    factory { FetchSessionContactUseCase(get()) }
+    factory<FetchSessionListUseCase> { FetchSessionListUseCaseImpl(get()) }
 }

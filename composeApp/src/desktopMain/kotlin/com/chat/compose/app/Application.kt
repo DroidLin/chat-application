@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import com.chat.compose.app.metadata.ApplicationConfiguration
 import com.chat.compose.app.ui.DesktopMaterialTheme
-import com.chat.compose.app.ui.screen.BasicApplication
+import com.chat.compose.app.ui.BasicApplication
 
 /**
  * @author liuzhongao

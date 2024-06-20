@@ -1,25 +1,28 @@
 package com.chat.compose.app.screen.message.vm
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.mutableStateOf
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.application.channel.im.MsgConnectionService
+import com.application.channel.im.draftMessage
 import com.application.channel.im.session.ChatSession
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
+import com.application.channel.message.metadata.SessionContact
 import com.chat.compose.app.metadata.UiMessage
-import com.chat.compose.app.metadata.UiSessionContact
 import com.chat.compose.app.metadata.toUiMessage
+import com.chat.compose.app.metadata.toUiSessionContact
 import com.chat.compose.app.usecase.CloseSessionUseCase
+import com.chat.compose.app.usecase.FetchSessionContactUseCase
 import com.chat.compose.app.usecase.OpenChatSessionUseCase
+import com.chat.compose.app.util.accessFirst
+import com.chat.compose.app.util.collect
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import javax.inject.Inject
 
 /**
  * @author liuzhongao
@@ -28,15 +31,31 @@ import javax.inject.Inject
 class SessionDetailViewModel constructor(
     private val openChatSessionUseCase: OpenChatSessionUseCase,
     private val closeSessionUseCase: CloseSessionUseCase,
+    private val fetchSessionContactUseCase: FetchSessionContactUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SessionDetailState())
     val state: StateFlow<SessionDetailState> = this._state.asStateFlow()
 
     private var chatSession: ChatSession? = null
+    private var observerJob: Job? = null
 
-    fun onTextChanged(text: String) {
-        this._state.update { it.copy(inputText = text) }
+    fun openSessionContact(sessionId: String, sessionType: SessionType) {
+        this.observerJob?.cancel()
+        this.observerJob = this.fetchSessionContactUseCase.fetchObservableSessionContact(sessionId, sessionType)
+            .accessFirst { sessionContact ->
+                val draftMessage= sessionContact?.draftMessage
+                if (!draftMessage.isNullOrBlank()) {
+                    this._state.update { it.copy(inputText = draftMessage) }
+                }
+            }
+            .map { sessionContact -> sessionContact?.toUiSessionContact() }
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { uiSessionContact ->
+                this._state.update { state -> state.copy(title = uiSessionContact.sessionContactName) }
+            }
+            .collect(this.viewModelScope)
     }
 
     fun openSession(sessionId: String, sessionType: SessionType): StateFlow<PagingData<UiMessage>> {
@@ -79,6 +98,16 @@ class SessionDetailViewModel constructor(
         this.chatSession = null
     }
 
+    fun release() {
+        this.closeSession()
+        this.observerJob?.cancel()
+        this.observerJob = null
+    }
+
+    fun updateInputText(text: String) {
+        this._state.update { it.copy(inputText = text) }
+    }
+
     override fun onCleared() {
         super.onCleared()
         this.closeSession()
@@ -88,6 +117,7 @@ class SessionDetailViewModel constructor(
 @Immutable
 data class SessionDetailState(
     val isLoading: Boolean = false,
-    val sessionContact: UiSessionContact? = null,
+    val sessionContact: SessionContact? = null,
+    val title: String = "",
     val inputText: String = "",
 )

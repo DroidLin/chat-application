@@ -1,5 +1,6 @@
 package com.chat.compose.app.screen.message.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +20,7 @@ import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
  * @author liuzhongao
  * @since 2024/6/16 21:56
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SessionListScreen(
     backPress: () -> Unit = {},
@@ -44,7 +45,7 @@ fun SessionListScreen(
             ) { uiSessionContact ->
                 SessionContactItem(
                     value = uiSessionContact,
-                    modifier = Modifier.fillParentMaxWidth(),
+                    modifier = Modifier.fillParentMaxWidth().animateItemPlacement(),
                     onPrimaryMouseClick = { sessionItemClick(uiSessionContact) },
                     onSecondaryMouseClick = {}
                 )

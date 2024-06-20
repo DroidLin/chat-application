@@ -1,11 +1,13 @@
-package com.chat.compose.app.ui.screen
+package com.chat.compose.app.ui
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
@@ -14,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.application.channel.message.SessionType
 import com.chat.compose.app.LocalApplicationConfiguration
@@ -22,7 +23,6 @@ import com.chat.compose.app.router.rememberRouterAction
 import com.chat.compose.app.screen.message.ui.SessionDetailScreen
 import com.chat.compose.app.screen.message.ui.SessionListScreen
 import com.chat.compose.app.screen.setting.SettingScreen
-import com.chat.compose.app.ui.NavRoute
 import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import moe.tlaster.precompose.navigation.*
 import moe.tlaster.precompose.navigation.transition.NavTransition
@@ -62,52 +62,50 @@ fun BasicApplication() {
         }
     }
     val applicationConfiguration = LocalApplicationConfiguration.current
-    PermanentNavigationDrawer(
-        modifier = Modifier,
-        drawerContent = {
-            val currentEntry = routerAction.navigator.currentEntry.collectAsStateWithLifecycle(null)
-            val currentRoute by remember { derivedStateOf { currentEntry.value?.route?.route } }
-            NavigationRail(
-                modifier = Modifier,
-                header = {
-                    Text(text = "Basic")
-                }
-            ) {
-                NavigationRailItem(
-                    selected = currentRoute == NavRoute.ChatSessionList.route,
-                    onClick = {
-                        navigateTo(NavRoute.ChatSessionList.route)
-                    },
-                    icon = {
-                        Icon(imageVector = Icons.Filled.Star, contentDescription = null)
-                    }
-                )
-                NavigationRailItem(
-                    selected = currentRoute == NavRoute.Settings.route,
-                    onClick = {
-                        navigateTo(NavRoute.Settings.route)
-                    },
-                    icon = {
-                        Icon(imageVector = Icons.Filled.Star, contentDescription = null)
-                    }
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                NavigationRailItem(
-                    modifier = Modifier,
-                    selected = false,
-                    onClick = {
-                        applicationConfiguration.isDarkMode = !applicationConfiguration.isDarkMode
-                    },
-                    icon = {
-                        Icon(imageVector = Icons.Filled.Phone, contentDescription = null)
-                    }
-                )
-            }
-        }
+    Row(
+        modifier = Modifier.fillMaxSize()
     ) {
-        val navigator = rememberNavigator(name = "")
+        val currentEntry = routerAction.navigator.currentEntry.collectAsStateWithLifecycle(null)
+        val currentRoute by remember { derivedStateOf { currentEntry.value?.route?.route } }
+        NavigationRail(
+            modifier = Modifier,
+            header = {
+                Text(text = "Basic")
+            }
+        ) {
+            NavigationRailItem(
+                selected = currentRoute == NavRoute.ChatSessionList.route,
+                onClick = {
+                    navigateTo(NavRoute.ChatSessionList.route)
+                },
+                icon = {
+                    Icon(imageVector = Icons.Filled.Star, contentDescription = null)
+                }
+            )
+            NavigationRailItem(
+                selected = currentRoute == NavRoute.Settings.route,
+                onClick = {
+                    navigateTo(NavRoute.Settings.route)
+                },
+                icon = {
+                    Icon(imageVector = Icons.Filled.Star, contentDescription = null)
+                }
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            NavigationRailItem(
+                modifier = Modifier,
+                selected = false,
+                onClick = {
+                    applicationConfiguration.isDarkMode = !applicationConfiguration.isDarkMode
+                },
+                icon = {
+                    Icon(imageVector = Icons.Filled.Phone, contentDescription = null)
+                }
+            )
+        }
+        VerticalDivider()
         NavHost(
-            navigator = navigator,
+            navigator = routerAction.navigator,
             initialRoute = NavRoute.ChatSessionList.route,
             swipeProperties = remember {
                 SwipeProperties()
@@ -150,5 +148,4 @@ fun BasicApplication() {
             }
         }
     }
-
 }

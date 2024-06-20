@@ -5,15 +5,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import com.chat.compose.app.LocalWindow
 import com.chat.compose.app.LocalApplicationConfiguration
+import com.chat.compose.app.LocalWindow
 import com.chat.compose.app.di.messageModule
 import com.chat.compose.app.di.useCaseModule
 import com.chat.compose.app.di.viewModelModule
-import com.chat.compose.app.usecase.fakeUseCaseModule
 import moe.tlaster.precompose.PreComposeApp
 import org.koin.compose.KoinApplication
-import org.koin.compose.KoinContext
 
 /**
  * @author liuzhongao
@@ -36,7 +34,7 @@ fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () 
     LaunchedEffect(colorScheme) {
         window.background = java.awt.Color(colorScheme.background.toArgb())
         window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
-        System.setProperty( "apple.awt.application.appearance", "system" )
+        System.setProperty("apple.awt.application.appearance", "system")
     }
 
     MaterialTheme(
@@ -49,7 +47,6 @@ fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () 
                         viewModelModule,
                         messageModule,
                         useCaseModule,
-                        fakeUseCaseModule
                     )
                 }
             ) {

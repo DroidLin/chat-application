@@ -27,9 +27,11 @@ interface MessageRepository {
     suspend fun deleteSessionContact(sessionContact: SessionContact)
 
     suspend fun fetchSessionContact(sessionId: String, sessionType: SessionType): SessionContact?
+    fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?>
 
     suspend fun fetchRecentSessionContactList(limit: Int): List<SessionContact>
     fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>>
+
     suspend fun fetchMessagesAtTime(
         chatterSessionId: String,
         sessionType: SessionType,
@@ -108,6 +110,13 @@ internal class MessageRepositoryImpl @Inject constructor(
 
     override suspend fun fetchSessionContact(sessionId: String, sessionType: SessionType): SessionContact? {
         return this.databaseProvider.sessionContactDatabaseApi.findSessionContact(sessionId, sessionType)
+    }
+
+    override fun fetchObservableSessionContact(
+        sessionId: String,
+        sessionType: SessionType
+    ): Flow<SessionContact?> {
+        return this.databaseProvider.sessionContactDatabaseApi.fetchObservableSessionContact(sessionId, sessionType)
     }
 
     override suspend fun fetchRecentSessionContactList(limit: Int): List<SessionContact> {

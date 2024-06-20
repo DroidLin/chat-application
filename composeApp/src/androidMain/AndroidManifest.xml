@@ -1,7 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-	<application android:name="com.chat.compose.app.App" android:icon="@mipmap/ic_launcher">
 
-		<activity android:name="com.chat.compose.app.MainActivity" android:exported="true">
+
+	<application
+		android:name="com.chat.compose.app.BasicApplication"
+		android:icon="@mipmap/ic_launcher"
+		android:theme="@style/BasicStyle">
+
+		<activity
+			android:name="com.chat.compose.app.MainActivity"
+			android:configChanges="orientation|locale|keyboardHidden|keyboard|fontScale|layoutDirection|uiMode|navigation|screenSize|screenLayout|colorMode|density|smallestScreenSize|touchscreen|mcc|mnc"
+			android:exported="true"
+			android:launchMode="singleTask"
+			android:theme="@style/BasicStyle"
+			android:windowSoftInputMode="adjustResize">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>

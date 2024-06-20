@@ -53,7 +53,7 @@ private class MsgServiceImpl : MsgService {
         function: MutableMap<String, Any?>.() -> Unit
     ) {
         this.messageRepository.updateSessionContact(sessionId, sessionType) {
-            copy(extensions = this.extensions.toMutableMap().apply(function))
+            copy(lastUpdateTimestamp = System.currentTimeMillis(), extensions = this.extensions.toMutableMap().apply(function))
         }
     }
 

@@ -33,6 +33,7 @@ interface SessionContactDatabaseApi {
     suspend fun updateSessionContact(sessionContact: SessionContact)
 
     suspend fun findSessionContact(sessionId: String, sessionType: SessionType): SessionContact?
+    fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?>
 }
 
 internal fun SessionContactDatabaseApi(database: AppMessageDatabase?): SessionContactDatabaseApi {
@@ -58,6 +59,12 @@ private class SessionContactDatabaseImpl(
         val database = this.database ?: return null
         val sessionContact = database.sessionContactDao.fetchSessionContact(sessionId, sessionType.value)
         return sessionContact?.toSessionContact(database)
+    }
+
+    override fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?> {
+        val database = this.database ?: return flowOf(null)
+        return database.sessionContactDao.fetchObservableSessionContact(sessionId, sessionType.value)
+            .map { localSessionContact -> localSessionContact?.toSessionContact(database) }
     }
 
     override suspend fun accessToSessionContact(sessionId: String, sessionType: SessionType) {
