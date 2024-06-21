@@ -1,6 +1,8 @@
 package com.chat.compose.app.screen.message.vm
 
 import androidx.compose.runtime.Immutable
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -21,8 +23,6 @@ import com.chat.compose.app.util.collect
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 /**
  * @author liuzhongao
@@ -40,9 +40,10 @@ class SessionDetailViewModel constructor(
     private var chatSession: ChatSession? = null
     private var observerJob: Job? = null
 
-    fun openSessionContact(sessionId: String, sessionType: SessionType) {
+    fun openSession(sessionId: String, sessionType: SessionType): StateFlow<PagingData<UiMessage>> {
         this.observerJob?.cancel()
-        this.observerJob = this.fetchSessionContactUseCase.fetchObservableSessionContact(sessionId, sessionType)
+        this.observerJob = this.fetchSessionContactUseCase
+            .fetchObservableSessionContact(sessionId, sessionType)
             .accessFirst { sessionContact ->
                 val draftMessage= sessionContact?.draftMessage
                 if (!draftMessage.isNullOrBlank()) {
@@ -56,9 +57,7 @@ class SessionDetailViewModel constructor(
                 this._state.update { state -> state.copy(title = uiSessionContact.sessionContactName) }
             }
             .collect(this.viewModelScope)
-    }
 
-    fun openSession(sessionId: String, sessionType: SessionType): StateFlow<PagingData<UiMessage>> {
         this.closeSession()
         val chatSession = this.openChatSessionUseCase.openChatSession(sessionId, sessionType)
         try {

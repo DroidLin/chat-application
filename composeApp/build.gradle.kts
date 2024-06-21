@@ -32,13 +32,10 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
-            implementation(compose.animation)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
-            implementation(libs.precompose)
-            implementation(libs.precompose.viewmodel)
             implementation(libs.droidlin.common.jvm)
             implementation(project(":app-channel-im"))
             implementation(project(":app-channel-message-core"))

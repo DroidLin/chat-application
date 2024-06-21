@@ -9,12 +9,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.metadata.UiSessionContact
 import com.chat.compose.app.screen.message.vm.SessionListViewModel
-import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 
 /**
  * @author liuzhongao
@@ -34,7 +34,7 @@ fun SessionListScreen(
         TopAppBar(
             title = { Text(text = "Session") },
         )
-        val sessionList by viewModel.sessionList.collectAsStateWithLifecycle()
+        val sessionList by viewModel.sessionList.collectAsState()
         LazyColumn(
             modifier = Modifier.weight(1f),
         ) {

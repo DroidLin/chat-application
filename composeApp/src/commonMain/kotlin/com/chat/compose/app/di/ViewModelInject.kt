@@ -1,7 +1,7 @@
 package com.chat.compose.app.di
 
 import androidx.compose.runtime.Composable
-import moe.tlaster.precompose.viewmodel.ViewModel
+import androidx.lifecycle.ViewModel
 import org.koin.compose.koinInject
 
 /**

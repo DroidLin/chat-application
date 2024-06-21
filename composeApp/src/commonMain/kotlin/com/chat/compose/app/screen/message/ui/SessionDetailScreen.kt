@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.application.channel.message.SessionType
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.paging.collectAsLazyPagingItems
@@ -18,7 +19,6 @@ import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.message_detail_send_button_hint
 import com.github.droidlin.composeapp.generated.resources.message_detail_text_field_place_holder
-import moe.tlaster.precompose.flow.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 
@@ -34,7 +34,7 @@ fun SessionDetailScreen(
     backPress: () -> Unit = {}
 ) {
     val viewModel: SessionDetailViewModel = koinViewModel()
-    val uiState = viewModel.state.collectAsStateWithLifecycle()
+    val uiState = viewModel.state.collectAsState()
 
     val lazyPagingItems = remember(sessionId, sessionType) {
         viewModel.openSession(sessionId, sessionType)
@@ -42,7 +42,6 @@ fun SessionDetailScreen(
         .collectAsLazyPagingItems()
 
     DisposableEffect(viewModel, sessionId, sessionType) {
-        viewModel.openSessionContact(sessionId, sessionType)
         onDispose {
             viewModel.saveDraft()
             viewModel.release()

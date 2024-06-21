@@ -10,7 +10,6 @@ import com.chat.compose.app.LocalWindow
 import com.chat.compose.app.di.messageModule
 import com.chat.compose.app.di.useCaseModule
 import com.chat.compose.app.di.viewModelModule
-import moe.tlaster.precompose.PreComposeApp
 import org.koin.compose.KoinApplication
 
 /**
@@ -40,18 +39,16 @@ fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () 
     MaterialTheme(
         colorScheme = colorScheme,
     ) {
-        PreComposeApp {
-            KoinApplication(
-                application = {
-                    modules(
-                        viewModelModule,
-                        messageModule,
-                        useCaseModule,
-                    )
-                }
-            ) {
-                Surface(modifier = modifier, content = content)
+        KoinApplication(
+            application = {
+                modules(
+                    viewModelModule,
+                    messageModule,
+                    useCaseModule,
+                )
             }
+        ) {
+            Surface(modifier = modifier, content = content)
         }
     }
 }

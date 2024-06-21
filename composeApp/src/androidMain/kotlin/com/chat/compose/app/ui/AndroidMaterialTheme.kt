@@ -7,7 +7,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -15,8 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.chat.compose.app.LocalActivity
 import com.chat.compose.app.ui.util.setLightNavigation
 import com.chat.compose.app.ui.util.setLightStatusBar
-import moe.tlaster.precompose.PreComposeApp
-import moe.tlaster.precompose.ui.LocalBackDispatcherOwner
 import org.koin.compose.KoinContext
 
 /**
@@ -45,10 +42,8 @@ fun AndroidMaterialTheme(modifier: Modifier = Modifier, content: @Composable () 
     }
 
     MaterialTheme(colorScheme = colorScheme) {
-        PreComposeApp {
-            KoinContext {
-                Surface(modifier = modifier, content = content)
-            }
+        KoinContext {
+            Surface(modifier = modifier, content = content)
         }
     }
 }
