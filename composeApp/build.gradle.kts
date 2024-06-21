@@ -32,6 +32,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
+            implementation(compose.animation)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -49,6 +50,8 @@ kotlin {
             implementation(libs.coil.core)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
+
+            implementation(libs.jetbrains.navigation.compose)
         }
         val androidMain by getting
         androidMain.dependencies {

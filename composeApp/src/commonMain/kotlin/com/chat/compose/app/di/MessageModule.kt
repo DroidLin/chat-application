@@ -3,12 +3,7 @@ package com.chat.compose.app.di
 import com.application.channel.im.IMInitConfig
 import com.application.channel.im.MsgClient
 import com.application.channel.im.MsgConnectionService
-import com.application.channel.message.MessageRepository
-import dagger.Module
-import dagger.Provides
 import org.koin.dsl.module
-import javax.inject.Singleton
-import kotlin.system.measureTimeMillis
 
 /**
  * @author liuzhongao
@@ -18,20 +13,9 @@ import kotlin.system.measureTimeMillis
 expect fun imInitConfig(): IMInitConfig
 
 val messageModule = module {
+    factory { imInitConfig() }
     factory {
-        imInitConfig()
+        MsgClient.getService(MsgConnectionService::class.java).also { it.initService(get()) }
     }
-    factory {
-        MsgClient.getService(MsgConnectionService::class.java).also { service ->
-            val times = measureTimeMillis {
-                val initConfig: IMInitConfig = get()
-                service.initService(initConfig)
-            }
-            println("cost: $times ms")
-        }
-    }
-    factory {
-        val service: MsgConnectionService = get()
-        service.messageRepository
-    }
+    factory { get<MsgConnectionService>().messageRepository }
 }
