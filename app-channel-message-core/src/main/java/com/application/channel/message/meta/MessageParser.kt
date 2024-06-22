@@ -22,9 +22,9 @@ internal class MessageParserImpl(private val parserList: List<MessageParser>) : 
         }
     }
 
-    override fun parse(message: Message): Message? {
+    override fun parse(message: Message): Message {
         return this.parserList.firstNotNullOfOrNull { parser ->
             parser.parse(message)
-        }
+        } ?: message
     }
 }

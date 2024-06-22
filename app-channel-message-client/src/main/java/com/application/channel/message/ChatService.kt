@@ -14,6 +14,7 @@ import com.application.channel.message.encryptor.DecryptorDecoder
 import com.application.channel.message.encryptor.EncryptorEncoder
 import com.application.channel.message.meta.Message
 import com.application.channel.message.meta.MessageParser
+import com.application.channel.message.modules.InitialConfigModule
 import com.application.channel.message.modules.MessageDatabaseModule
 import com.application.channel.message.transformer.ByteArrayToObjectDecoder
 import com.application.channel.message.transformer.JSONObjectToMessageDecoder
@@ -50,6 +51,7 @@ fun ChatService(
         .messageParserModule(MessageParserModule(initConfig.messageParserList))
         .messageDatabaseModule(MessageDatabaseModule(initConfig.messageDatabase))
         .channelClientComponent(DaggerChannelClientComponent.create())
+        .initialConfigModule(InitialConfigModule(initConfig))
         .build()
         .chatService()
 }
@@ -63,7 +65,8 @@ internal class ChatServiceImpl @Inject constructor(
     @EncryptReleaseKey
     private val encryptKey: ByteArray,
     private val databaseProvider: DBProvider,
-    override val messageRepository: MessageRepository
+    override val messageRepository: MessageRepository,
+    private val chatServiceInitConfig: ChatServiceInitConfig
 ) : ChatService {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
@@ -98,7 +101,7 @@ internal class ChatServiceImpl @Inject constructor(
     }
 
     private val initConfig = socketInitConfig {
-        address("http://127.0.0.1:8325")
+        address(this@ChatServiceImpl.chatServiceInitConfig.remoteAddress)
         afterNewValueRead(this@ChatServiceImpl.newValueArrivedListener)
         onExceptionCreated(this@ChatServiceImpl.exceptionHandler)
         onConnectionLoss(this@ChatServiceImpl.onConnectionLossListener)

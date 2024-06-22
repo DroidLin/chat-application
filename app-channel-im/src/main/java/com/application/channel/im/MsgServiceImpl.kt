@@ -53,8 +53,16 @@ private class MsgServiceImpl : MsgService {
         function: MutableMap<String, Any?>.() -> Unit
     ) {
         this.messageRepository.updateSessionContact(sessionId, sessionType) {
-            copy(lastUpdateTimestamp = System.currentTimeMillis(), extensions = this.extensions.toMutableMap().apply(function))
+            copy(extensions = this.extensions.toMutableMap().apply(function))
         }
+    }
+
+    override suspend fun fetchSessionContact(sessionId: String, sessionType: SessionType): SessionContact? {
+        return this.messageRepository.fetchSessionContact(sessionId, sessionType)
+    }
+
+    override fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?> {
+        return this.messageRepository.fetchObservableSessionContact(sessionId, sessionType)
     }
 
     override suspend fun deleteSessionContact(sessionId: String, sessionType: SessionType) {
@@ -69,7 +77,7 @@ private class MsgServiceImpl : MsgService {
         return this.messageRepository.fetchRecentSessionContactList(limit)
     }
 
-    override suspend fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>> {
+    override fun fetchObservableRecentSessionContactList(limit: Int): Flow<List<SessionContact>> {
         return this.messageRepository.fetchObservableSessionContactList(limit)
     }
 

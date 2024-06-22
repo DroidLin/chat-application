@@ -11,5 +11,6 @@ val useCaseModule = module {
     factory { OpenChatSessionUseCase(get()) }
     factory { CloseSessionUseCase(get()) }
     factory { FetchSessionContactUseCase(get()) }
-    factory<FetchSessionListUseCase> { FetchSessionListUseCaseImpl(get()) }
+    factory { FetchSessionListUseCase(get()) }
+    factory { FetchChatDetailListUseCase(get()) }
 }

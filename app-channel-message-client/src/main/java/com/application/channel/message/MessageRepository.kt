@@ -13,6 +13,8 @@ import javax.inject.Inject
  */
 interface MessageRepository {
 
+    val useSessionId: String
+
     suspend fun insertSessionContact(sessionId: String, sessionType: SessionType)
     suspend fun insertSessionContact(sessionContact: SessionContact)
 
@@ -75,6 +77,8 @@ internal class MessageRepositoryImpl @Inject constructor(
     private val databaseProvider: DBProvider
 ) : MessageRepository {
 
+    override val useSessionId: String get() = this.databaseProvider.userSessionId
+
     override suspend fun insertSessionContact(sessionId: String, sessionType: SessionType) {
         val sessionContact = SessionContact(sessionId = sessionId, sessionType = sessionType)
         this.insertSessionContact(sessionContact)
@@ -95,8 +99,9 @@ internal class MessageRepositoryImpl @Inject constructor(
     ) {
         val sessionContact = this.databaseProvider.sessionContactDatabaseApi.findSessionContact(sessionId, sessionType)
         val updatedSessionContact = sessionContact?.run(function)
-        if (updatedSessionContact != null) {
-            this.databaseProvider.sessionContactDatabaseApi.updateSessionContact(updatedSessionContact)
+        if (sessionContact != null && updatedSessionContact != null && sessionContact != updatedSessionContact) {
+            val timestampUpdatedSessionContact = updatedSessionContact.copy(lastUpdateTimestamp = System.currentTimeMillis())
+            this.databaseProvider.sessionContactDatabaseApi.updateSessionContact(timestampUpdatedSessionContact)
         }
     }
 

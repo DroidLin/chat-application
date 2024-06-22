@@ -14,6 +14,7 @@ import javax.inject.Singleton
 @Module
 class CommonModule {
 
+    @Singleton
     @Provides
     fun provideChannelGroup(): ChannelGroup {
         return DefaultChannelGroup(GlobalEventExecutor.INSTANCE)

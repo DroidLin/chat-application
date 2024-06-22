@@ -9,10 +9,10 @@ import com.application.channel.message.SessionType
 internal object ChatSessionFactory {
 
     @JvmStatic
-    fun create(sessionId: String, sessionType: SessionType): ChatSession {
-        return when (sessionType) {
-            SessionType.P2P -> P2PChatSession(sessionId, sessionType)
-            SessionType.Group -> GroupChatSession(sessionId, sessionType)
+    fun create(ctx: ChatSessionCreationContext): ChatSession {
+        return when (ctx.targetSessionType) {
+            SessionType.P2P -> P2PChatSession(ctx.toChatSessionContext)
+            SessionType.Group -> GroupChatSession(ctx.toChatSessionContext)
             else -> throw IllegalArgumentException("illegal session type.")
         }
     }

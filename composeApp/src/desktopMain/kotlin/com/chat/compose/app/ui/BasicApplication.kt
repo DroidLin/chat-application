@@ -1,18 +1,14 @@
 package com.chat.compose.app.ui
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -39,7 +35,7 @@ fun BasicApplication() {
                 route = route,
                 navOptions = navOptions {
                     launchSingleTop = true
-                    popUpTo(route = "") {
+                    popUpTo(route = route) {
                         inclusive = true
                     }
                 }
@@ -56,7 +52,8 @@ fun BasicApplication() {
             modifier = Modifier,
             header = {
                 Text(text = "Basic")
-            }
+            },
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         ) {
             NavigationRailItem(
                 selected = currentRoute == NavRoute.ChatSessionList.route,
@@ -88,28 +85,30 @@ fun BasicApplication() {
                 }
             )
         }
-        VerticalDivider()
         NavHost(
+            modifier = Modifier.weight(1f),
             navController = routerAction.navController,
             startDestination = NavRoute.ChatSessionList.route,
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() },
+            popEnterTransition = { fadeIn() },
+            popExitTransition = { fadeOut() }
         ) {
             composable(
                 route = NavRoute.ChatSessionList.route,
             ) {
-                SessionListScreen(
-                    backPress = routerAction::backPress,
-                    sessionItemClick = { sessionContact ->
-                        val route = NavRoute.ChatMessageDetail.buildRoute(
-                            sessionId = sessionContact.sessionId,
-                            sessionType = sessionContact.sessionType,
-                        )
-                        routerAction.navigateTo(route)
-                    }
-                )
+                Surface {
+                    SessionListScreen(
+                        backPress = routerAction::backPress,
+                        sessionItemClick = { sessionContact ->
+                            val route = NavRoute.ChatMessageDetail.buildRoute(
+                                sessionId = sessionContact.sessionId,
+                                sessionType = sessionContact.sessionType,
+                            )
+                            routerAction.navigateTo(route)
+                        }
+                    )
+                }
             }
             navigationComposable(
                 route = NavRoute.ChatMessageDetail.route
@@ -121,18 +120,22 @@ fun BasicApplication() {
                         backStackEntry.arguments?.getString("sessionType")?.toIntOrNull()
                     )
                 )
-                SessionDetailScreen(
-                    sessionId = sessionId,
-                    sessionType = sessionType,
-                    backPress = routerAction::backPress
-                )
+                Surface {
+                    SessionDetailScreen(
+                        sessionId = sessionId,
+                        sessionType = sessionType,
+                        backPress = routerAction::backPress
+                    )
+                }
             }
             composable(
                 route = NavRoute.Settings.route,
             ) {
-                SettingScreen(
-                    backPressed = routerAction::backPress
-                )
+                Surface {
+                    SettingScreen(
+                        backPressed = routerAction::backPress
+                    )
+                }
             }
         }
     }

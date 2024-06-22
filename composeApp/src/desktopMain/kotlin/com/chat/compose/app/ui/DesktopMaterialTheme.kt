@@ -11,6 +11,7 @@ import com.chat.compose.app.di.messageModule
 import com.chat.compose.app.di.useCaseModule
 import com.chat.compose.app.di.viewModelModule
 import org.koin.compose.KoinApplication
+import org.koin.compose.KoinContext
 
 /**
  * @author liuzhongao
@@ -39,15 +40,7 @@ fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () 
     MaterialTheme(
         colorScheme = colorScheme,
     ) {
-        KoinApplication(
-            application = {
-                modules(
-                    viewModelModule,
-                    messageModule,
-                    useCaseModule,
-                )
-            }
-        ) {
+        KoinContext {
             Surface(modifier = modifier, content = content)
         }
     }

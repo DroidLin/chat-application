@@ -24,6 +24,8 @@ coil = "3.0.0-alpha06"
 
 navigation-compose-multiplatform = "2.7.0-alpha07"
 
+kotlin-coroutines = "1.8.0"
+
 [libraries]
 dagger-runtime = { group = "com.google.dagger", name = "dagger", version.ref = "dagger-version" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger-version" }
@@ -64,6 +66,8 @@ coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref 
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor", version.ref = "coil" }
 
 jetbrains-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose-multiplatform" }
+
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlin-coroutines" }
 
 
 [plugins]

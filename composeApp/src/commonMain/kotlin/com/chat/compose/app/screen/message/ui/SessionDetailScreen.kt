@@ -1,5 +1,6 @@
 package com.chat.compose.app.screen.message.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -9,24 +10,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.application.channel.message.SessionType
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.paging.collectAsLazyPagingItems
 import com.chat.compose.app.paging.itemContentType
 import com.chat.compose.app.paging.itemKey
 import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
-import com.github.droidlin.composeapp.generated.resources.Res
-import com.github.droidlin.composeapp.generated.resources.message_detail_send_button_hint
-import com.github.droidlin.composeapp.generated.resources.message_detail_text_field_place_holder
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.stringResource
+import com.chat.compose.app.ui.framework.Box
+import com.chat.compose.app.ui.framework.Column
+import com.chat.compose.app.ui.messages.MessageUi
 
 /**
  * @author liuzhongao
  * @since 2024/6/17 00:00
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SessionDetailScreen(
     sessionId: String,
@@ -35,11 +33,6 @@ fun SessionDetailScreen(
 ) {
     val viewModel: SessionDetailViewModel = koinViewModel()
     val uiState = viewModel.state.collectAsState()
-
-    val lazyPagingItems = remember(sessionId, sessionType) {
-        viewModel.openSession(sessionId, sessionType)
-    }
-        .collectAsLazyPagingItems()
 
     DisposableEffect(viewModel, sessionId, sessionType) {
         onDispose {
@@ -62,38 +55,47 @@ fun SessionDetailScreen(
                 }
             }
         )
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().weight(1f),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            reverseLayout = true
+        Box(
+            modifier = Modifier.weight(1f)
         ) {
-            items(
-                count = lazyPagingItems.itemCount,
-                key = lazyPagingItems.itemKey { it.uuid },
-                contentType = lazyPagingItems.itemContentType { it.javaClass.name }
+            val lazyPagingItems = remember(sessionId, sessionType) {
+                viewModel.openSession(sessionId, sessionType)
+            }
+                .collectAsLazyPagingItems()
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                reverseLayout = true,
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
             ) {
-
+                item(key = "header_place_holder") { Spacer(modifier = Modifier.fillMaxWidth().height(1.dp)) }
+                items(
+                    count = lazyPagingItems.itemCount,
+                    key = lazyPagingItems.itemKey { it.uiMessage.uuid },
+                    contentType = lazyPagingItems.itemContentType { it.javaClass.name }
+                ) { index ->
+                    val messageItem = lazyPagingItems[index] ?: return@items
+                    MessageUi(
+                        modifier = Modifier
+                            .fillParentMaxWidth(),
+                        uiMessageItem = messageItem
+                    )
+                }
             }
         }
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            val inputTextState = remember { derivedStateOf { uiState.value.inputText } }
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth().height(180.dp),
-                value = inputTextState.value,
-                onValueChange = viewModel::updateInputText,
-                shape = MaterialTheme.shapes.large,
-                placeholder = {
-                    Text(text = stringResource(Res.string.message_detail_text_field_place_holder))
-                }
+        Box {
+            val inputText by remember { derivedStateOf { uiState.value.inputText } }
+            ChatInputArea(
+                text = inputText,
+                onTextChange = viewModel::updateInputText,
+                onSendClick = viewModel::onSendTextMessage,
+                modifier = Modifier,
             )
-            TextButton(
-                modifier = Modifier.align(Alignment.End),
-                onClick = {}
-            ) {
-                Text(text = stringResource(Res.string.message_detail_send_button_hint))
-            }
         }
     }
+}
+
+@Composable
+private fun SessionDetailScreen() {
+
 }

@@ -2,23 +2,28 @@ package com.application.channel.im.session
 
 import androidx.paging.PagingSource
 import com.application.channel.im.MsgClient
+import com.application.channel.im.MsgConnectionService
 import com.application.channel.im.MsgService
 import com.application.channel.im.SessionExtensions
+import com.application.channel.message.Callback
 import com.application.channel.message.MessageReceiveListener
 import com.application.channel.message.MessageReceiveListenerWrapper
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
+import com.application.channel.message.meta.Messages
 
 /**
  * @author liuzhongao
  * @since 2024/6/10 09:52
  */
 internal abstract class AbstractChatSession(
-    final override val sessionId: String,
-    final override val sessionType: SessionType
+    override val context: ChatSessionContext
 ) : ChatSession, MessageReceiveListener {
 
     private val receiveListenerWrapper = MessageReceiveListenerWrapper()
+
+    private val sessionId: String get() = this.context.chatterSessionId
+    private val sessionType: SessionType get() = this.context.chatterSessionType
 
     override fun addListener(listener: MessageReceiveListener) {
         this.receiveListenerWrapper.addListener(listener)
@@ -26,6 +31,16 @@ internal abstract class AbstractChatSession(
 
     override fun removeListener(listener: MessageReceiveListener) {
         this.receiveListenerWrapper.removeListener(listener)
+    }
+
+    override fun sendTextMessage(text: String) {
+        val textMessage = Messages.buildTextMessage(
+            content = text,
+            selfSessionId = this.context.selfUserSessionId,
+            sessionId = this.context.chatterSessionId,
+            sessionType = this.context.chatterSessionType
+        )
+        MsgClient.getService(MsgConnectionService::class.java).writeMessage(textMessage, Callback)
     }
 
     override suspend fun fetchHistoryMessages(timestamp: Long, limit: Int): List<Message> {
@@ -59,11 +74,11 @@ internal abstract class AbstractChatSession(
 
     abstract fun interceptMessageEvent(message: Message, notify: (Message) -> Unit)
 
-    fun performOnCreate() {
+    internal fun performOnCreate() {
         this.onCreate()
     }
 
-    fun performOnDestroy() {
+    internal fun performOnDestroy() {
         this.onDestroy()
     }
 

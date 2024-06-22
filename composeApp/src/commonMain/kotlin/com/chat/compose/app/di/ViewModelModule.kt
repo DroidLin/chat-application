@@ -10,5 +10,5 @@ import org.koin.dsl.module
  */
 val viewModelModule = module {
     factory { SessionListViewModel(get()) }
-    factory { SessionDetailViewModel(get(), get(), get()) }
+    factory { SessionDetailViewModel(get(), get(), get(), get()) }
 }

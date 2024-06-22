@@ -2,6 +2,7 @@ package com.application.channel.message
 
 import com.application.channel.core.client.ChannelClientComponent
 import com.application.channel.message.modules.DBProviderModule
+import com.application.channel.message.modules.InitialConfigModule
 import com.application.channel.message.modules.MessageDatabaseModule
 import com.application.channel.message.modules.MessageRepositoryModule
 import dagger.Binds
@@ -24,7 +25,8 @@ import javax.inject.Singleton
         MessageParserModule::class,
         MessageDatabaseModule::class,
         DBProviderModule::class,
-        MessageRepositoryModule::class
+        MessageRepositoryModule::class,
+        InitialConfigModule::class,
     ],
     dependencies = [ChannelClientComponent::class]
 )

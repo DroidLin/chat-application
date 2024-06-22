@@ -11,13 +11,13 @@ import com.application.channel.message.meta.Message
  */
 interface ChatSession {
 
-    val sessionId: String
-
-    val sessionType: SessionType
+    val context: ChatSessionContext
 
     fun addListener(listener: MessageReceiveListener)
 
     fun removeListener(listener: MessageReceiveListener)
+
+    fun sendTextMessage(text: String)
 
     suspend fun fetchHistoryMessages(timestamp: Long = Long.MAX_VALUE, limit: Int = 20): List<Message>
 

@@ -10,10 +10,7 @@ import com.application.channel.message.meta.Message
  * @author liuzhongao
  * @since 2024/6/10 13:42
  */
-internal class GroupChatSession(
-    sessionId: String,
-    sessionType: SessionType
-) : AbstractChatSession(sessionId, sessionType), MessageReceiveListener {
+internal class GroupChatSession(context: ChatSessionContext) : AbstractChatSession(context), MessageReceiveListener {
 
     override fun onCreate() {
         MsgClient.getService(MsgConnectionService::class.java)

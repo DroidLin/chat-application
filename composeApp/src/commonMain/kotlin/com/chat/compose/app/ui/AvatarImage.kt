@@ -7,8 +7,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,8 +37,11 @@ fun NameAvatarImage(
     name: String,
     modifier: Modifier = Modifier,
 ) {
+    val nameState = rememberUpdatedState(name)
+    val singleWord = remember { derivedStateOf { nameState.value.getOrNull(0)?.uppercase() ?: "" } }
+
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = MaterialTheme.colorScheme.tertiaryContainer,
         shape = CircleShape
     ) {
         Box(
@@ -42,11 +49,12 @@ fun NameAvatarImage(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = name,
+                text = singleWord.value,
                 style = MaterialTheme.typography.bodyLarge,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }

@@ -3,6 +3,7 @@ package com.application.channel.message.database
 import com.application.channel.database.AppMessageDatabase
 import com.application.channel.database.meta.LocalSessionContact
 import com.application.channel.message.SessionType
+import com.application.channel.message.meta.MessageParser
 import com.application.channel.message.metadata.SessionContact
 import com.application.channel.message.metadata.SessionContacts.toLocalSessionContact
 import com.application.channel.message.metadata.SessionContacts.toSessionContact
@@ -36,12 +37,13 @@ interface SessionContactDatabaseApi {
     fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?>
 }
 
-internal fun SessionContactDatabaseApi(database: AppMessageDatabase?): SessionContactDatabaseApi {
-    return SessionContactDatabaseImpl(database)
+internal fun SessionContactDatabaseApi(database: AppMessageDatabase?, messageParser: MessageParser): SessionContactDatabaseApi {
+    return SessionContactDatabaseImpl(database, messageParser)
 }
 
 private class SessionContactDatabaseImpl(
-    private val database: AppMessageDatabase?
+    private val database: AppMessageDatabase?,
+    private val messageParser: MessageParser
 ) : SessionContactDatabaseApi {
 
     override suspend fun insertSessionContact(sessionContact: SessionContact) {
@@ -58,13 +60,13 @@ private class SessionContactDatabaseImpl(
     override suspend fun findSessionContact(sessionId: String, sessionType: SessionType): SessionContact? {
         val database = this.database ?: return null
         val sessionContact = database.sessionContactDao.fetchSessionContact(sessionId, sessionType.value)
-        return sessionContact?.toSessionContact(database)
+        return sessionContact?.toSessionContact(database, this.messageParser)
     }
 
     override fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?> {
         val database = this.database ?: return flowOf(null)
         return database.sessionContactDao.fetchObservableSessionContact(sessionId, sessionType.value)
-            .map { localSessionContact -> localSessionContact?.toSessionContact(database) }
+            .map { localSessionContact -> localSessionContact?.toSessionContact(database, this.messageParser) }
     }
 
     override suspend fun accessToSessionContact(sessionId: String, sessionType: SessionType) {
@@ -80,7 +82,7 @@ private class SessionContactDatabaseImpl(
         return coroutineScope {
             val sessionContactList = database.sessionContactDao.fetchRecentSessionContactList(limit)
             sessionContactList.map { sessionContact ->
-                async { sessionContact.toSessionContact(database) }
+                async { sessionContact.toSessionContact(database, this@SessionContactDatabaseImpl.messageParser) }
             }.awaitAll()
         }
     }
@@ -91,7 +93,7 @@ private class SessionContactDatabaseImpl(
             .distinctUntilChanged()
             .map { localSessionContactList ->
                 localSessionContactList.map { localSessionContact ->
-                    localSessionContact.toSessionContact(this.database)
+                    localSessionContact.toSessionContact(this.database, this.messageParser)
                 }
             }
             .distinctUntilChanged()

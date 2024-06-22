@@ -53,7 +53,7 @@ fun FrameworkScreen() {
             navController = routerAction.navController,
             startDestination = NavRoute.ChatSessionList.route,
         ) {
-            composable(
+            homeNavigationComposable(
                 route = NavRoute.ChatSessionList.route,
             ) {
                 Surface {
@@ -69,7 +69,16 @@ fun FrameworkScreen() {
                     )
                 }
             }
-            composable(
+            homeNavigationComposable(
+                route = NavRoute.Settings.route,
+            ) {
+                Surface {
+                    SettingScreen(
+                        backPressed = routerAction::backPress
+                    )
+                }
+            }
+            navigationComposable(
                 route = NavRoute.ChatMessageDetail.route
             ) { backStackEntry ->
                 Surface {
@@ -84,15 +93,6 @@ fun FrameworkScreen() {
                         sessionId = sessionId,
                         sessionType = sessionType,
                         backPress = routerAction::backPress
-                    )
-                }
-            }
-            composable(
-                route = NavRoute.Settings.route,
-            ) {
-                Surface {
-                    SettingScreen(
-                        backPressed = routerAction::backPress
                     )
                 }
             }

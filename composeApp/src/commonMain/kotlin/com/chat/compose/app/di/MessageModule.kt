@@ -3,6 +3,7 @@ package com.chat.compose.app.di
 import com.application.channel.im.IMInitConfig
 import com.application.channel.im.MsgClient
 import com.application.channel.im.MsgConnectionService
+import com.application.channel.im.MsgService
 import org.koin.dsl.module
 
 /**
@@ -14,8 +15,7 @@ expect fun imInitConfig(): IMInitConfig
 
 val messageModule = module {
     factory { imInitConfig() }
-    factory {
-        MsgClient.getService(MsgConnectionService::class.java).also { it.initService(get()) }
-    }
+    factory { MsgClient.getService(MsgConnectionService::class.java).also { it.initService(get()) } }
     factory { get<MsgConnectionService>().messageRepository }
+    factory { MsgClient.getService(MsgService::class.java) }
 }

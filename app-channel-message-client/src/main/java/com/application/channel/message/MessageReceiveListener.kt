@@ -40,4 +40,10 @@ class MessageReceiveListenerWrapper @Inject constructor() : MessageReceiveListen
         }
         newCopyList.forEach { listener -> listener.onReceive(message) }
     }
+
+    fun release() {
+        synchronized(this.listeners) {
+            this.listeners.clear()
+        }
+    }
 }

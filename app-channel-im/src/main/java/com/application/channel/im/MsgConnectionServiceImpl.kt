@@ -2,8 +2,10 @@ package com.application.channel.im
 
 import com.application.channel.im.session.AbstractChatSession
 import com.application.channel.im.session.ChatSession
+import com.application.channel.im.session.ChatSessionCreationContext
 import com.application.channel.im.session.ChatSessionFactory
 import com.application.channel.message.*
+import com.application.channel.message.meta.Message
 
 /**
  * @author liuzhongao
@@ -33,7 +35,12 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
     }
 
     override fun openSession(sessionId: String, sessionType: SessionType): ChatSession {
-        val chatSession = ChatSessionFactory.create(sessionId, sessionType)
+        val ctx = ChatSessionCreationContext(
+            userSessionId = this.messageRepository.useSessionId,
+            targetSessionId = sessionId,
+            targetSessionType = sessionType
+        )
+        val chatSession = ChatSessionFactory.create(ctx)
         if (chatSession is AbstractChatSession) {
             chatSession.performOnCreate()
         }
@@ -46,9 +53,18 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
         }
     }
 
-    override fun initService(initConfig: IMInitConfig) {
-        if (this.initConfig == initConfig) {
+    override fun writeMessage(message: Message, callback: Callback) {
+        val chatService = this.chatService
+        if (chatService == null) {
+            callback.onFailure(Throwable("chat service not running"))
             return
+        }
+        chatService.writeMessage(message, callback)
+    }
+
+    override fun initService(initConfig: IMInitConfig): Boolean {
+        if (this.initConfig == initConfig) {
+            return false
         }
         this.stopService()
         val sessionId = initConfig.token.sessionId
@@ -61,6 +77,7 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
         chatService.addMessageReceivedListener(this.globalMessageReceiveListener)
         this.chatService = chatService
         this.initConfig = initConfig
+        return true
     }
 
     override fun startService() {
@@ -75,5 +92,11 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
         this.chatService?.removeMessageReceivedListener(this.globalMessageReceiveListener)
         this.chatService?.stopService()
         this.chatService = null
+    }
+
+    override fun release() {
+        this.globalMessageReceiveListener.release()
+        this.initConfig = null
+        this.stopService()
     }
 }

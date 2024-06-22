@@ -15,5 +15,9 @@ sealed interface UiMessage {
     val sessionType: SessionType
 
     val timestamp: Long
+
+    val isSenderMessage: Boolean
+
+    val isReceiverMessage: Boolean
 }
 

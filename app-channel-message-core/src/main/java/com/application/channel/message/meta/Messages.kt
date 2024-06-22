@@ -15,13 +15,18 @@ import java.util.UUID
 object Messages {
 
     @JvmStatic
-    fun buildTextMessage(content: String, sessionType: SessionType): TextMessage {
+    fun buildTextMessage(
+        content: String,
+        selfSessionId: String,
+        sessionId: String,
+        sessionType: SessionType
+    ): TextMessage {
         val extensions = mapOf(KEY_CONTENT to content)
         val textMessage = TextMessage(
             uuid = UUID.randomUUID().toString(),
             sessionType = sessionType,
-            sender = Account.default,
-            receiver = Account.default,
+            sender = Account(sessionId = selfSessionId, accountId = selfSessionId),
+            receiver = Account(sessionId = sessionId, accountId = sessionId),
             timestamp = System.currentTimeMillis(),
             ext = extensions
         )

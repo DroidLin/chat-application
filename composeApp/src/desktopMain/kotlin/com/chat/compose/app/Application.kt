@@ -11,15 +11,31 @@ import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
+import com.application.channel.im.MsgConnectionService
+import com.chat.compose.app.di.messageModule
+import com.chat.compose.app.di.useCaseModule
+import com.chat.compose.app.di.viewModelModule
 import com.chat.compose.app.metadata.ApplicationConfiguration
-import com.chat.compose.app.ui.DesktopMaterialTheme
 import com.chat.compose.app.ui.BasicApplication
+import com.chat.compose.app.ui.DesktopMaterialTheme
+import org.koin.compose.koinInject
+import org.koin.core.context.GlobalContext
+import org.koin.core.context.startKoin
 
 /**
  * @author liuzhongao
  * @since 2024/6/16 10:36
  */
 fun main() {
+    startKoin {
+        modules(
+            viewModelModule,
+            messageModule,
+            useCaseModule,
+        )
+    }
+    val service: MsgConnectionService = GlobalContext.get().get()
+    service.startService()
     application {
         val isSystemInDarkMode = isSystemInDarkTheme()
         val applicationConfiguration = remember(isSystemInDarkMode) {

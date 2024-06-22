@@ -4,6 +4,7 @@ import com.application.channel.database.AppMessageDatabase
 import com.application.channel.database.meta.LocalSessionContact
 import com.application.channel.message.SessionType
 import com.application.channel.message.map
+import com.application.channel.message.meta.MessageParser
 import com.application.channel.message.util.LocalMessageConverter.toMessage
 import org.json.JSONObject
 
@@ -19,7 +20,7 @@ internal object SessionContacts {
     }
 
     @JvmStatic
-    suspend fun LocalSessionContact.toSessionContact(database: AppMessageDatabase): SessionContact {
+    suspend fun LocalSessionContact.toSessionContact(database: AppMessageDatabase, messageParser: MessageParser): SessionContact {
         val recentMessage = database.messageDao.queryRecentMessageWithSomeone(
             sessionId = database.userSessionId,
             chatterSessionId = this.sessionId,
@@ -33,7 +34,9 @@ internal object SessionContacts {
         return SessionContact(
             sessionId = this.sessionId,
             unreadCount = unreadCount,
-            recentMessage = recentMessage,
+            recentMessage = if (recentMessage != null) {
+                messageParser.parse(recentMessage)
+            } else null,
             lastUpdateTimestamp = this.lastModifyTimestamp,
             sessionType = SessionType.fromValue(this.sessionTypeCode),
             extensions = this.extensions?.takeIf { it.isNotBlank() }?.let { extensions ->

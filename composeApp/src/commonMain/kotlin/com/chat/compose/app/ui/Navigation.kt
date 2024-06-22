@@ -1,11 +1,7 @@
 package com.chat.compose.app.ui
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -22,9 +18,9 @@ private const val AnimationDuration = 400
 private const val FadeAnimationDuration = 300
 
 private val enterTransition = slideInHorizontally(animationSpec = tween(AnimationDuration)) { it }
-private val exitTransition = slideOutHorizontally(animationSpec = tween(AnimationDuration)) { it }
-private val popEnterTransition = EnterTransition.None
-private val popExitTransition = ExitTransition.None
+private val exitTransition = fadeOut(animationSpec = tween(FadeAnimationDuration))
+private val popEnterTransition = fadeIn(animationSpec = tween(FadeAnimationDuration))
+private val popExitTransition = slideOutHorizontally(animationSpec = tween(AnimationDuration)) { it }
 
 
 fun NavGraphBuilder.homeNavigationComposable(
@@ -37,6 +33,10 @@ fun NavGraphBuilder.homeNavigationComposable(
         route = route,
         arguments = arguments,
         deepLinks = deepLinks,
+        enterTransition = { popEnterTransition },
+        exitTransition = { exitTransition },
+        popEnterTransition = { popEnterTransition },
+        popExitTransition = { exitTransition },
         content = content
     )
 }

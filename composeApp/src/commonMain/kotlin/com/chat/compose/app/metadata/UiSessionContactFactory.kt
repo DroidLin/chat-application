@@ -16,7 +16,7 @@ fun SessionContact.toUiSessionContact(): UiSessionContact {
         sessionType = this.sessionType,
         sessionContactName = "${this.sessionId} [Test]",
         unreadCount = this.unreadCount,
-        displayContent = draftMessage ?: "",
+        displayContent = draftMessage ?: this.recentMessage?.showingContent ?: "",
         time = formatTime(this.lastUpdateTimestamp)
     )
 }

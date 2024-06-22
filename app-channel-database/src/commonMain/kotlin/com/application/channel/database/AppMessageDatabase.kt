@@ -3,7 +3,13 @@ package com.application.channel.database
 import androidx.room.*
 import com.application.channel.database.dao.LocalMessageDao
 import com.application.channel.database.dao.LocalSessionContactDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -41,6 +47,8 @@ private class AppMessageDatabaseImpl(
     private val database: MessageDatabase
 ) : AppMessageDatabase {
 
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
     override val sessionContactDao: LocalSessionContactDao = this.database.sessionDao
     override val messageDao: LocalMessageDao = this.database.messageDao
 
@@ -61,7 +69,7 @@ private class AppMessageDatabaseImpl(
         if (this.observerMapping.contains(observer)) {
             return
         }
-        runBlocking {
+        this.coroutineScope.launch {
             val invalidationTracker = this@AppMessageDatabaseImpl.database.invalidationTracker
             val trackerObserverAdapter = TrackerObserverAdapter(observer)
             invalidationTracker.subscribe(trackerObserverAdapter)
@@ -73,11 +81,12 @@ private class AppMessageDatabaseImpl(
         if (!this.observerMapping.contains(observer)) {
             return
         }
-        runBlocking {
+        this.coroutineScope.launch {
             val invalidationTracker = this@AppMessageDatabaseImpl.database.invalidationTracker
-            val trackerObserverAdapter =
-                this@AppMessageDatabaseImpl.observerMapping.remove(observer) ?: return@runBlocking
-            invalidationTracker.unsubscribe(trackerObserverAdapter)
+            val trackerObserverAdapter = this@AppMessageDatabaseImpl.observerMapping.remove(observer)
+            if (trackerObserverAdapter != null) {
+                invalidationTracker.unsubscribe(trackerObserverAdapter)
+            }
         }
     }
 

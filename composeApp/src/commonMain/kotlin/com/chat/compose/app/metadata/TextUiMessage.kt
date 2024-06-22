@@ -12,5 +12,7 @@ data class TextUiMessage(
     override val uuid: String,
     override val sessionType: SessionType,
     override val timestamp: Long,
-    val textContent: String
+    override val isSenderMessage: Boolean,
+    override val isReceiverMessage: Boolean,
+    val textContent: String,
 ) : UiMessage
