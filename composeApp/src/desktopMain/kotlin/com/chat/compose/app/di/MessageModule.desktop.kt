@@ -2,8 +2,9 @@ package com.chat.compose.app.di
 
 import com.application.channel.database.AppMessageDatabase
 import com.application.channel.database.jvm.AppMessageDatabase
+import com.application.channel.im.IMDatabaseInitConfig
 import com.application.channel.im.IMInitConfig
-import com.application.channel.im.Token
+import com.application.channel.message.Account
 import com.chat.compose.app.usecase.sessionContactV1
 import java.io.File
 
@@ -20,10 +21,22 @@ private val databaseFactory = AppMessageDatabase.Factory { sessionId ->
     )
 }
 
+actual fun platformAppDatabaseFactory(): AppMessageDatabase.Factory {
+    return databaseFactory
+}
+
+private val account = Account(sessionContactV1.sessionId, sessionContactV1.sessionId)
+
 actual fun imInitConfig(): IMInitConfig {
     return IMInitConfig(
         remoteAddress = "http://192.168.2.110:8325",
-        token = Token(sessionContactV1.sessionId, sessionContactV1.sessionId),
+        account = account,
+    )
+}
+
+actual fun imDatabaseInitConfig(): IMDatabaseInitConfig {
+    return IMDatabaseInitConfig(
+        account = account,
         factory = databaseFactory
     )
 }

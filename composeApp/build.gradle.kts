@@ -49,6 +49,7 @@ kotlin {
             implementation(libs.coil.network.ktor)
 
             implementation(libs.jetbrains.navigation.compose)
+
         }
         val androidMain by getting
         androidMain.dependencies {

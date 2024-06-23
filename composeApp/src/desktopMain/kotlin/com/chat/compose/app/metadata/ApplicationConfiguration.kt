@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.application.channel.im.IMInitConfig
 import com.application.channel.im.Token
+import com.application.channel.message.Account
 
 /**
  * @author liuzhongao
@@ -22,8 +23,7 @@ class ApplicationConfiguration(
     var initConfig: IMInitConfig by mutableStateOf(
         IMInitConfig(
             remoteAddress = "127.0.0.1",
-            token = Token(sessionId = "", authorizedToken = ""),
-            factory = { null }
+            account = Account(sessionId = "", accountId = ""),
         )
     )
 }

@@ -4,7 +4,12 @@ import android.app.Application
 import android.content.Context
 import android.os.Debug
 import android.os.Looper
+import com.application.channel.core.client.TcpClientModule
+import com.application.channel.core.util.koinInject
+import com.application.channel.im.IMDatabaseInitConfig
+import com.application.channel.im.IMInitConfig
 import com.application.channel.im.MsgConnectionService
+import com.application.channel.message.ChatServiceModule
 import com.chat.compose.app.di.messageModule
 import com.chat.compose.app.di.useCaseModule
 import com.chat.compose.app.di.viewModelModule
@@ -35,12 +40,14 @@ class BasicApplication : Application() {
                 viewModelModule,
                 messageModule,
                 useCaseModule,
+                TcpClientModule,
+                ChatServiceModule
             )
         }
 
-        val service: MsgConnectionService = GlobalContext.get().get()
-        service.initService(GlobalContext.get().get())
-
+        val service: MsgConnectionService = koinInject()
+        val imInitConfig: IMDatabaseInitConfig = koinInject()
+        service.initDatabase(imInitConfig)
     }
 
     companion object {

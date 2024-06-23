@@ -11,15 +11,20 @@ import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
+import com.android.dependencies.common.ComponentFacade
+import com.application.channel.core.client.TcpClientModule
+import com.application.channel.core.util.koinInject
+import com.application.channel.im.IMDatabaseInitConfig
+import com.application.channel.im.IMInitConfig
 import com.application.channel.im.MsgConnectionService
+import com.application.channel.im.SingleIMManager
+import com.application.channel.message.ChatServiceModule
 import com.chat.compose.app.di.messageModule
 import com.chat.compose.app.di.useCaseModule
 import com.chat.compose.app.di.viewModelModule
 import com.chat.compose.app.metadata.ApplicationConfiguration
 import com.chat.compose.app.ui.BasicApplication
 import com.chat.compose.app.ui.DesktopMaterialTheme
-import org.koin.compose.koinInject
-import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 
 /**
@@ -27,15 +32,17 @@ import org.koin.core.context.startKoin
  * @since 2024/6/16 10:36
  */
 fun main() {
+    ComponentFacade
     startKoin {
         modules(
             viewModelModule,
             messageModule,
             useCaseModule,
+            TcpClientModule,
+            ChatServiceModule
         )
     }
-    val service: MsgConnectionService = GlobalContext.get().get()
-    service.startService()
+    initAndStartChatService()
     application {
         val isSystemInDarkMode = isSystemInDarkTheme()
         val applicationConfiguration = remember(isSystemInDarkMode) {
