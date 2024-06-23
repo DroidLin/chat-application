@@ -1,27 +1,42 @@
 package com.application.channel.im
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
-
 /**
  * @author liuzhongao
  * @since 2024/6/22 20:16
  */
 object SingleIMManager {
 
-    private val _state = MutableStateFlow(value = SingleIMState())
+    private val reConnectProcessor = ReConnectProcessor(maxReConnectCount = 5) {
+        val initConfig = this.imInitConfig ?: return@ReConnectProcessor
+        this.startService(initConfig, true)
+    }
+    val connectionState = this.reConnectProcessor.state
 
-    val connectionService = MsgConnectionService()
-    val msgService = MsgService()
+    val connectionService = MsgClient.getService(MsgConnectionService::class.java)
+    val msgService = MsgClient.getService(MsgService::class.java)
 
-    fun initService(initConfig: IMInitConfig) {
-        if (this.connectionService.initService(initConfig)) {
-            this._state.update { it.copy(state = State.NotConnected) }
-        }
+    private var databaseInitConfig: IMDatabaseInitConfig? = null
+    private var imInitConfig: IMInitConfig? = null
+
+    init {
+        this.connectionService.addEventObserver(this.reConnectProcessor)
     }
 
-    fun startService() {
-        this.connectionService.startService()
+    fun initDatabase(initConfig: IMDatabaseInitConfig) {
+        if (this.databaseInitConfig == initConfig) {
+            return
+        }
+        this.databaseInitConfig = initConfig
+        this.connectionService.initDatabase(initConfig)
+    }
+
+    @JvmOverloads
+    fun startService(initConfig: IMInitConfig, force: Boolean = false) {
+        if (this.imInitConfig == initConfig) {
+            return
+        }
+        this.imInitConfig = initConfig
+        this.connectionService.startService(initConfig)
     }
 
     fun stopService() {
@@ -30,19 +45,9 @@ object SingleIMManager {
 
     fun release() {
         this.connectionService.release()
-        this._state.update { it.copy(state = State.NotInitialized) }
     }
 }
 
 data class SingleIMState(
     val state: State = State.NotInitialized
 )
-
-enum class State {
-    NotInitialized,
-    NotConnected,
-    Connecting,
-    Connected,
-    NotAuthorized,
-    Authorized,
-}

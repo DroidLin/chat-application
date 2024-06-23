@@ -44,8 +44,6 @@ internal class ChatServiceImpl @Inject constructor(
     private val authorizationMapping: AuthorizationMapping,
     private val controller: Controller<Message>,
     private val messageParser: MessageParser,
-    @EncryptReleaseKey
-    private val encryptKey: ByteArray
 ) : ChatService {
 
     override val chatServiceController = ChatServiceControllerImpl(this.channelServer, this.authorizationMapping)
@@ -65,13 +63,13 @@ internal class ChatServiceImpl @Inject constructor(
         initAdapter {
             val decoderFactories = listOf(
                 ByteBufToByteArrayDecoder(),
-                DecryptorDecoder(this@ChatServiceImpl.encryptKey),
+                DecryptorDecoder(EncryptionKey),
                 ByteArrayToObjectDecoder(),
                 JSONObjectToMessageDecoder(this@ChatServiceImpl.messageParser)
             )
             val encoderFactories = listOf(
                 ByteArrayToByteBufEncoder(),
-                EncryptorEncoder(this@ChatServiceImpl.encryptKey),
+                EncryptorEncoder(EncryptionKey),
                 ObjectToByteArrayEncoder()
             )
             val handlerFactories = listOf(

@@ -27,15 +27,12 @@ class WriteToChannelJob(
             this.listener?.onFailure(NotConnectedException("none of any channel is connected."))
             return
         }
-        val channelGroupFutureListener = object : ChannelGroupFutureListener {
-            override fun operationComplete(future: ChannelGroupFuture?) {
-                if (future == null) return
-                if (future.isSuccess || future.isPartialSuccess) {
-                    listener?.onSuccess()
-                } else listener?.onFailure(future.cause() ?: Throwable())
-            }
+        val channelGroupFutureListener = ChannelGroupFutureListener { future ->
+            if (future.isSuccess || future.isPartialSuccess) {
+                listener?.onSuccess()
+            } else listener?.onFailure(future.cause() ?: Throwable())
         }
-        this.channelGroup.writeAndFlush(value, object : ChannelMatcher {
+        this.channelGroup.writeAndFlush(this.value, object : ChannelMatcher {
             override fun matches(channel: Channel?): Boolean {
                 channel ?: return false
                 val channelContext = channel.channelContext

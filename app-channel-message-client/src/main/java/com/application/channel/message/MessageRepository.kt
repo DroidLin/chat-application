@@ -73,7 +73,11 @@ interface MessageRepository {
     fun release()
 }
 
-internal class MessageRepositoryImpl @Inject constructor(
+fun MessageRepository(dbProvider: DBProvider): MessageRepository {
+    return MessageRepositoryImpl(dbProvider)
+}
+
+private class MessageRepositoryImpl(
     private val databaseProvider: DBProvider
 ) : MessageRepository {
 

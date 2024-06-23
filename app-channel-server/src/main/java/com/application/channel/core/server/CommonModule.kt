@@ -12,11 +12,4 @@ import javax.inject.Singleton
  * @since 2024/6/1 14:56
  */
 @Module
-class CommonModule {
-
-    @Singleton
-    @Provides
-    fun provideChannelGroup(): ChannelGroup {
-        return DefaultChannelGroup(GlobalEventExecutor.INSTANCE)
-    }
-}
+class CommonModule

@@ -17,7 +17,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @since 2024/6/8 21:17
  */
 class MessagePersistenceListenerAdapter(
-    private val databaseProvider: DBProvider,
+    private val databaseProvider: DBProvider?,
     private val coroutineContext: CoroutineContext = EmptyCoroutineContext
 ) : MessageReceiveListener {
 
@@ -29,18 +29,19 @@ class MessagePersistenceListenerAdapter(
     )
 
     override fun onReceive(message: Message) {
+        val databaseProvider = this.databaseProvider ?: return
         // skip persist login related messages
-        if (!this.databaseProvider.isDatabaseAvailable || message is LoginMessage || message is LoginResultMessage) return
+        if (!databaseProvider.isDatabaseAvailable || message is LoginMessage || message is LoginResultMessage) return
 
         // always pick up session id related to target but not mine.
-        val sessionId = if (message.sender.sessionId == this.databaseProvider.userSessionId) {
+        val sessionId = if (message.sender.sessionId == databaseProvider.userSessionId) {
             message.receiver.sessionId
-        } else if (message.receiver.sessionId == this.databaseProvider.userSessionId) {
+        } else if (message.receiver.sessionId == databaseProvider.userSessionId) {
             message.sender.sessionId
         } else return
 
-        val sessionContactDao = this.databaseProvider.sessionContactDatabaseApi
-        val messageApi = this.databaseProvider.messageDatabaseApi
+        val sessionContactDao = databaseProvider.sessionContactDatabaseApi
+        val messageApi = databaseProvider.messageDatabaseApi
         this.coroutineScope.launch {
             this@MessagePersistenceListenerAdapter.coroutineMutex.withLock {
                 sessionContactDao.accessToSessionContact(sessionId, message.sessionType)

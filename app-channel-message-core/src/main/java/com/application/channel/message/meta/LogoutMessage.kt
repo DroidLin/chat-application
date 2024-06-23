@@ -8,9 +8,9 @@ import org.json.JSONObject
 
 /**
  * @author liuzhongao
- * @since 2024/6/1 19:52
+ * @since 2024/6/23 12:00
  */
-data class LoginResultMessage internal constructor(
+class LogoutMessage(
     override val uuid: String,
     override val sender: Account,
     override val receiver: Account,
@@ -21,6 +21,8 @@ data class LoginResultMessage internal constructor(
     override val msgType: MsgType = MsgType.Custom
     override val sessionType: SessionType get() = SessionType.Unknown
 
+    val code: Int get() = (this.ext[KEY_CONTENT] as? Map<*, *>)?.get(KEY_CODE) as? Int ?: -1
+
     constructor(message: Message) : this(
         uuid = message.uuid,
         sender = message.sender,
@@ -28,18 +30,6 @@ data class LoginResultMessage internal constructor(
         timestamp = message.timestamp,
         ext = message.ext
     )
-
-    val authorized: Boolean by lazy {
-        (this.ext[KEY_CONTENT] as? Map<*, *>)?.get(KEY_AUTHORIZED) as? Boolean ?: false
-    }
-
-    val code: Int by lazy {
-        (this.ext[KEY_CONTENT] as? Map<*, *>)?.get(KEY_CODE) as? Int ?: -1
-    }
-
-    val message: String? by lazy {
-        (this.ext[KEY_CONTENT] as? Map<*, *>)?.get(KEY_MESSAGE) as? String
-    }
 
     class Parser : MessageParser {
         override fun parse(jsonObject: JSONObject): Message? {
@@ -51,7 +41,7 @@ data class LoginResultMessage internal constructor(
             if (message.msgType != MsgType.Custom) return null
 
             val customType = message.ext[KEY_TYPE] as? String ?: return null
-            if (customType != TYPE_LOGIN_RESULT_MESSAGE) return null
+            if (customType != TYPE_LOGOUT_MESSAGE) return null
             return LoginResultMessage(message)
         }
     }

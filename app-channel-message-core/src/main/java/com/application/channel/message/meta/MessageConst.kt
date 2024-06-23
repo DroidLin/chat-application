@@ -7,6 +7,7 @@ package com.application.channel.message.meta
 
 const val TYPE_LOGIN_MESSAGE = "LOGIN_MESSAGE"
 const val TYPE_LOGIN_RESULT_MESSAGE = "LOGIN_RESULT_MESSAGE"
+const val TYPE_LOGOUT_MESSAGE = "LOGOUT_MESSAGE"
 
 const val KEY_CONTENT = "content"
 const val KEY_TYPE = "type"
@@ -25,3 +26,5 @@ const val KEY_URL = "url"
 
 const val KEY_AUTHORIZED = "authorized"
 const val KEY_MESSAGE = "message"
+
+const val KEY_CODE = "code"

@@ -10,6 +10,8 @@ import javax.inject.Singleton
  * @author liuzhongao
  * @since 2024/6/2 09:36
  */
+val EncryptionKey = "LZA".encodeToByteArray()
+
 @Module
 class KeyModule {
 

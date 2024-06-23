@@ -23,6 +23,8 @@ dependencies {
     api(libs.netty.all)
     api(libs.dagger.runtime)
     ksp(libs.dagger.compiler)
+
+    api(libs.koin.core)
 }
 
 publishing {

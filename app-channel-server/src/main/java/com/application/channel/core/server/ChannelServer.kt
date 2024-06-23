@@ -10,7 +10,10 @@ import io.netty.bootstrap.Bootstrap
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture
 import io.netty.channel.group.ChannelGroup
+import io.netty.channel.group.DefaultChannelGroup
 import io.netty.channel.nio.NioEventLoopGroup
+import io.netty.util.concurrent.GlobalEventExecutor
+import org.koin.core.context.GlobalContext
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -41,9 +44,9 @@ interface ChannelServer {
     fun shutDown(initConfig: InitConfig)
 }
 
-internal class ChannelServerImpl @Inject constructor(
-    private val channelGroup: ChannelGroup
-) : ChannelServer {
+internal class ChannelServerImpl @Inject constructor() : ChannelServer {
+
+    private val channelGroup = DefaultChannelGroup(GlobalEventExecutor.INSTANCE)
 
     private val _initConfigFutureMap = ConcurrentHashMap<InitConfig, ChannelFuture>()
 

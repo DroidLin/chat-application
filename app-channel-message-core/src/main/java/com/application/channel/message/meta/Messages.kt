@@ -70,11 +70,29 @@ object Messages {
         val extensions = mapOf(
             KEY_CONTENT to mapOf(
                 KEY_AUTHORIZED to authorized,
-                KEY_MESSAGE to messages
+                KEY_MESSAGE to messages,
+                KEY_CODE to 200
             ),
             KEY_TYPE to TYPE_LOGIN_RESULT_MESSAGE
         )
         return LoginResultMessage(
+            uuid = UUID.randomUUID().toString(),
+            sender = account,
+            receiver = account,
+            timestamp = System.currentTimeMillis(),
+            ext = extensions
+        )
+    }
+
+    @JvmStatic
+    fun buildLogoutMessage(account: Account, code: Int): LogoutMessage {
+        val extensions = mapOf(
+            KEY_CONTENT to mapOf(
+                KEY_CODE to code
+            ),
+            KEY_TYPE to TYPE_LOGOUT_MESSAGE
+        )
+        return LogoutMessage(
             uuid = UUID.randomUUID().toString(),
             sender = account,
             receiver = account,

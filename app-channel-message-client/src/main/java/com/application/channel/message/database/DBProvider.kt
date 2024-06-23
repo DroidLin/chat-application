@@ -25,7 +25,14 @@ interface DBProvider {
     fun release()
 }
 
-internal class DBProviderImpl @Inject constructor(
+internal fun DBProvider(
+    database: AppMessageDatabase?,
+    messageParser: MessageParser
+): DBProvider {
+    return DBProviderImpl(database, messageParser)
+}
+
+private class DBProviderImpl(
     private val database: AppMessageDatabase?,
     messageParser: MessageParser
 ) : DBProvider {
@@ -33,7 +40,8 @@ internal class DBProviderImpl @Inject constructor(
     override val userSessionId: String get() = this.database?.userSessionId ?: ""
     override val isDatabaseAvailable: Boolean get() = this.database != null
 
-    override val sessionContactDatabaseApi: SessionContactDatabaseApi = SessionContactDatabaseApi(this.database, messageParser)
+    override val sessionContactDatabaseApi: SessionContactDatabaseApi =
+        SessionContactDatabaseApi(this.database, messageParser)
     override val messageDatabaseApi: MessageDatabaseApi = MessageDatabaseApi(this.database, messageParser)
 
     override fun addTableChangedObserver(observer: OnTableChangedObserver) {

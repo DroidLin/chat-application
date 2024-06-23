@@ -13,10 +13,10 @@ class MessageComponent : Component {
 
     override fun collect(installer: ComponentInstaller) {
         installer.installLazily(MsgService::class.java) {
-            MsgClient.getService(MsgService::class.java)
+            SingleIMManager.msgService
         }
         installer.installLazily(MsgConnectionService::class.java) {
-            MsgClient.getService(MsgConnectionService::class.java)
+            SingleIMManager.connectionService
         }
     }
 }

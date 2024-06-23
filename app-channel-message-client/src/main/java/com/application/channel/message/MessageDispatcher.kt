@@ -4,35 +4,63 @@ import com.application.channel.core.model.ChannelContext
 import com.application.channel.message.meta.LoginResultMessage
 import com.application.channel.message.meta.Message
 import java.util.logging.Logger
-import javax.inject.Inject
 
 /**
  * @author liuzhongao
  * @since 2024/6/2 10:31
  */
-internal class MessageDispatcher @Inject constructor(
-    private val loginResultMessageHandler: LoginResultMessageHandler,
-    private val listeners: MessageReceiveListenerWrapper,
-) : MessageHandler {
+internal class MessageDispatcher : MessageHandler {
+
+    private val messageHandlers = mutableListOf<MessageHandler>()
+    private val listeners = MessageReceiveListenerWrapper()
+
+    fun addHandler(handler: MessageHandler) {
+        synchronized(this.messageHandlers) {
+            if (!this.messageHandlers.contains(handler)) {
+                this.messageHandlers.add(handler)
+            }
+        }
+    }
+
+    fun removeHandler(handler: MessageHandler) {
+        synchronized(this.messageHandlers) {
+            if (this.messageHandlers.contains(handler)) {
+                this.messageHandlers.remove(handler)
+            }
+        }
+    }
+
+    fun addReceiveListener(listener: MessageReceiveListener) {
+        this.listeners.addListener(listener)
+    }
+
+    fun removeReceiveListener(listener: MessageReceiveListener) {
+        this.listeners.removeListener(listener)
+    }
+
     override fun handle(channelContext: ChannelContext, message: Message): Boolean {
-        if (!this.loginResultMessageHandler.handle(channelContext, message)) {
+        return this.handleInner(channelContext, message) {
             this.listeners.onReceive(message)
         }
-        return true
     }
-}
 
-internal class LoginResultMessageHandler @Inject constructor(
-    private val authorization: Authorization,
-    private val logger: Logger
-): MessageHandler {
-    override fun handle(channelContext: ChannelContext, message: Message): Boolean {
-        return if (message is LoginResultMessage) {
-            if (message.authorized) {
-                this.logger.info { "authorization successfully." }
-                this.authorization.setLoginResultMessage(message)
-            }
-            true
-        } else false
+    private inline fun handleInner(channelContext: ChannelContext, message: Message, function: () -> Unit): Boolean {
+        val intercept = synchronized(this.messageHandlers) {
+            this.messageHandlers.find { handler ->
+                handler.handle(channelContext, message)
+            } != null
+        }
+        if (intercept) {
+            return true
+        }
+        function()
+        return false
+    }
+
+    fun clear() {
+        synchronized(this.messageHandlers) {
+            this.messageHandlers.clear()
+        }
+        this.listeners.clear()
     }
 }

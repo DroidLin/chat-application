@@ -18,7 +18,9 @@ interface Authorization {
     fun setLoginResultMessage(loginResultMessage: LoginResultMessage?)
 }
 
-internal class AuthorizationImpl @Inject constructor() : Authorization {
+fun Authorization(): Authorization = AuthorizationImpl()
+
+internal class AuthorizationImpl : Authorization {
 
     private var _contact: Account? = null
     private var _loginResultMessage: LoginResultMessage? = null

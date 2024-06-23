@@ -1,6 +1,6 @@
 package com.application.channel.im
 
-import com.application.channel.database.AppMessageDatabase
+import com.application.channel.message.Account
 
 /**
  * @author liuzhongao
@@ -8,6 +8,6 @@ import com.application.channel.database.AppMessageDatabase
  */
 data class IMInitConfig(
     val remoteAddress: String,
-    val token: Token,
-    val factory: AppMessageDatabase.Factory
+    val account: Account,
+    val maxReConnectCount: Int = 3
 )

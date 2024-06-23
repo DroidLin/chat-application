@@ -21,7 +21,9 @@ java {
 
 dependencies {
     api(project(":app-channel-core"))
-    ksp("com.google.dagger:dagger-compiler:2.51.1")
+    api(libs.koin.core)
+
+    ksp(libs.dagger.compiler)
 }
 
 publishing {
