@@ -2,20 +2,16 @@ package com.chat.compose.app
 
 import android.app.Application
 import android.content.Context
-import android.os.Debug
-import android.os.Looper
+import com.android.dependencies.common.android.installContext
 import com.application.channel.core.client.TcpClientModule
 import com.application.channel.core.util.koinInject
 import com.application.channel.im.IMDatabaseInitConfig
-import com.application.channel.im.IMInitConfig
-import com.application.channel.im.MsgConnectionService
+import com.application.channel.im.SingleIMManager
 import com.application.channel.message.ChatServiceModule
 import com.chat.compose.app.di.messageModule
 import com.chat.compose.app.di.useCaseModule
 import com.chat.compose.app.di.viewModelModule
-import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
-import java.io.File
 
 /**
  * @author liuzhongao
@@ -30,7 +26,7 @@ class BasicApplication : Application() {
 //            Debug.stopMethodTracing()
 //            false
 //        }
-        basicApplication = this
+        installContext(this)
     }
 
     override fun onCreate() {
@@ -45,13 +41,7 @@ class BasicApplication : Application() {
             )
         }
 
-        val service: MsgConnectionService = koinInject()
         val imInitConfig: IMDatabaseInitConfig = koinInject()
-        service.initDatabase(imInitConfig)
-    }
-
-    companion object {
-        private var basicApplication: BasicApplication? = null
-        val applicationContext: Context get() = requireNotNull(this.basicApplication)
+        SingleIMManager.initDatabase(imInitConfig)
     }
 }

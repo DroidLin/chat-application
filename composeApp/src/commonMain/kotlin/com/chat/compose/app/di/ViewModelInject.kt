@@ -2,7 +2,8 @@ package com.chat.compose.app.di
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
-import org.koin.compose.koinInject
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.application.channel.core.util.koinInject
 
 /**
  * @author liuzhongao
@@ -11,5 +12,5 @@ import org.koin.compose.koinInject
 
 @Composable
 inline fun <reified T : ViewModel> koinViewModel(): T {
-    return koinInject<T>()
+    return viewModel { koinInject() }
 }

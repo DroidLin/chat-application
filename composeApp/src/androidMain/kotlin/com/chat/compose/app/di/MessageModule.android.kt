@@ -1,15 +1,13 @@
 package com.chat.compose.app.di
 
+import com.android.dependencies.common.ComponentFacade
+import com.android.dependencies.common.android.IContext
 import com.application.channel.database.AppMessageDatabase
 import com.application.channel.database.android.AppMessageDatabase
 import com.application.channel.im.IMDatabaseInitConfig
 import com.application.channel.im.IMInitConfig
-import com.application.channel.im.Token
 import com.application.channel.message.Account
-import com.chat.compose.app.BasicApplication
-import com.chat.compose.app.usecase.sessionContactV1
 import com.chat.compose.app.usecase.sessionContactV2
-import java.io.File
 
 /**
  * @author liuzhongao
@@ -18,7 +16,7 @@ import java.io.File
 
 private val databaseFactory = AppMessageDatabase.Factory { sessionId ->
     AppMessageDatabase(
-        context = BasicApplication.applicationContext,
+        context = ComponentFacade[IContext::class.java].applicationContext,
         sessionId = sessionId
     )
 }

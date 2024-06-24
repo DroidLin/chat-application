@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="app_name">True</string>
+
 	<string name="button_title">Hello</string>
 	<string name="lable_with_name">Hello %1$s</string>
 
@@ -13,4 +15,8 @@
 
 	<string name="message_detail_text_field_place_holder">聊点什么吧！</string>
 	<string name="message_detail_send_button_hint">发送</string>
+
+	<string name="login_title">登录</string>
+	<string name="login_input_username">用户名、邮箱</string>
+	<string name="login_input_password">密码</string>
 </resources>
