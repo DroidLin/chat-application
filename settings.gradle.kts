@@ -5,6 +5,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven { url = uri("https://jitpack.io") }
+        maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
     }
 }
 dependencyResolutionManagement {
@@ -14,6 +15,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
+        maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
     }
 }
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
@@ -30,6 +32,8 @@ include(":app-channel-im")
 include(":app-channel-message-core")
 include(":app-channel-message-client")
 include(":app-channel-message-server")
+
+include(":app-channel-backend-server")
 
 include(":app-channel-database")
 

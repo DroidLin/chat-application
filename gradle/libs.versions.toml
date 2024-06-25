@@ -4,8 +4,10 @@ kotlinVersion = "1.9.22"
 roomVersion = "2.7.0-alpha04"
 kspVersion = "1.9.22-1.0.16"
 compose-plugin = "1.6.10"
+ktor-version = "2.3.12"
+logback-version = "1.4.14"
 dagger-version = "2.51.1"
-netty-version = "4.1.108.Final"
+netty-version = "4.1.111.Final"
 sqlite-budnel-version = "2.5.0-alpha04"
 org-json-version = "20240303"
 compose = "1.6.8"
@@ -68,6 +70,11 @@ coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor", ve
 jetbrains-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose-multiplatform" }
 
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlin-coroutines" }
+ktor-core-jvm = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor-version" }
+ktor-netty-jvm = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktor-version" }
+ktor-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor-version" }
+ktor-serialization-jackson = { group = "io.ktor", name = "ktor-serialization-jackson", version.ref = "ktor-version" }
+logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback-version" }
 
 
 [plugins]
@@ -76,6 +83,9 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 roomGradlePlugin = { id = "androidx.room", version.ref = "roomVersion" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlinVersion" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+
+ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
