@@ -1,6 +1,6 @@
 package com.chat.compose.app.di
 
-import com.chat.compose.app.screen.login.LoginViewModel
+import com.chat.compose.app.ui.login.LoginViewModel
 import org.koin.dsl.module
 
 /**

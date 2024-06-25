@@ -14,6 +14,10 @@ interface NavRoute {
         override val route: String = "route/login"
     }
 
+    object RegisterAccount : NavRoute {
+        override val route: String = "route/register/account"
+    }
+
     object ChatSessionList : NavRoute {
         override val route: String get() = "homeRoute"
     }
