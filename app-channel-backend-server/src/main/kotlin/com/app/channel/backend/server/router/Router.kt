@@ -1,6 +1,7 @@
 package com.app.channel.backend.server.router
 
 import com.app.channel.backend.server.metadata.ApiResult
+import com.app.channel.backend.server.router.login.loginRouter
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -15,10 +16,6 @@ fun Application.router() {
         get("/") {
             this.call.respond(status = HttpStatusCode.OK, message = "Hello World.")
         }
-        route(path = "/login") {
-            get("/path") {
-                this.call.respond(status = HttpStatusCode.OK, message = ApiResult.success("Hello World."))
-            }
-        }
+        loginRouter()
     }
 }

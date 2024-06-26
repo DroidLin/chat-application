@@ -10,13 +10,22 @@ import io.ktor.util.pipeline.*
  * @since 2024/6/26 01:26
  */
 
-private val BizFallback = PipelinePhase("BizFallback")
+private val BizAfterCall = PipelinePhase("BizFallback")
+private val API_RESULT_NOT_FOUND = ApiResult.failure(code = 404, message = "接口未找到！")
 
 fun Application.interceptor() {
-    insertPhaseAfter(ApplicationCallPipeline.ApplicationPhase.Call, BizFallback)
-    intercept(BizFallback) {
+    interceptorPhases()
+    bizInterceptor()
+}
+
+private fun Application.interceptorPhases() {
+    insertPhaseAfter(ApplicationCallPipeline.ApplicationPhase.Call, BizAfterCall)
+}
+
+private fun Application.bizInterceptor() {
+    intercept(BizAfterCall) {
         if (call.isHandled) return@intercept finish()
-        call.respond(ApiResult.failure(code = 404, message = "接口未找到！"))
+        call.respond(API_RESULT_NOT_FOUND)
         finish()
     }
 }

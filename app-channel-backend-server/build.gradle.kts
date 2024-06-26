@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.ktor)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.roomGradlePlugin)
     id("maven-publish")
 }
 
@@ -32,8 +34,18 @@ dependencies {
     implementation(libs.ktor.netty.jvm)
     implementation(libs.ktor.content.negotiation)
     implementation(libs.ktor.serialization.jackson)
-    implementation(libs.koin.core)
+
     implementation(libs.logback)
+
+    implementation(libs.koin.core)
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.sqlite)
+    ksp(libs.androidx.room.compiler)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 publishing {

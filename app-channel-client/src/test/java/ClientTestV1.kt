@@ -61,6 +61,9 @@ fun main() {
     var socketAddress: SocketAddress? = null
     var tcpClient: TcpClient? = null
     val observer = object : TcpConnectionObserver {
+        override fun onStartConnect() {
+        }
+
         override fun onConnectionSuccess(channelCtx: ChannelContext) {
             tcpClient?.write(
                 writable = StringWritable("Hello World!"),
