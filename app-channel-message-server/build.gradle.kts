@@ -20,9 +20,9 @@ java {
 }
 
 dependencies {
-    implementation(project(":app-channel-core"))
-    implementation(project(":app-channel-server"))
-    implementation(project(":app-channel-message-core"))
+    api(project(":app-channel-core"))
+    api(project(":app-channel-server"))
+    api(project(":app-channel-message-core"))
 
     ksp(libs.dagger.compiler)
 }
