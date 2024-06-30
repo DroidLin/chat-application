@@ -24,13 +24,17 @@ interface AppMessageDatabase {
 
     val messageDao: LocalMessageDao
 
-    suspend fun withTransaction(readOnly: Boolean, block: suspend () -> Unit)
+    suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.() -> T): T
 
     fun addTableObserver(observer: OnTableChangedObserver)
 
     fun removeTableObserver(observer: OnTableChangedObserver)
 
     fun release()
+
+    interface Transaction<T> {
+        suspend fun rollback(result: T)
+    }
 
     fun interface Factory {
 
@@ -51,16 +55,20 @@ private class AppMessageDatabaseImpl(
 
     override val sessionContactDao: LocalSessionContactDao = this.database.sessionDao
     override val messageDao: LocalMessageDao = this.database.messageDao
-
     private val observerMapping: MutableMap<OnTableChangedObserver, InvalidationTracker.Observer> = ConcurrentHashMap()
 
-    override suspend fun withTransaction(readOnly: Boolean, block: suspend () -> Unit) {
-        val function: suspend (Transactor) -> Unit = { transactor ->
-            transactor.immediateTransaction {
-                block()
+    override suspend fun <T> withTransaction(
+        readOnly: Boolean,
+        block: suspend AppMessageDatabase.Transaction<T>.() -> T
+    ): T {
+        val function: suspend (Transactor) -> T = { transactor ->
+            if (transactor.inTransaction()) {
+                EmptyTransaction<T>().block()
+            } else transactor.deferredTransaction {
+                TransactionScopedTransaction<T>(this).block()
             }
         }
-        if (readOnly) {
+        return if (readOnly) {
             this.database.useReaderConnection(function)
         } else this.database.useWriterConnection(function)
     }
@@ -99,6 +107,17 @@ private class AppMessageDatabaseImpl(
     ) : InvalidationTracker.Observer(tables = observer.tables.toTypedArray()) {
         override fun onInvalidated(tables: Set<String>) {
             this.observer.onTableChanged(tableNames = tables)
+        }
+    }
+
+    private class EmptyTransaction<T>: AppMessageDatabase.Transaction<T> {
+        override suspend fun rollback(result: T) {
+        }
+    }
+
+    private class TransactionScopedTransaction<T>(private val transactionScope: TransactionScope<T>): AppMessageDatabase.Transaction<T> {
+        override suspend fun rollback(result: T) {
+            this.transactionScope.rollback(result)
         }
     }
 }
