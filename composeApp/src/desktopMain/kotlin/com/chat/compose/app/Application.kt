@@ -22,8 +22,7 @@ fun main() {
         CompositionLocalProvider(
             LocalApplicationConfiguration provides applicationConfiguration
         ) {
-            LoginWindow(::exitApplication)
-//            AppWindow(::exitApplication)
+            AppWindow(::exitApplication)
         }
     }
 }

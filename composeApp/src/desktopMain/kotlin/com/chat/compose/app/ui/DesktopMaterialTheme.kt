@@ -7,10 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import com.chat.compose.app.LocalApplicationConfiguration
 import com.chat.compose.app.LocalWindow
-import com.chat.compose.app.di.messageModule
-import com.chat.compose.app.di.useCaseModule
-import com.chat.compose.app.di.viewModelModule
-import org.koin.compose.KoinApplication
 import org.koin.compose.KoinContext
 
 /**

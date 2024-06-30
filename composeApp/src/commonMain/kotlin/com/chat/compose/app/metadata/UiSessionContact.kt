@@ -12,7 +12,8 @@ data class UiSessionContact(
     val sessionId: String,
     val sessionType: SessionType,
     val sessionContactName: String,
+    val sessionContactUserId: Long,
     val unreadCount: Int,
     val displayContent: String,
-    val time: String
+    val time: String,
 )

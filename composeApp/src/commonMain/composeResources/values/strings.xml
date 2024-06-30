@@ -19,4 +19,6 @@
 	<string name="login_title">登录</string>
 	<string name="login_input_username">用户名、邮箱</string>
 	<string name="login_input_password">密码</string>
+
+	<string name="string_button_search">搜索</string>
 </resources>

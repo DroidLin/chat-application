@@ -1,13 +1,17 @@
-package com.chat.compose.app.ui.login
+package com.chat.compose.app.screen.login
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -23,15 +27,22 @@ import org.jetbrains.compose.resources.stringResource
  * @since 2024/6/25 00:19
  */
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    loginComplete: () -> Unit,
+) {
     val viewModel = koinViewModel<LoginViewModel>()
     val uiState = viewModel.state.collectAsState()
+
+    val launchLogin = {
+        viewModel.launchLogin(loginComplete)
+    }
+
     Box(
-        modifier = Modifier.size(400.dp, 600.dp),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -90,11 +101,12 @@ fun LoginScreen() {
                     },
                     visualTransformation = if (showRawPassword) {
                         VisualTransformation.None
-                    } else PasswordVisualTransformation()
+                    } else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+                    keyboardActions = KeyboardActions(onDone = { launchLogin() })
                 )
             }
             LoginBottomCustomArea(modifier = Modifier)
-
             Box {
                 val isLoadingState = remember { derivedStateOf { uiState.value.isLoading } }
                 val buttonEnable by remember {
@@ -108,7 +120,7 @@ fun LoginScreen() {
                     }
                 }
                 Button(
-                    onClick = {},
+                    onClick = launchLogin,
                     enabled = buttonEnable,
                 ) {
                     AnimatedContent(isLoadingState.value) { isLoading ->

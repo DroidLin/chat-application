@@ -49,7 +49,9 @@ kotlin {
             implementation(libs.coil.network.ktor)
 
             implementation(libs.jetbrains.navigation.compose)
-
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.cio)
+            implementation(libs.moshi)
         }
         val androidMain by getting
         androidMain.dependencies {
@@ -73,7 +75,7 @@ kotlin {
 }
 
 dependencies {
-    ksp(libs.dagger.compiler)
+    ksp(libs.moshi.compiler)
 }
 
 android {

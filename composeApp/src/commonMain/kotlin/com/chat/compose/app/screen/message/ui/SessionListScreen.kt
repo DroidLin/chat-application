@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.chat.compose.app.di.koinViewModel
@@ -26,21 +26,30 @@ import com.chat.compose.app.screen.message.vm.SessionListViewModel
 fun SessionListScreen(
     backPress: () -> Unit = {},
     sessionItemClick: (UiSessionContact) -> Unit = {},
+    navigateToSearch: () -> Unit = {}
 ) {
     val viewModel: SessionListViewModel = koinViewModel()
+    val sessionListState = remember(viewModel) { viewModel.sessionList }.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.updateSessionContactInfo()
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TopAppBar(
             title = { Text(text = "Session") },
+            actions = {
+                IconButton(onClick = navigateToSearch) {
+                    Icon(Icons.Filled.Search, contentDescription = "search")
+                }
+            }
         )
-        val sessionList by remember(viewModel) {
-            viewModel.sessionList
-        }.collectAsState()
         LazyColumn(
             modifier = Modifier.weight(1f),
         ) {
+            val sessionList = sessionListState.value
             items(
                 items = sessionList,
                 key = { it.sessionId },

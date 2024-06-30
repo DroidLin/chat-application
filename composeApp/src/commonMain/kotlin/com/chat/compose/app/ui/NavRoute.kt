@@ -10,12 +10,20 @@ interface NavRoute {
 
     val route: String
 
-    object Login : NavRoute {
-        override val route: String = "route/login"
+    object SplashScreen : NavRoute {
+        override val route: String = "route/splash/screen"
     }
 
-    object RegisterAccount : NavRoute {
-        override val route: String = "route/register/account"
+    object LoginRoute : NavRoute {
+        override val route: String = "route/login"
+
+        object Login : NavRoute {
+            override val route: String = "route/login/screen"
+        }
+
+        object RegisterAccount : NavRoute {
+            override val route: String = "route/register/account"
+        }
     }
 
     object ChatSessionList : NavRoute {
@@ -33,6 +41,10 @@ interface NavRoute {
 
     object Settings : NavRoute {
         override val route: String get() = "settings"
+    }
+
+    object SearchLauncher : NavRoute {
+        override val route: String = "search/launcher"
     }
 
 }

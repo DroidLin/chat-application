@@ -18,9 +18,6 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
         super.onCreate(savedInstanceState)
 
-        val intent = Intent(this, AndroidChatService::class.java)
-        startService(intent)
-
         setContent {
             CompositionLocalProvider(LocalActivity provides this) {
                 AndroidMaterialTheme {

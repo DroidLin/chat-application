@@ -3,10 +3,11 @@ package com.chat.compose.app
 import com.android.dependencies.common.ComponentFacade
 import com.application.channel.core.client.TcpClientModule
 import com.application.channel.message.ChatServiceModule
-import com.chat.compose.app.di.LoginModule
-import com.chat.compose.app.di.messageModule
-import com.chat.compose.app.di.useCaseModule
-import com.chat.compose.app.di.viewModelModule
+import com.chat.compose.app.di.*
+import com.chat.compose.app.lifecycle.ApplicationLifecycleObserver
+import com.chat.compose.app.lifecycle.ApplicationLifecycleRegistry
+import com.chat.compose.app.metadata.Profile
+import kotlinx.coroutines.*
 import org.koin.core.context.startKoin
 
 /**
@@ -15,14 +16,37 @@ import org.koin.core.context.startKoin
  */
 fun initEntryPoint() {
     initSystemProperties()
-    ComponentFacade.autoInit()
     initKoin()
-    initAndStartChatService()
+    initApplicationLifecycleObserver()
 }
 
 private fun initSystemProperties() {
     System.setProperty("apple.awt.application.appearance", "system")
     System.setProperty("apple.awt.application.name", "True")
+}
+
+private fun initApplicationLifecycleObserver() {
+    ApplicationLifecycleRegistry.addObserver(
+        object : ApplicationLifecycleObserver {
+            override suspend fun onUserLogin(profile: Profile) {
+                initAndStartChatService()
+            }
+
+            override suspend fun onUserLogout() {
+
+            }
+
+            override suspend fun onFirstFrameComplete() {
+                initAndStartChatService()
+            }
+        }
+    )
+}
+
+suspend fun bizInit() = coroutineScope {
+    listOf(
+        async { ComponentFacade.autoInit() },
+    ).awaitAll()
 }
 
 private fun initKoin() {
@@ -33,7 +57,8 @@ private fun initKoin() {
             useCaseModule,
             TcpClientModule,
             ChatServiceModule,
-            LoginModule
+            NetworkModule,
+            SerializationModule
         )
     }
 }

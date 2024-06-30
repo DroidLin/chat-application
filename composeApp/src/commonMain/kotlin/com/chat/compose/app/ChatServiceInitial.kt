@@ -1,11 +1,15 @@
 package com.chat.compose.app
 
+import com.application.channel.core.util.koinInject
 import com.application.channel.im.IMDatabaseInitConfig
 import com.application.channel.im.IMInitConfig
 import com.application.channel.im.SingleIMManager
 import com.application.channel.message.Account
 import com.chat.compose.app.di.platformAppDatabaseFactory
-import com.chat.compose.app.storage.MutableMapStorage
+import com.chat.compose.app.metadata.isValid
+import com.chat.compose.app.network.DEFAULT_HOST
+import com.chat.compose.app.network.TCP_PORT
+import com.chat.compose.app.services.ProfileService
 
 /**
  * @author liuzhongao
@@ -13,9 +17,12 @@ import com.chat.compose.app.storage.MutableMapStorage
  */
 
 fun initChatService() {
-    val mutablePreference = MutableMapStorage("im.json")
-    val sessionId = mutablePreference.getString("sessionId", "")
-    val accountId = mutablePreference.getString("accountId", "")
+    val profileService = koinInject<ProfileService>()
+    val profile = profileService.profile
+    if (!profile.isValid) return
+
+    val sessionId = profile.sessionInfo?.sessionId
+    val accountId = profile.account?.accountId
     if (sessionId.isNullOrEmpty() || accountId.isNullOrEmpty()) {
         return
     }
@@ -28,11 +35,13 @@ fun initChatService() {
 }
 
 fun startChatService() {
-    val mutablePreference = MutableMapStorage("im.json")
-    val sessionId = mutablePreference.getString("sessionId", "")
-    val accountId = mutablePreference.getString("accountId", "")
-    val remoteAddress = mutablePreference.getString("remoteAddress", "")
-    if (sessionId.isNullOrEmpty() || accountId.isNullOrEmpty() || remoteAddress.isNullOrEmpty()) {
+    val profileService = koinInject<ProfileService>()
+    val profile = profileService.profile
+    if (!profile.isValid) return
+    val sessionId = profile.sessionInfo?.sessionId
+    val accountId = profile.account?.accountId
+    val remoteAddress = "http://${DEFAULT_HOST}:${TCP_PORT}"
+    if (sessionId.isNullOrEmpty() || accountId.isNullOrEmpty() || remoteAddress.isEmpty()) {
         return
     }
     val account = Account(sessionId = sessionId, accountId = accountId)
@@ -44,9 +53,12 @@ fun startChatService() {
 }
 
 fun initAndStartChatService() {
-    val mutablePreference = MutableMapStorage("im.json")
-    val sessionId = mutablePreference.getString("sessionId", "")
-    val accountId = mutablePreference.getString("accountId", "")
+    val profileService = koinInject<ProfileService>()
+    val profile = profileService.profile
+    if (!profile.isValid) return
+
+    val sessionId = profile.sessionInfo?.sessionId
+    val accountId = profile.account?.accountId
     if (sessionId.isNullOrEmpty() || accountId.isNullOrEmpty()) {
         return
     }
@@ -57,8 +69,8 @@ fun initAndStartChatService() {
     )
     SingleIMManager.initDatabase(databaseInitConfig)
 
-    val remoteAddress = mutablePreference.getString("remoteAddress", "")
-    if (remoteAddress.isNullOrEmpty()) {
+    val remoteAddress = "http://${DEFAULT_HOST}:${TCP_PORT}"
+    if (remoteAddress.isEmpty()) {
         return
     }
     val initConfig = IMInitConfig(

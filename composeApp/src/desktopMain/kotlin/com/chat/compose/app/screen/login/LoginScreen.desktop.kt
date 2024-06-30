@@ -1,4 +1,4 @@
-package com.chat.compose.app.ui.login
+package com.chat.compose.app.screen.login
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

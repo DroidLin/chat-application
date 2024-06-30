@@ -1,18 +1,26 @@
-package com.chat.compose.app.ui.login
+package com.chat.compose.app.screen.login
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.chat.compose.app.lifecycle.ApplicationLifecycleRegistry
+import com.chat.compose.app.metadata.isValid
+import com.chat.compose.app.network.isSuccess
+import com.chat.compose.app.services.ProfileService
 import com.chat.compose.app.storage.MutableMapStorage
+import com.chat.compose.app.usecase.network.LoginUserUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /**
  * @author liuzhongao
  * @since 2024/6/25 00:24
  */
-class LoginViewModel : ViewModel() {
-
-    private val mutablePreference = MutableMapStorage("loginPreference.json")
+class LoginViewModel(
+    private val loginUserUseCase: LoginUserUseCase,
+    private val profileService: ProfileService
+) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
     val state = this._state.asStateFlow()
@@ -41,6 +49,20 @@ class LoginViewModel : ViewModel() {
             return
         }
         this._state.update { it.copy(inputUserName = InputTextState(inputText)) }
+    }
+
+    fun launchLogin(onComplete: () -> Unit) {
+        val userAccount = this._state.value.inputUserName.inputText
+        val password = this._state.value.inputPassword.inputText
+        this._state.update { it.copy(isLoading = true) }
+        this.viewModelScope.launch {
+            val loginResult = this@LoginViewModel.loginUserUseCase.loginUserAccount(userAccount, password)
+            if (loginResult.isSuccess && this@LoginViewModel.profileService.refreshProfile().isValid) {
+                ApplicationLifecycleRegistry.onUserLogin(this@LoginViewModel.profileService.profile)
+                onComplete()
+            }
+            this@LoginViewModel._state.update { it.copy(isLoading = false) }
+        }
     }
 
     fun updatePassword(inputText: String) {

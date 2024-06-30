@@ -1,12 +1,9 @@
 package com.chat.compose.app
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import com.application.channel.core.util.koinInject
-import com.application.channel.im.IMInitConfig
-import com.application.channel.im.MsgConnectionService
-import org.koin.core.context.GlobalContext
 
 /**
  * @author liuzhongao
@@ -14,14 +11,24 @@ import org.koin.core.context.GlobalContext
  */
 class AndroidChatService : Service() {
 
-    override fun onCreate() {
-        super.onCreate()
-        val service: MsgConnectionService = koinInject()
-        val imInitConfig: IMInitConfig= koinInject()
-        service.startService(imInitConfig)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startChatService()
+        return super.onStartCommand(intent, flags, startId)
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    companion object {
+        @JvmStatic
+        fun start(context: Context) {
+            val intent = Intent(context, AndroidChatService::class.java)
+            context.startService(intent)
+        }
+
+        @JvmStatic
+        fun stop(context: Context) {
+            val intent = Intent(context, AndroidChatService::class.java)
+            context.stopService(intent)
+        }
     }
 }

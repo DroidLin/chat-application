@@ -1,6 +1,7 @@
 package com.chat.compose.app.usecase
 
 import com.application.channel.im.MsgService
+import com.application.channel.im.SingleIMManager
 import com.application.channel.message.SessionType
 import com.application.channel.message.metadata.SessionContact
 import com.chat.compose.app.metadata.UiSessionContact
@@ -25,7 +26,7 @@ val sessionContactV2 = SessionContact(
 class FetchSessionListUseCase(private val msgService: MsgService) {
 
     val sessionList: Flow<List<UiSessionContact>>
-        get() = this.msgService.fetchObservableRecentSessionContactList(Int.MAX_VALUE)
+        get() = SingleIMManager.sessionContact
             .map { sessionContactList -> sessionContactList.map(SessionContact::toUiSessionContact) }
             .distinctUntilChanged()
 }

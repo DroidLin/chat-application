@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalFocusManager
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun FocusClearMan() {
+actual fun FocusClearMan() {
     val focusRequester = LocalFocusManager.current
     val imeVisible = WindowInsets.isImeVisible
     LaunchedEffect(imeVisible) {
