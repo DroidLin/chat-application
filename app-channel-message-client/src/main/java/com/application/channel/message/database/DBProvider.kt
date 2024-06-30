@@ -1,9 +1,9 @@
 package com.application.channel.message.database
 
 import com.application.channel.database.AppMessageDatabase
+import com.application.channel.database.AppMessageDatabase.Transaction
 import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.meta.MessageParser
-import javax.inject.Inject
 
 /**
  * @author liuzhongao
@@ -18,6 +18,8 @@ interface DBProvider {
     val sessionContactDatabaseApi: SessionContactDatabaseApi
 
     val messageDatabaseApi: MessageDatabaseApi
+
+    suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.() -> T): T
 
     fun addTableChangedObserver(observer: OnTableChangedObserver)
     fun removeTableChangedObserver(observer: OnTableChangedObserver)
@@ -43,6 +45,10 @@ private class DBProviderImpl(
     override val sessionContactDatabaseApi: SessionContactDatabaseApi =
         SessionContactDatabaseApi(this.database, messageParser)
     override val messageDatabaseApi: MessageDatabaseApi = MessageDatabaseApi(this.database, messageParser)
+
+    override suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.() -> T): T {
+        return requireNotNull(this.database).withTransaction(readOnly, block)
+    }
 
     override fun addTableChangedObserver(observer: OnTableChangedObserver) {
         this.database?.addTableObserver(observer)

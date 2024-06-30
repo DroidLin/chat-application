@@ -1,11 +1,11 @@
 package com.application.channel.message
 
+import com.application.channel.database.AppMessageDatabase.Transaction
 import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.database.DBProvider
 import com.application.channel.message.meta.Message
 import com.application.channel.message.metadata.SessionContact
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
 /**
  * @author liuzhongao
@@ -14,6 +14,8 @@ import javax.inject.Inject
 interface MessageRepository {
 
     val useSessionId: String
+
+    suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.() -> T): T
 
     suspend fun insertSessionContact(sessionId: String, sessionType: SessionType)
     suspend fun insertSessionContact(sessionContact: SessionContact)
@@ -83,6 +85,10 @@ private class MessageRepositoryImpl(
 
     override val useSessionId: String get() = this.databaseProvider.userSessionId
 
+    override suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.() -> T): T {
+        return this.databaseProvider.withTransaction(readOnly, block)
+    }
+
     override suspend fun insertSessionContact(sessionId: String, sessionType: SessionType) {
         val sessionContact = SessionContact(sessionId = sessionId, sessionType = sessionType)
         this.insertSessionContact(sessionContact)
@@ -104,7 +110,8 @@ private class MessageRepositoryImpl(
         val sessionContact = this.databaseProvider.sessionContactDatabaseApi.findSessionContact(sessionId, sessionType)
         val updatedSessionContact = sessionContact?.run(function)
         if (sessionContact != null && updatedSessionContact != null && sessionContact != updatedSessionContact) {
-            val timestampUpdatedSessionContact = updatedSessionContact.copy(lastUpdateTimestamp = System.currentTimeMillis())
+            val timestampUpdatedSessionContact =
+                updatedSessionContact.copy(lastUpdateTimestamp = System.currentTimeMillis())
             this.databaseProvider.sessionContactDatabaseApi.updateSessionContact(timestampUpdatedSessionContact)
         }
     }
