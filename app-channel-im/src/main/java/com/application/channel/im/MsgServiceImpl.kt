@@ -1,6 +1,7 @@
 package com.application.channel.im
 
 import androidx.paging.PagingSource
+import com.application.channel.database.AppMessageDatabase
 import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.MessageRepository
 import com.application.channel.message.SessionType
@@ -20,6 +21,12 @@ private class MsgServiceImpl : MsgService {
 
     private val messageRepository: MessageRepository
         get() = MsgClient.getService(MsgConnectionService::class.java).messageRepository
+
+    override suspend fun <T> withTransaction(readOnly: Boolean, block: suspend AppMessageDatabase.Transaction<T>.(MsgService) -> T): T {
+        return this.messageRepository.withTransaction(readOnly) {
+            block(this@MsgServiceImpl)
+        }
+    }
 
     override suspend fun insertSessionContact(sessionId: String, sessionType: SessionType) {
         this.messageRepository.insertSessionContact(sessionId, sessionType)

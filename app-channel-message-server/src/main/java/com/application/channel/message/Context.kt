@@ -8,5 +8,5 @@ import com.application.channel.core.model.ChannelContext
  */
 data class Context(
     val channelContext: ChannelContext,
-    val chatServiceController: ChatServiceController
+    val chatServiceController: ChatServiceController,
 )

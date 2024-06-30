@@ -1,6 +1,7 @@
 package com.application.channel.im
 
 import androidx.paging.PagingSource
+import com.application.channel.database.AppMessageDatabase.Transaction
 import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
@@ -12,6 +13,8 @@ import kotlinx.coroutines.flow.Flow
  * @since 2024/6/10 09:53
  */
 interface MsgService {
+
+    suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.(MsgService) -> T): T
 
     // SessionContact
     suspend fun insertSessionContact(sessionId: String, sessionType: SessionType)

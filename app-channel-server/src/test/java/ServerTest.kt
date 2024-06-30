@@ -18,7 +18,7 @@ import io.netty.handler.codec.MessageToMessageEncoder
 fun main() {
     val chatServer = ChannelServer()
     val initConfig = socketInitConfig {
-        address("http://127.0.0.1:8325")
+        address("http://localhost:8081")
         maxReconnectCount(3)
         afterNewValueRead { channelContext, any ->
             println("receive data from: ${channelContext.channelRemoteAddress}, data: $any")

@@ -49,7 +49,7 @@ internal class ChatServiceImpl @Inject constructor(
     override val chatServiceController = ChatServiceControllerImpl(this.channelServer, this.authorizationMapping)
 
     private val initConfig = socketInitConfig {
-        address("http://0.0.0.0:8325")
+        address("http://0.0.0.0:8081")
         afterNewValueRead { channelContext, any ->
             if (any is Message) {
                 val context = Context(
