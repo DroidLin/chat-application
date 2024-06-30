@@ -16,12 +16,20 @@ fun LocalAccount.toAccountVO(): AccountVO {
     )
 }
 
-fun LocalUserInfo.toUserInfoVO(localSessionInfo: LocalSessionInfo): UserInfoVO {
+fun LocalSessionInfo.toSessionInfoVO(): SessionInfoVO {
+    return SessionInfoVO(
+        sessionId = this.sessionId,
+        accountId = this.accountId,
+        userId = this.userId,
+        sessionTypeCode = this.sessionTypeCode
+    )
+}
+
+fun LocalUserInfo.toUserInfoVO(): UserInfoVO {
     return UserInfoVO(
-        sessionId = localSessionInfo.sessionId,
         userId = this.userId,
         userPhone = this.userPhone,
         userEmail = this.userEmail,
-        userName = this. userName
+        userName = this.userName
     )
 }

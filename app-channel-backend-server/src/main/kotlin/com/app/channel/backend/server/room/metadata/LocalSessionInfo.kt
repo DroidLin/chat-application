@@ -29,4 +29,5 @@ data class LocalSessionInfo(
     @ColumnInfo(name = "session_id") val sessionId: String,
     @ColumnInfo(name = "user_id") val userId: Long,
     @ColumnInfo(name = "account_id") val accountId: String,
+    @ColumnInfo(name = "session_type") val sessionTypeCode: Int,
 )

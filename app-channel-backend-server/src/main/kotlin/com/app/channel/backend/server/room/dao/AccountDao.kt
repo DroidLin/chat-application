@@ -15,6 +15,9 @@ interface AccountDao {
     @Insert
     suspend fun insertAccount(localAccount: LocalAccount)
 
-    @Query("SELECT * FROM local_account WHERE account_id = :accountId limit 1")
-    suspend fun fetchAccountById(accountId: String): LocalAccount?
+    @Query("SELECT * FROM local_account WHERE account_id = :userAccount limit 1")
+    suspend fun fetchAccountById(userAccount: String): LocalAccount?
+
+    @Query("SELECT count(*) FROM local_account WHERE account_id = :userAccount")
+    suspend fun checkCountOfUserAccount(userAccount: String): Int
 }

@@ -15,14 +15,14 @@ import androidx.room.PrimaryKey
         ForeignKey(
             entity = LocalAccount::class,
             parentColumns = ["account_id"],
-            childColumns = ["user_account"]
+            childColumns = ["account_id"]
         )
     ]
 )
 data class LocalUserInfo(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "user_id", index = true) val userId: Long,
-    @ColumnInfo(name = "user_account", index = true) val userAccount: String,
+    @ColumnInfo(name = "account_id", index = true) val userAccount: String,
     @ColumnInfo(name = "user_name", index = true) val userName: String,
     @ColumnInfo(name = "user_email", defaultValue = "null") val userEmail: String? = null,
     @ColumnInfo(name = "user_phone", defaultValue = "null") val userPhone: String? = null,

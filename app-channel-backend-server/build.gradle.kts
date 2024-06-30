@@ -1,8 +1,10 @@
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlinJvm)
-    alias(libs.plugins.ktor)
-    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.kotlinPluginSpring)
+    alias(libs.plugins.kotlinPluginJpa)
+    alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.ksp)
     alias(libs.plugins.roomGradlePlugin)
     id("maven-publish")
@@ -22,26 +24,25 @@ java {
     withSourcesJar()
 }
 
-application {
-    mainClass = "com.app.channel.backend.server.KtorServerApplicationKt"
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
-
 dependencies {
-    implementation(libs.ktor.core.jvm)
-    implementation(libs.ktor.netty.jvm)
-    implementation(libs.ktor.content.negotiation)
-    implementation(libs.ktor.serialization.jackson)
-
-    implementation(libs.logback)
-
-    implementation(libs.koin.core)
+    implementation(libs.spring.boot.framework.starter.web)
+    testImplementation(libs.spring.boot.framework.starter.test)
+    implementation(libs.jetbrains.kotlinx.coroutines.core)
+    implementation(libs.jetbrains.kotlinx.coroutines.reactor)
+    implementation(libs.jackson.module.kotlin)
+    implementation(libs.kotlin.reflect)
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.sqlite)
     ksp(libs.androidx.room.compiler)
+
+    implementation(project(":app-channel-message-server"))
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
 }
 
 room {

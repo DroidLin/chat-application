@@ -18,6 +18,6 @@ interface UserInfoDao {
     @Query("select * from local_user_info where user_id = :userId")
     suspend fun fetchUserInfo(userId: Long): LocalUserInfo?
 
-    @Query("select * from local_user_info where user_account = :userAccount")
+    @Query("select * from local_user_info where account_id = :userAccount")
     suspend fun fetchUserInfoByAccount(userAccount: String): LocalUserInfo?
 }
