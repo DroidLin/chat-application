@@ -1,10 +1,14 @@
 [versions]
 agp = "8.2.0"
+coroutinesVersion = "1.8.0"
+jacksonModuleKotlin = "2.17.1"
 kotlinVersion = "1.9.22"
 roomVersion = "2.7.0-alpha04"
 kspVersion = "1.9.22-1.0.16"
 compose-plugin = "1.6.10"
 ktor-version = "2.3.12"
+okhttp-version = "4.12.0"
+moshi-version = "1.15.1"
 logback-version = "1.4.14"
 dagger-version = "2.51.1"
 netty-version = "4.1.111.Final"
@@ -14,23 +18,22 @@ compose = "1.6.8"
 androidx-activityCompose = "1.9.0"
 activityKtx = "1.9.0"
 paging-version = "3.3.0"
-
 droidlin-common = "1.0.4"
-droidlin-storage = "1.0.2"
-
-pre-compose = "1.6.0"
-material3Desktop = "1.2.1"
-
+droidlin-storage = "1.0.4"
 koin = "3.6.0-wasm-alpha2"
 coil = "3.0.0-alpha06"
-
 navigation-compose-multiplatform = "2.7.0-alpha07"
-
 kotlin-coroutines = "1.8.0"
+spring-boot-version = "3.3.1"
+spring-dependency-management-version = "1.1.5"
 
 [libraries]
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonModuleKotlin" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlinVersion" }
 dagger-runtime = { group = "com.google.dagger", name = "dagger", version.ref = "dagger-version" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger-version" }
+jetbrains-kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "coroutinesVersion" }
+jetbrains-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
 netty-all = { group = "io.netty", name = "netty-all", version.ref = "netty-version" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomVersion" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
@@ -42,39 +45,33 @@ org-json = { group = "org.json", name = "json", version.ref = "org-json-version"
 androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "paging-version" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging-version" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging-version" }
-
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
-
 droidlin-common-jvm = { group = "com.github.DroidLin.common", name = "common-jvm", version.ref = "droidlin-common" }
 droidlin-common-android = { group = "com.github.DroidLin.common", name = "common-android", version.ref = "droidlin-common" }
 droidlin-storage = { group = "com.github.DroidLin.storage", name = "storage", version.ref = "droidlin-storage" }
-
-precompose = { group = "moe.tlaster", name = "precompose", version.ref = "pre-compose" }
-precompose-viewmodel = { group = "moe.tlaster", name = "precompose-viewmodel", version.ref = "pre-compose" }
-androidx-material3-desktop = { group = "androidx.compose.material3", name = "material3-desktop", version.ref = "material3Desktop" }
-
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
 koin-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines", version.ref = "koin" }
 koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-android-compat = { group = "io.insert-koin", name = "koin-android-compat", version.ref = "koin" }
-
 coil-core = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor", version.ref = "coil" }
-
 jetbrains-navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose-multiplatform" }
-
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlin-coroutines" }
-ktor-core-jvm = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor-version" }
-ktor-netty-jvm = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktor-version" }
-ktor-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor-version" }
-ktor-serialization-jackson = { group = "io.ktor", name = "ktor-serialization-jackson", version.ref = "ktor-version" }
-logback = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback-version" }
+spring-boot-framework-starter = { group = "org.springframework.boot", name = "spring-boot-starter", version.ref = "spring-boot-version" }
+spring-boot-framework-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "spring-boot-version" }
+spring-boot-framework-starter-jetty = { group = "org.springframework.boot", name = "spring-boot-starter-jetty", version.ref = "spring-boot-version" }
+spring-boot-framework-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "spring-boot-version" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor-version" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor-version" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp-version" }
+moshi = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshi-version" }
+moshi-compiler = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi-version" }
 
 
 [plugins]
@@ -83,9 +80,11 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 roomGradlePlugin = { id = "androidx.room", version.ref = "roomVersion" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }
+kotlinPluginSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlinVersion" }
+kotlinPluginJpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlinVersion" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlinVersion" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
-
-ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot-version" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management-version" }
+spring-kotlin = { id = "org.jetbrains.kotlin.spring", version.ref = "kotlinVersion" }
