@@ -17,8 +17,6 @@ import kotlinx.coroutines.coroutineScope
  */
 interface MessageDatabaseApi {
 
-    suspend fun persistMessage(message: Message)
-
     suspend fun queryMessagesAtTime(
         chatterSessionId: String,
         sessionType: SessionType,
@@ -64,12 +62,6 @@ private class MessageDatabaseApiImpl(
     private val database: AppMessageDatabase?,
     private val messageParser: MessageParser,
 ) : MessageDatabaseApi {
-
-    override suspend fun persistMessage(message: Message) {
-        val database = this.database ?: return
-        val localMessage = message.toLocalMessage()
-        database.messageDao.upsertMessage(localMessage)
-    }
 
     override suspend fun queryMessagesAtTime(
         chatterSessionId: String,

@@ -51,14 +51,14 @@ class ChatService internal constructor(
 
     fun initDatabase(initConfig: ChatServiceDatabaseInitConfig) {
         val account = initConfig.account
-        val database = initConfig.factory.databaseCreate(account.accountId)
+        val database = initConfig.factory.databaseCreate(account.sessionId)
         val databaseProvider = DBProvider(database, this.messageParser)
         this.databaseProvider = databaseProvider
         this.mutableEventObserver.onDatabaseInitialized()
     }
 
-    fun startService(initConfig: ChatServiceInitConfig) {
-        if (this.initConfig == initConfig) {
+    fun startService(initConfig: ChatServiceInitConfig, force: Boolean) {
+        if (this.initConfig == initConfig && !force) {
             return
         }
         this.initConfig = initConfig
@@ -140,7 +140,7 @@ class ChatService internal constructor(
         val databaseProvider = this.databaseProvider
         if (databaseProvider != null) {
             this.coroutineScope.launch {
-                databaseProvider.messageDatabaseApi.persistMessage(message)
+                databaseProvider.messageDatabaseApi.insertMessage(message)
             }
         }
 

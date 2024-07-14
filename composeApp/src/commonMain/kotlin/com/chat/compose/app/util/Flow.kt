@@ -16,12 +16,12 @@ fun <T> Flow<T>.collect(coroutineScope: CoroutineScope): Job {
     return coroutineScope.launch(Dispatchers.Default) { collect() }
 }
 
-fun <T> Flow<T>.accessFirst(function: (T) -> Unit): Flow<T> {
-    var first: Boolean = true
+fun <T> Flow<T>.onFirst(function: (T) -> Unit): Flow<T> {
+    var hasAccess: Boolean = true
     return transform {
-        if (first) {
+        if (hasAccess) {
             function(it)
-            first = false
+            hasAccess = false
         }
         emit(it)
     }

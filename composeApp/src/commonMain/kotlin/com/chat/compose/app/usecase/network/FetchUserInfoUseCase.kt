@@ -32,7 +32,21 @@ class FetchUserInfoUseCase(private val httpClient: HttpClient) {
         return withContext(Dispatchers.Default) { fromJson<Profile>(userInfoDataString) }
     }
 
-    suspend fun fetchProfileList(ids: List<String>): List<Profile> {
+    suspend fun fetchProfileBySessionId(sessionId: String): Profile? {
+        val response = this.httpClient.serverRequest(
+            path = "api/userinfo/get",
+            parameters = Parameters.build {
+                this["sessionId"] = sessionId
+            }
+        )
+        val userInfoDataString = response.data?.toString()
+        if (userInfoDataString.isNullOrEmpty()) {
+            return null
+        }
+        return withContext(Dispatchers.Default) { fromJson<Profile>(userInfoDataString) }
+    }
+
+    suspend fun fetchProfileList(ids: List<Long>): List<Profile> {
         val response = this.httpClient.serverRequest(
             path = "api/userinfo/get",
             parameters = Parameters.build {
@@ -48,7 +62,7 @@ class FetchUserInfoUseCase(private val httpClient: HttpClient) {
 
     suspend fun fetchProfileBySessionId(sessionIdList: List<String>): List<Profile> {
         val response = this.httpClient.serverRequest(
-            path = "api/userinfo/get",
+            path = "api/userinfo/get/batch",
             parameters = Parameters.build {
                 this["sessionIdList"] = sessionIdList.joinToString(separator = ",")
             }

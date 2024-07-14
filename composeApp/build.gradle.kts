@@ -64,6 +64,7 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.android.compat)
             implementation(libs.koin.androidx.compose)
+            implementation(libs.androidx.lifecycle.process)
         }
         val desktopMain by getting
         desktopMain.dependencies {
@@ -87,6 +88,8 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
+        applicationId = "com.android.dependencies.chat.android"
+        compileSdk = 34
         minSdk = 24
         targetSdk = 34
     }

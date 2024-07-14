@@ -9,6 +9,7 @@ compose-plugin = "1.6.10"
 ktor-version = "2.3.12"
 okhttp-version = "4.12.0"
 moshi-version = "1.15.1"
+androidx-lifecycle-version = "2.8.3"
 logback-version = "1.4.14"
 dagger-version = "2.51.1"
 netty-version = "4.1.111.Final"
@@ -72,6 +73,7 @@ ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp-version" }
 moshi = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshi-version" }
 moshi-compiler = { group = "com.squareup.moshi", name = "moshi-kotlin-codegen", version.ref = "moshi-version" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "androidx-lifecycle-version" }
 
 
 [plugins]

@@ -9,7 +9,7 @@ import com.chat.compose.app.metadata.UiMessageItem
  * @since 2024/6/22 12:20
  */
 @Composable
-fun MessageUi(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier) {
+fun MessageUi(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
     val messageItem = rememberUpdatedState(uiMessageItem)
 
     val sessionContact by remember { derivedStateOf { messageItem.value.uiSessionContact } }
@@ -20,10 +20,10 @@ fun MessageUi(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier) {
 
     if (isSenderMessage && isReceiverMessage) {
         // chat with self condition
-        SenderMessageItem(messageItem.value, modifier)
+        SenderMessageItem(messageItem.value, modifier, onAvatarClick)
     } else if (isSenderMessage && !isReceiverMessage) {
-        SenderMessageItem(messageItem.value, modifier)
+        SenderMessageItem(messageItem.value, modifier, onAvatarClick)
     } else if (isReceiverMessage && !isSenderMessage) {
-        ReceiverMessageItem(messageItem.value, modifier)
+        ReceiverMessageItem(messageItem.value, modifier, onAvatarClick)
     }
 }

@@ -1,10 +1,7 @@
 package com.chat.compose.app.di
 
 import com.chat.compose.app.network.NetworkCookieStorage
-import com.chat.compose.app.usecase.network.FetchUserInfoUseCase
-import com.chat.compose.app.usecase.network.LoginUserUseCase
-import com.chat.compose.app.usecase.network.RegistrationUseCase
-import com.chat.compose.app.usecase.network.UserAccountCheckForRegistrationUseCase
+import com.chat.compose.app.usecase.network.*
 import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*
 import org.koin.dsl.module
@@ -27,4 +24,5 @@ val NetworkModule = module {
     factory { LoginUserUseCase(get()) }
     factory { UserAccountCheckForRegistrationUseCase(get()) }
     factory { RegistrationUseCase(get()) }
+    factory { SearchComplexUseCase(get()) }
 }

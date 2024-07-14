@@ -5,6 +5,9 @@ import com.chat.compose.app.screen.login.RegisterAccountViewModel
 import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
 import com.chat.compose.app.screen.message.vm.SessionListViewModel
 import com.chat.compose.app.screen.search.SearchLauncherViewModel
+import com.chat.compose.app.screen.search.SearchResultViewModel
+import com.chat.compose.app.screen.user.PersonalInfoViewModel
+import com.chat.compose.app.screen.user.UserBasicInfoViewModel
 import org.koin.dsl.module
 
 /**
@@ -17,4 +20,7 @@ val viewModelModule = module {
     factory { LoginViewModel(get(), get()) }
     factory { RegisterAccountViewModel(get(), get(), get(), get()) }
     factory { SearchLauncherViewModel(get()) }
+    factory { SearchResultViewModel(get()) }
+    factory { UserBasicInfoViewModel(get(), get()) }
+    factory { PersonalInfoViewModel(get()) }
 }

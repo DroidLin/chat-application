@@ -29,6 +29,7 @@ interface MsgConnectionService {
 
     fun initDatabase(initConfig: IMDatabaseInitConfig): Boolean
     fun startService(initConfig: IMInitConfig)
+    fun startService(initConfig: IMInitConfig, force: Boolean)
     fun stopService()
     fun release()
 }
@@ -104,7 +105,11 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
     }
 
     override fun startService(initConfig: IMInitConfig) {
-        if (this.initConfig == initConfig) {
+        this.startService(initConfig, false)
+    }
+
+    override fun startService(initConfig: IMInitConfig, force: Boolean) {
+        if (this.initConfig == initConfig && !force) {
             return
         }
         this.initConfig = initConfig
@@ -116,7 +121,8 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
                 account = initConfig.account,
                 messageReceiveListener = this.globalMessageReceiveListener,
                 chatServiceEventObserver = this.mutableEventObserver
-            )
+            ),
+            force = force
         )
     }
 

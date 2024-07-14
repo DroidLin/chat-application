@@ -20,7 +20,7 @@ import com.chat.compose.app.ui.NameAvatarImage
  */
 
 @Composable
-fun ReceiverMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier) {
+fun ReceiverMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
     val messageItem = rememberUpdatedState(uiMessageItem)
 
     val sessionContact by remember { derivedStateOf { messageItem.value.uiSessionContact } }
@@ -34,6 +34,7 @@ fun ReceiverMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modif
         NameAvatarImage(
             name = sessionContact?.sessionContactName ?: "",
             modifier = Modifier,
+            onClick = onAvatarClick
         )
         Spacer(modifier = Modifier.width(8.dp))
         Box(

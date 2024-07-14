@@ -9,6 +9,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerButton
@@ -29,6 +31,7 @@ actual fun SessionContactItem(
     onPrimaryMouseClick: () -> Unit,
     onSecondaryMouseClick: () -> Unit,
 ) {
+    val uiSessionContact by rememberUpdatedState(value)
     Surface(
         modifier = modifier
             .onClick(matcher = PointerMatcher.mouse(PointerButton.Secondary), onClick = onSecondaryMouseClick),
@@ -65,9 +68,10 @@ actual fun SessionContactItem(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row {
+                    val text= uiSessionContact.rememberShowingContent()
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = value.displayContent,
+                        text = text,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

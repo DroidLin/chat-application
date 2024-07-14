@@ -17,9 +17,9 @@ fun formatTime(time: Long): String {
     }
 
     return if (abs(todayTime.hour - targetTime.hour) > 0) {
-        "${targetTime.hour}:${targetTime.minute}"
+        String.format("%02d:%02d", targetTime.hour, targetTime.minute)
     } else if (abs(todayTime.minute - targetTime.minute) > 10) {
-        "${targetTime.hour}:${targetTime.minute}"
+        String.format("%02d:%02d", targetTime.hour, targetTime.minute)
     } else if (abs(todayTime.minute - targetTime.minute) > 0) {
         "${todayTime.minute - targetTime.minute}分钟前"
     } else {

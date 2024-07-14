@@ -2,10 +2,7 @@ package com.application.channel.im
 
 import com.application.channel.message.metadata.SessionContact
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 
 /**
  * @author liuzhongao
@@ -18,8 +15,8 @@ object SingleIMManager {
         this.startService(initConfig, true)
     }
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val _sessionContactFlow = MutableSharedFlow<List<SessionContact>>()
-    val sessionContact = _sessionContactFlow.asSharedFlow()
+    private val _sessionContactFlow = MutableStateFlow<List<SessionContact>>(emptyList())
+    val sessionContact = _sessionContactFlow.asStateFlow()
 
     val connectionService = MsgClient.getService(MsgConnectionService::class.java)
     val msgService = MsgClient.getService(MsgService::class.java)
@@ -40,7 +37,7 @@ object SingleIMManager {
         this.connectionService.initDatabase(initConfig)
         this.connectionService.messageRepository.fetchObservableSessionContactList(Int.MAX_VALUE)
             .onEach { sessionContactList -> this._sessionContactFlow.emit(sessionContactList) }
-            .let { this.flowCoroutineJob = this.coroutineScope.launch { it.collect() } }
+            .let { this.flowCoroutineJob?.cancel(); this.flowCoroutineJob = this.coroutineScope.launch { it.collect() } }
     }
 
     @JvmOverloads
@@ -49,7 +46,12 @@ object SingleIMManager {
             return
         }
         this.imInitConfig = initConfig
-        this.connectionService.startService(initConfig)
+        this.connectionService.startService(initConfig, force)
+    }
+
+    @JvmStatic
+    fun onApplicationForeground() {
+
     }
 
     fun stopService() {
@@ -58,5 +60,9 @@ object SingleIMManager {
 
     fun release() {
         this.connectionService.release()
+        this.flowCoroutineJob?.cancel()
+        this.flowCoroutineJob = null
+        this.databaseInitConfig = null
+        this.imInitConfig = null
     }
 }

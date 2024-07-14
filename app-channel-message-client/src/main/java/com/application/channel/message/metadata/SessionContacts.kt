@@ -4,6 +4,7 @@ import com.application.channel.database.AppMessageDatabase
 import com.application.channel.database.meta.LocalSessionContact
 import com.application.channel.message.SessionType
 import com.application.channel.message.map
+import com.application.channel.message.meta.Message
 import com.application.channel.message.meta.MessageParser
 import com.application.channel.message.util.LocalMessageConverter.toMessage
 import org.json.JSONObject
@@ -15,8 +16,19 @@ import org.json.JSONObject
 internal object SessionContacts {
 
     @JvmStatic
-    fun LocalSessionContact.toSessionContact(): SessionContact {
-        TODO("not supported yet")
+    fun LocalSessionContact.toSessionContact(message: Message?, unreadCount: Int): SessionContact {
+        return SessionContact(
+            sessionId = this.sessionId,
+            unreadCount = unreadCount,
+            recentMessage = message,
+            lastUpdateTimestamp = this.lastModifyTimestamp,
+            sessionType = SessionType.fromValue(this.sessionTypeCode),
+            extensions = this.extensions?.takeIf { it.isNotBlank() }?.let { extensions ->
+                kotlin.runCatching { JSONObject(extensions) }
+                    .onFailure { it.printStackTrace() }
+                    .getOrNull()?.map
+            } ?: emptyMap()
+        )
     }
 
     @JvmStatic

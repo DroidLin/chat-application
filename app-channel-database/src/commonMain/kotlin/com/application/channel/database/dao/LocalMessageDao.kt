@@ -2,6 +2,7 @@ package com.application.channel.database.dao
 
 import androidx.room.*
 import com.application.channel.database.meta.LocalMessage
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author liuzhongao
@@ -119,6 +120,13 @@ interface LocalMessageDao {
     suspend fun calculateUserSessionUnreadCount(sessionId: String, chatterSessionId: String, sessionTypeCode: Int): Int
 
     @Query(
+        "select count(*) from table_message_record where ((message_sender_session_id = :sessionId and message_receiver_session_id = :chatterSessionId) or (message_sender_session_id = :chatterSessionId and message_receiver_session_id = :sessionId)) " +
+                "and message_session_type_code = :sessionTypeCode " +
+                "and message_state_user_consumed = 1"
+    )
+    fun observableCalculateUserSessionUnreadCount(sessionId: String, chatterSessionId: String, sessionTypeCode: Int): Flow<Int>
+
+    @Query(
         "select * from table_message_record where ((message_sender_session_id = :sessionId and message_receiver_session_id = :chatterSessionId) or (message_sender_session_id = :chatterSessionId and message_receiver_session_id = :sessionId)) " +
                 "and message_session_type_code = :sessionTypeCode " +
                 "order by message_timestamp desc limit 1"
@@ -128,6 +136,17 @@ interface LocalMessageDao {
         chatterSessionId: String,
         sessionTypeCode: Int
     ): LocalMessage?
+
+    @Query(
+        "select * from table_message_record where ((message_sender_session_id = :sessionId and message_receiver_session_id = :chatterSessionId) or (message_sender_session_id = :chatterSessionId and message_receiver_session_id = :sessionId)) " +
+                "and message_session_type_code = :sessionTypeCode " +
+                "order by message_timestamp desc limit 1"
+    )
+    fun observableRecentMessageWithSomeone(
+        sessionId: String,
+        chatterSessionId: String,
+        sessionTypeCode: Int
+    ): Flow<LocalMessage?>
 
     @Delete
     suspend fun deleteMessages(vararg messages: LocalMessage)

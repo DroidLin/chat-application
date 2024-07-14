@@ -54,6 +54,7 @@ class TcpClient {
             .option(ChannelOption.TCP_NODELAY, true)
             .option(ChannelOption.SO_SNDBUF, 4096)
             .option(ChannelOption.SO_RCVBUF, 4096)
+            .option(ChannelOption.AUTO_CLOSE, false)
             .option(ChannelOption.WRITE_BUFFER_WATER_MARK, WriteBufferWaterMark(8 * 1024, 32 * 1024))
             .connect(tcpInitConfig.socketAddress)
             .addListener(channelFutureListener)

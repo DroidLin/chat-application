@@ -162,6 +162,7 @@ fun parseCookie(jsonString: String?): Cookie? {
         name = name,
         value = value,
         maxAge = maxAge,
+        encoding = CookieEncoding.RAW,
         expires = GMTDate(expires),
         domain = domain,
         secure = secure,

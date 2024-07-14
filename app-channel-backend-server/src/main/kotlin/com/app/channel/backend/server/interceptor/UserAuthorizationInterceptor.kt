@@ -29,7 +29,9 @@ class UserAuthorizationInterceptor(
         if (profileString.isNullOrEmpty()) {
             throw BizException(code = CodeConst.CODE_NOT_LOGIN, message = "user not login.")
         }
-        val profileDecodeString = Base64.getDecoder().decode(profileString).decodeToString()
+        val profileDecodeString = kotlin.runCatching {
+            Base64.getDecoder().decode(profileString).decodeToString()
+        }.getOrNull() ?: throw BizException(code = CodeConst.CODE_NOT_LOGIN, message = "user not logged in.")
         val profileDTO = kotlin.runCatching {
             this.objectMapper.readValue(profileDecodeString, ProfileDTO::class.java)
         }.onFailure { it.printStackTrace() }.getOrNull()

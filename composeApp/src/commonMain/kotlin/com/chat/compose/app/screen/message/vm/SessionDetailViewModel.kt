@@ -14,8 +14,9 @@ import com.chat.compose.app.usecase.CloseSessionUseCase
 import com.chat.compose.app.usecase.FetchChatDetailListUseCase
 import com.chat.compose.app.usecase.FetchSessionContactUseCase
 import com.chat.compose.app.usecase.OpenChatSessionUseCase
-import com.chat.compose.app.util.accessFirst
 import com.chat.compose.app.util.collect
+import com.chat.compose.app.util.mainCoroutineScope
+import com.chat.compose.app.util.onFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -44,14 +45,14 @@ class SessionDetailViewModel constructor(
     fun openSession(sessionId: String, sessionType: SessionType): StateFlow<PagingData<UiMessageItem>> {
         this.observerJob?.cancel()
         this.observerJob = this.fetchSessionContactUseCase
-            .fetchObservableSessionContact(sessionId, sessionType)
-            .accessFirst { sessionContact ->
-                val draftMessage = sessionContact?.draftMessage
+            .fetchObservableSessionContactOrCreate(sessionId, sessionType)
+            .onFirst { sessionContact ->
+                val draftMessage = sessionContact.draftMessage
                 if (!draftMessage.isNullOrBlank()) {
                     this._state.update { it.copy(inputText = draftMessage) }
                 }
             }
-            .map { sessionContact -> sessionContact?.toUiSessionContact() }
+            .map { sessionContact -> sessionContact.toUiSessionContact() }
             .filterNotNull()
             .distinctUntilChanged()
             .onEach { uiSessionContact ->
@@ -72,7 +73,7 @@ class SessionDetailViewModel constructor(
     fun saveDraft() {
         val inputText = this._state.value.inputText
         val chatSession = this.chatSession ?: return
-        this.coroutineScope.launch {
+        mainCoroutineScope.launch {
             chatSession.saveDraftContent(inputText)
         }
     }

@@ -1,7 +1,10 @@
 package com.chat.compose.app.ui
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
@@ -10,9 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import com.application.channel.core.util.koinInject
@@ -20,24 +25,26 @@ import com.application.channel.message.SessionType
 import com.chat.compose.app.LocalApplicationConfiguration
 import com.chat.compose.app.lifecycle.MainFirstFrameContent
 import com.chat.compose.app.metadata.isValid
-import com.chat.compose.app.router.LocalRouterAction
+import com.chat.compose.app.router.LocalRouteAction
 import com.chat.compose.app.router.rememberRouterAction
 import com.chat.compose.app.screen.login.LoginScreen
 import com.chat.compose.app.screen.login.RegisterAccountScreen
 import com.chat.compose.app.screen.message.ui.SessionDetailScreen
 import com.chat.compose.app.screen.message.ui.SessionListScreen
 import com.chat.compose.app.screen.search.SearchLauncherScreen
+import com.chat.compose.app.screen.search.SearchResultScreen
 import com.chat.compose.app.screen.setting.SettingScreen
 import com.chat.compose.app.screen.splash.SplashScreen
+import com.chat.compose.app.screen.user.UserBasicInfoScreen
 import com.chat.compose.app.services.ProfileService
 import com.chat.compose.app.ui.framework.Box
 
 @Composable
 fun BasicApplication() {
-    val routerAction = rememberRouterAction()
+    val routeAction = rememberRouterAction()
     val navigateTo = { route: String ->
-        val currentRoute = routerAction.navController.currentDestination?.route
-        routerAction.navigateTo(
+        val currentRoute = routeAction.navController.currentDestination?.route
+        routeAction.navigateTo(
             route = route,
             navOptions = navOptions {
                 launchSingleTop = true
@@ -49,14 +56,14 @@ fun BasicApplication() {
             }
         )
     }
-    CompositionLocalProvider(LocalRouterAction provides routerAction) {
+    CompositionLocalProvider(LocalRouteAction provides routeAction) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
             NavHost(
                 modifier = Modifier.fillMaxSize()
                     .navigationRailPadding(),
-                navController = routerAction.navController,
+                navController = routeAction.navController,
                 startDestination = NavRoute.SplashScreen.route,
                 enterTransition = { fadeIn() },
                 exitTransition = { fadeOut() },
@@ -106,16 +113,16 @@ fun BasicApplication() {
                     MainFirstFrameContent()
                     Surface {
                         SessionListScreen(
-                            backPress = routerAction::backPress,
+                            backPress = routeAction::backPress,
                             sessionItemClick = { sessionContact ->
                                 val route = NavRoute.ChatMessageDetail.buildRoute(
                                     sessionId = sessionContact.sessionId,
                                     sessionType = sessionContact.sessionType,
                                 )
-                                routerAction.navigateTo(route)
+                                routeAction.navigateTo(route)
                             },
                             navigateToSearch = {
-                                routerAction.navigateTo(NavRoute.SearchLauncher.route)
+                                routeAction.navigateTo(NavRoute.SearchLauncher.route)
                             }
                         )
                     }
@@ -125,7 +132,7 @@ fun BasicApplication() {
                 ) {
                     Surface {
                         SettingScreen(
-                            backPressed = routerAction::backPress
+                            backPressed = routeAction::backPress
                         )
                     }
                 }
@@ -143,7 +150,12 @@ fun BasicApplication() {
                         SessionDetailScreen(
                             sessionId = sessionId,
                             sessionType = sessionType,
-                            backPress = routerAction::backPress
+                            backPress = routeAction::backPress,
+                            navigateToUseBasicInfo = { userId ->
+                                routeAction.navigateTo(
+                                    route = NavRoute.UserBasicInfo.buildRoute(userId = userId)
+                                )
+                            }
                         )
                     }
                 }
@@ -151,7 +163,51 @@ fun BasicApplication() {
                     route = NavRoute.SearchLauncher.route
                 ) {
                     SearchLauncherScreen(
-                        backPressed = routerAction::backPress
+                        backPressed = routeAction::backPress,
+                        navigateToSearchResult = { keyword ->
+                            routeAction.navigateTo(
+                                route = NavRoute.SearchComplexResult.buildRoute(keyword)
+                            )
+                        }
+                    )
+                }
+                composable(
+                    route = NavRoute.SearchComplexResult.route,
+                    deepLinks = listOf(
+
+                    )
+                ) { backStackEntry ->
+                    val keyword = requireNotNull(backStackEntry.arguments?.getString("keyword"))
+                    SearchResultScreen(
+                        keyword = keyword,
+                        backPressed = routeAction::backPress,
+                        navigateToUseBasicScreen = { userId ->
+                            routeAction.navigateTo(
+                                route = NavRoute.UserBasicInfo.buildRoute(userId = userId)
+                            )
+                        }
+                    )
+                }
+                composable(
+                    route = NavRoute.UserBasicInfo.route,
+                    arguments = listOf(
+                        navArgument(name = "userId") {
+                            type = NavType.LongType
+                            nullable = false
+                        }
+                    )
+                ) { backStackEntry ->
+                    val userId = requireNotNull(backStackEntry.arguments?.getLong("userId"))
+                    UserBasicInfoScreen(
+                        userId = userId,
+                        backPress = routeAction::backPress,
+                        navigateToChat = { sessionId, sessionType ->
+                            val route = NavRoute.ChatMessageDetail.buildRoute(
+                                sessionId = sessionId,
+                                sessionType = sessionType,
+                            )
+                            routeAction.navigateTo(route)
+                        }
                     )
                 }
             }
@@ -166,7 +222,7 @@ private fun AppNavigationRail(
     switchHomeTo: (String) -> Unit
 ) {
     val applicationConfiguration = LocalApplicationConfiguration.current
-    val routerAction = LocalRouterAction.current
+    val routerAction = LocalRouteAction.current
     Box(
         modifier = modifier,
     ) {

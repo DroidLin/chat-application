@@ -59,7 +59,16 @@ private class MsgServiceImpl : MsgService {
         sessionType: SessionType,
         function: MutableMap<String, Any?>.() -> Unit
     ) {
-        this.messageRepository.updateSessionContact(sessionId, sessionType) {
+        this.updateSessionContactExtensions(sessionId, sessionType, true, function)
+    }
+
+    override suspend fun updateSessionContactExtensions(
+        sessionId: String,
+        sessionType: SessionType,
+        updateAccess: Boolean,
+        function: MutableMap<String, Any?>.() -> Unit
+    ) {
+        this.messageRepository.updateSessionContact(sessionId, sessionType, updateAccess) {
             copy(extensions = this.extensions.toMutableMap().apply(function))
         }
     }

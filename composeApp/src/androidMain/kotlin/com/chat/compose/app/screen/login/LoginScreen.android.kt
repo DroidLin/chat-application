@@ -7,12 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.android.dependencies.chat.android.R
-import com.chat.compose.app.router.LocalRouterAction
+import com.chat.compose.app.router.LocalRouteAction
 import com.chat.compose.app.ui.NavRoute
 
 @Composable
 actual fun LoginBottomCustomArea(modifier: Modifier) {
-    val routerAction = LocalRouterAction.current
+    val routerAction = LocalRouteAction.current
     Row(modifier = modifier) {
         TextButton(
             onClick = {

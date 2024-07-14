@@ -3,7 +3,6 @@ package com.chat.compose.app.router
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 
@@ -12,7 +11,7 @@ import androidx.navigation.NavOptions
  * @since 2024/6/16 21:56
  */
 @Stable
-interface RouterAction {
+interface RouteAction {
 
     val navController: NavHostController
 
@@ -24,6 +23,6 @@ interface RouterAction {
 }
 
 @Composable
-expect fun rememberRouterAction(): RouterAction
+expect fun rememberRouterAction(): RouteAction
 
-val LocalRouterAction = compositionLocalOf<RouterAction> { error("No LocalRouterAction provided") }
+val LocalRouteAction = compositionLocalOf<RouteAction> { error("No LocalRouterAction provided") }

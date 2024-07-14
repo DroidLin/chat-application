@@ -1,11 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING"/>
 
 	<application
 		android:name="com.chat.compose.app.BasicApplication"
 		android:icon="@mipmap/ic_launcher"
-		android:theme="@style/BasicStyle">
+		android:theme="@style/BasicStyle"
+		android:label="@string/app_name">
 
 		<activity
 			android:name="com.chat.compose.app.MainActivity"
@@ -18,8 +23,18 @@
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
+
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<data android:scheme="@string/scheme_deeplink"/>
+			</intent-filter>
 		</activity>
 
-		<service android:name="com.chat.compose.app.AndroidChatService" android:exported="false"/>
+		<service
+			android:name="com.chat.compose.app.AndroidChatService"
+			android:exported="false"
+			android:foregroundServiceType="remoteMessaging"/>
 	</application>
 </manifest>

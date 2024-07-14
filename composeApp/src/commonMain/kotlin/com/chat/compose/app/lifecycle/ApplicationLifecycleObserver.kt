@@ -11,5 +11,7 @@ interface ApplicationLifecycleObserver {
     suspend fun onUserLogin(profile: Profile) {}
     suspend fun onUserLogout() {}
 
+    suspend fun onLoginSessionExpired() {}
+
     suspend fun onFirstFrameComplete() {}
 }

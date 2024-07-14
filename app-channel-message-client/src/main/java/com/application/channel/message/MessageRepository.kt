@@ -26,6 +26,12 @@ interface MessageRepository {
         sessionType: SessionType,
         function: SessionContact.() -> SessionContact
     )
+    suspend fun updateSessionContact(
+        sessionId: String,
+        sessionType: SessionType,
+        updateAccess: Boolean,
+        function: SessionContact.() -> SessionContact
+    )
 
     suspend fun deleteSessionContact(sessionId: String, sessionType: SessionType)
     suspend fun deleteSessionContact(sessionContact: SessionContact)
@@ -107,11 +113,21 @@ private class MessageRepositoryImpl(
         sessionType: SessionType,
         function: SessionContact.() -> SessionContact
     ) {
+        this.updateSessionContact(sessionId, sessionType, true, function)
+    }
+
+    override suspend fun updateSessionContact(
+        sessionId: String,
+        sessionType: SessionType,
+        updateAccess: Boolean,
+        function: SessionContact.() -> SessionContact
+    ) {
         val sessionContact = this.databaseProvider.sessionContactDatabaseApi.findSessionContact(sessionId, sessionType)
         val updatedSessionContact = sessionContact?.run(function)
         if (sessionContact != null && updatedSessionContact != null && sessionContact != updatedSessionContact) {
-            val timestampUpdatedSessionContact =
+            val timestampUpdatedSessionContact = if (updateAccess) {
                 updatedSessionContact.copy(lastUpdateTimestamp = System.currentTimeMillis())
+            } else updatedSessionContact
             this.databaseProvider.sessionContactDatabaseApi.updateSessionContact(timestampUpdatedSessionContact)
         }
     }

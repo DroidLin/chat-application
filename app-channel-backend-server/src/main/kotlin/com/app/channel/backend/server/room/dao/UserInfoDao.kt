@@ -20,4 +20,7 @@ interface UserInfoDao {
 
     @Query("select * from local_user_info where account_id = :userAccount")
     suspend fun fetchUserInfoByAccount(userAccount: String): LocalUserInfo?
+
+    @Query("select * from local_user_info where user_name like :query order by user_name limit :limit")
+    suspend fun searchMatch(query: String, limit: Int): List<LocalUserInfo>
 }

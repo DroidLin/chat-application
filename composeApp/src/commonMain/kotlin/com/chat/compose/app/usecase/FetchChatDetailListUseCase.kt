@@ -9,8 +9,10 @@ import com.application.channel.message.SessionType
 import com.chat.compose.app.metadata.UiMessageItem
 import com.chat.compose.app.metadata.toUiMessage
 import com.chat.compose.app.metadata.toUiSessionContact
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
 /**
@@ -34,7 +36,7 @@ class FetchChatDetailListUseCase(private val fetchSessionContactUseCase: FetchSe
         )
             .flow
             .map { pagingData ->
-                val selfUserSessionContact = this.fetchSessionContactUseCase.fetchSessionContact(
+                val selfUserSessionContact = this.fetchSessionContactUseCase.fetchSessionContactOrCreate(
                     sessionId = chatSessionContext.selfUserSessionId,
                     sessionType = SessionType.P2P
                 )?.toUiSessionContact()
@@ -43,17 +45,14 @@ class FetchChatDetailListUseCase(private val fetchSessionContactUseCase: FetchSe
                     sessionType = chatSessionContext.chatterSessionType
                 )?.toUiSessionContact()
                 pagingData.map { message ->
-
                     val isSenderMessage = message.sender.sessionId == chatSession.context.selfUserSessionId
                     val isReceiverMessage = message.sender.sessionId == chatSession.context.chatterSessionId || message.receiver.sessionId == chatSession.context.chatterSessionId
-
                     val uiSessionContact = when {
-                        isSenderMessage && isReceiverMessage -> selfUserSessionContact ?: chatterSessionContact
+                        isSenderMessage && isReceiverMessage -> selfUserSessionContact
                         isSenderMessage -> selfUserSessionContact
                         isReceiverMessage -> chatterSessionContact
                         else -> null
                     }
-
                     UiMessageItem(
                         uiSessionContact = uiSessionContact,
                         uiMessage = message.toUiMessage(
@@ -64,5 +63,6 @@ class FetchChatDetailListUseCase(private val fetchSessionContactUseCase: FetchSe
                 }
             }
             .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
     }
 }

@@ -6,45 +6,42 @@ import com.application.channel.message.SessionType
  * @author liuzhongao
  * @since 2024/6/16 21:49
  */
-interface NavRoute {
+sealed class NavRoute(val route: String, val deepLinks: List<String> = emptyList()) {
 
-    val route: String
+    data object SplashScreen : NavRoute(route = "splashScreen")
 
-    object SplashScreen : NavRoute {
-        override val route: String = "route/splash/screen"
+    data object LoginRoute : NavRoute(route = "login") {
+        data object Login : NavRoute(route = "loginScreen")
+        data object RegisterAccount : NavRoute(route = "registerAccount")
     }
 
-    object LoginRoute : NavRoute {
-        override val route: String = "route/login"
-
-        object Login : NavRoute {
-            override val route: String = "route/login/screen"
-        }
-
-        object RegisterAccount : NavRoute {
-            override val route: String = "route/register/account"
-        }
-    }
-
-    object ChatSessionList : NavRoute {
-        override val route: String get() = "homeRoute"
-    }
-
-    object ChatMessageDetail : NavRoute {
-
-        override val route: String get() = "chatMessageDetail/{sessionId}/{sessionType}"
-
+    data object ChatSessionList : NavRoute(route = "homeRoute")
+    data object ChatMessageDetail : NavRoute(
+        route = "chatDetail/{sessionId}/{sessionType}",
+        deepLinks = listOf("chatter://chatDetail?sessionId={sessionId}&sessionType={sessionType}"),
+    ) {
         fun buildRoute(sessionId: String, sessionType: SessionType): String {
-            return "chatMessageDetail/$sessionId/${sessionType.value}"
+            return "chatDetail/$sessionId/${sessionType.value}"
         }
     }
 
-    object Settings : NavRoute {
-        override val route: String get() = "settings"
+    data object Settings : NavRoute(route = "settings")
+    data object SearchLauncher : NavRoute(route = "searchLauncher")
+
+    data object SearchComplexResult : NavRoute(
+        route = "searchResultComplex?keyword={keyword}",
+        deepLinks = listOf("chatter://searchResultComplex?keyword={keyword}")
+    ) {
+        fun buildRoute(keyword: String): String = "searchResultComplex?keyword=${keyword}"
     }
 
-    object SearchLauncher : NavRoute {
-        override val route: String = "search/launcher"
+    data object UserBasicInfo : NavRoute(
+        route = "userBasicInfo?userId={userId}",
+        deepLinks = listOf("chatter://userBasicInfo?userId={userId}")
+    ) {
+        fun buildRoute(userId: Long): String = "userBasicInfo?userId=${userId}"
     }
+
+    data object PersonalInfo : NavRoute(route = "personalInfo")
 
 }

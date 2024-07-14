@@ -21,5 +21,5 @@ fun main() {
         messageParser = MessageParser(emptyList()),
         authorization = Authorization()
     )
-    chatService.startService(initConfig)
+    chatService.startService(initConfig, false)
 }

@@ -62,10 +62,16 @@ private class AppMessageDatabaseImpl(
         block: suspend AppMessageDatabase.Transaction<T>.() -> T
     ): T {
         val function: suspend (Transactor) -> T = { transactor ->
-            if (transactor.inTransaction()) {
-                EmptyTransaction<T>().block()
-            } else transactor.deferredTransaction {
-                TransactionScopedTransaction<T>(this).block()
+            try {
+                if (transactor.inTransaction()) {
+                    EmptyTransaction<T>().block()
+                } else transactor.immediateTransaction {
+                    TransactionScopedTransaction<T>(this).block()
+                }
+            } finally {
+                if (!readOnly && !transactor.inTransaction()) {
+                    this.database.invalidationTracker.refreshAsync()
+                }
             }
         }
         return if (readOnly) {

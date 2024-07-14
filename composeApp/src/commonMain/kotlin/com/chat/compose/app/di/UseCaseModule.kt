@@ -13,8 +13,8 @@ import org.koin.dsl.module
 val useCaseModule = module {
     factory { OpenChatSessionUseCase(get()) }
     factory { CloseSessionUseCase(get()) }
-    factory { FetchSessionContactUseCase(get()) }
-    factory { FetchSessionListUseCase(get()) }
+    factory { FetchSessionContactUseCase(get(), get(), get()) }
+    factory { FetchSessionListUseCase() }
     factory { FetchChatDetailListUseCase(get()) }
     factory { UpdateSessionContactUserBasicInfoUseCase(get()) }
     factory { SearchHistoryUseCase() }

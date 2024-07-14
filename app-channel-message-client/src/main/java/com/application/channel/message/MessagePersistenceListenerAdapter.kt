@@ -45,7 +45,7 @@ class MessagePersistenceListenerAdapter(
         this.coroutineScope.launch {
             this@MessagePersistenceListenerAdapter.coroutineMutex.withLock {
                 sessionContactDao.accessToSessionContact(sessionId, message.sessionType)
-                messageApi.persistMessage(message)
+                messageApi.insertMessage(message)
             }
         }
     }

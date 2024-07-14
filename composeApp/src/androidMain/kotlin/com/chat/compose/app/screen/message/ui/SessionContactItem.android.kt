@@ -8,10 +8,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.chat.compose.app.metadata.UiSessionContact
@@ -25,6 +29,7 @@ actual fun SessionContactItem(
     onPrimaryMouseClick: () -> Unit,
     onSecondaryMouseClick: () -> Unit
 ) {
+    val uiSessionContact by rememberUpdatedState(value)
     Surface(
         modifier = modifier
             .graphicsLayer(shape = MaterialTheme.shapes.large)
@@ -64,9 +69,10 @@ actual fun SessionContactItem(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row {
+                    val text = uiSessionContact.rememberShowingContent()
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = value.displayContent,
+                        text = text,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

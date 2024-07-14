@@ -27,11 +27,7 @@ fun initChatService() {
         return
     }
     val account = Account(sessionId = sessionId, accountId = accountId)
-    val initConfig = IMDatabaseInitConfig(
-        account = account,
-        factory = platformAppDatabaseFactory()
-    )
-    SingleIMManager.initDatabase(initConfig)
+    innerInitDatabase(account)
 }
 
 fun startChatService() {
@@ -45,11 +41,7 @@ fun startChatService() {
         return
     }
     val account = Account(sessionId = sessionId, accountId = accountId)
-    val initConfig = IMInitConfig(
-        remoteAddress = remoteAddress,
-        account = account
-    )
-    SingleIMManager.startService(initConfig)
+    innerStartService(remoteAddress, account)
 }
 
 fun initAndStartChatService() {
@@ -63,16 +55,20 @@ fun initAndStartChatService() {
         return
     }
     val account = Account(sessionId = sessionId, accountId = accountId)
-    val databaseInitConfig = IMDatabaseInitConfig(
+    val remoteAddress = "http://${DEFAULT_HOST}:${TCP_PORT}"
+    innerInitDatabase(account)
+    innerStartService(remoteAddress, account)
+}
+
+private fun innerInitDatabase(account: Account) {
+    val initConfig = IMDatabaseInitConfig(
         account = account,
         factory = platformAppDatabaseFactory()
     )
-    SingleIMManager.initDatabase(databaseInitConfig)
+    SingleIMManager.initDatabase(initConfig)
+}
 
-    val remoteAddress = "http://${DEFAULT_HOST}:${TCP_PORT}"
-    if (remoteAddress.isEmpty()) {
-        return
-    }
+private fun innerStartService(remoteAddress: String, account: Account) {
     val initConfig = IMInitConfig(
         remoteAddress = remoteAddress,
         account = account

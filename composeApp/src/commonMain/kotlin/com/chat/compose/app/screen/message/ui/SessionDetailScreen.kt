@@ -1,6 +1,5 @@
 package com.chat.compose.app.screen.message.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -24,12 +23,13 @@ import com.chat.compose.app.ui.messages.MessageUi
  * @author liuzhongao
  * @since 2024/6/17 00:00
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionDetailScreen(
     sessionId: String,
     sessionType: SessionType,
-    backPress: () -> Unit = {}
+    backPress: () -> Unit = {},
+    navigateToUseBasicInfo: (Long) -> Unit,
 ) {
     val viewModel: SessionDetailViewModel = koinViewModel()
     val uiState = viewModel.state.collectAsState()
@@ -78,7 +78,11 @@ fun SessionDetailScreen(
                     MessageUi(
                         modifier = Modifier
                             .fillParentMaxWidth(),
-                        uiMessageItem = messageItem
+                        uiMessageItem = messageItem,
+                        onAvatarClick = {
+                            val userId = messageItem.uiSessionContact?.sessionContactUserId
+                            if (userId != null) navigateToUseBasicInfo(userId)
+                        }
                     )
                 }
             }

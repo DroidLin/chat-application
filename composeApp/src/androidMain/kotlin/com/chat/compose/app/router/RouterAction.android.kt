@@ -12,15 +12,15 @@ import androidx.navigation.compose.rememberNavController
  * @since 2024/6/21 11:25
  */
 @Composable
-actual fun rememberRouterAction(): RouterAction {
+actual fun rememberRouterAction(): RouteAction {
     val navigator = rememberNavController()
-    return remember(navigator) { RouterActionImpl(navigator) }
+    return remember(navigator) { RouteActionImpl(navigator) }
 }
 
 @Stable
-private class RouterActionImpl(
+private class RouteActionImpl(
     override val navController: NavHostController,
-) : RouterAction {
+) : RouteAction {
 
     override fun navigateTo(route: String) {
         this.navController.navigate(route)

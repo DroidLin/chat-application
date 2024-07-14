@@ -14,6 +14,8 @@ data class UiSessionContact(
     val sessionContactName: String,
     val sessionContactUserId: Long,
     val unreadCount: Int,
-    val displayContent: String,
+    val draftMessage: String?,
+    val showingContent: String,
+    val timestamp: Long,
     val time: String,
 )

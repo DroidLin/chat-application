@@ -12,6 +12,7 @@ interface SessionExtensions {
         const val KEY_DRAFT_MESSAGE_STRING = "draft_message_string"
         const val KEY_USER_INFO_NAME = "user_info_name"
         const val KEY_USER_INFO_ID = "user_info_id"
+        const val KEY_USER_INFO_STRING = "user_info_string"
     }
 }
 
@@ -23,3 +24,6 @@ val SessionContact.userName: String?
 
 val SessionContact.userId: Long
     get() = this.extensions[SessionExtensions.KEY_USER_INFO_ID]?.toString()?.toLongOrNull() ?: -1
+
+val SessionContact.userInfoString: String
+    get() = this.extensions[SessionExtensions.KEY_USER_INFO_STRING] as? String ?: ""

@@ -4,10 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Debug
 import android.os.Looper
-import com.android.dependencies.common.android.installContext
-import com.application.channel.core.util.koinInject
-import com.application.channel.im.IMDatabaseInitConfig
-import com.application.channel.im.SingleIMManager
+import com.chat.compose.app.init.initCore
 import java.io.File
 
 /**
@@ -24,5 +21,8 @@ class BasicApplication : Application() {
             false
         }
         initCore(this)
+
+
+
     }
 }

@@ -32,6 +32,12 @@ interface MsgService {
         sessionType: SessionType,
         function: MutableMap<String, Any?>.() -> Unit
     )
+    suspend fun updateSessionContactExtensions(
+        sessionId: String,
+        sessionType: SessionType,
+        updateAccess: Boolean,
+        function: MutableMap<String, Any?>.() -> Unit
+    )
 
     suspend fun fetchSessionContact(sessionId: String, sessionType: SessionType): SessionContact?
     fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?>

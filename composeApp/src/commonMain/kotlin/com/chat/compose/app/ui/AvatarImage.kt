@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,32 +26,64 @@ import androidx.compose.ui.unit.dp
 private val DefaultAvatarSize = 48.dp
 
 @Composable
-fun AvatarImage(
-    url: String?,
+fun NameAvatarImage(
+    name: String,
     modifier: Modifier = Modifier,
+    style: TextStyle? = null,
 ) {
-
+    InnerNameAvatarImage(
+        name = name,
+        modifier = modifier,
+        style = style
+    ) { content ->
+        Surface(
+            color = MaterialTheme.colorScheme.tertiaryContainer,
+            shape = CircleShape,
+            content = content
+        )
+    }
 }
+
 
 @Composable
 fun NameAvatarImage(
     name: String,
     modifier: Modifier = Modifier,
+    style: TextStyle? = null,
+    onClick: () -> Unit,
+) {
+    InnerNameAvatarImage(
+        name = name,
+        modifier = modifier,
+        style = style
+    ) { content ->
+        Surface(
+            color = MaterialTheme.colorScheme.tertiaryContainer,
+            shape = CircleShape,
+            content = content,
+            onClick = onClick
+        )
+    }
+}
+
+@Composable
+private fun InnerNameAvatarImage(
+    name: String,
+    modifier: Modifier = Modifier,
+    style: TextStyle? = null,
+    container: @Composable (@Composable () -> Unit) -> Unit
 ) {
     val nameState = rememberUpdatedState(name)
     val singleWord = remember { derivedStateOf { nameState.value.getOrNull(0)?.uppercase() ?: "" } }
 
-    Surface(
-        color = MaterialTheme.colorScheme.tertiaryContainer,
-        shape = CircleShape
-    ) {
+    container {
         Box(
-            modifier = Modifier.size(DefaultAvatarSize).then(modifier),
+            modifier = Modifier.then(modifier).size(DefaultAvatarSize),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = singleWord.value,
-                style = MaterialTheme.typography.bodyLarge,
+                style = style ?: MaterialTheme.typography.bodyLarge,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
                 textAlign = TextAlign.Center,

@@ -19,7 +19,7 @@ import com.chat.compose.app.ui.NameAvatarImage
  * @since 2024/6/22 11:45
  */
 @Composable
-fun SenderMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier) {
+fun SenderMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
     val messageItem = rememberUpdatedState(uiMessageItem)
 
     val sessionContact by remember { derivedStateOf { messageItem.value.uiSessionContact } }
@@ -42,6 +42,7 @@ fun SenderMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modifie
         NameAvatarImage(
             name = sessionContact?.sessionContactName ?: "",
             modifier = Modifier,
+            onClick = onAvatarClick,
         )
     }
 }
@@ -52,7 +53,7 @@ private fun TextUiMessageItem(uiMessage: TextUiMessage, modifier: Modifier = Mod
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium.copy(topEnd = CornerSize(0.dp)),
-        color = MaterialTheme.colorScheme.secondaryContainer,
+        color = MaterialTheme.colorScheme.tertiaryContainer,
     ) {
         Box(
             modifier = Modifier.heightIn(min = 48.dp),

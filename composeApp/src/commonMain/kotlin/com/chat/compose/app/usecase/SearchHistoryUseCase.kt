@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 /**
  * @author liuzhongao
@@ -19,23 +19,42 @@ class SearchHistoryUseCase {
     private val userPreference by PreferenceCenter.userBasicPreference
     private val coroutineScope by lazy { CoroutineScope(Dispatchers.Default) }
 
-    val historyConfigList get() = flow {
-        val history = this@SearchHistoryUseCase.userPreference.getString(KEY_SEARCH_HISTORY, "")
-        if (history.isNullOrBlank()) {
-            emit(emptyList())
-            return@flow
-        }
-        val historyConfigList = fromJsonArray<SearchHistoryConfig>(history)
-        emit(historyConfigList ?: emptyList())
-    }
-        .distinctUntilChanged()
-        .stateIn(this.coroutineScope, SharingStarted.Lazily, emptyList())
+    private val _historyConfigList = MutableStateFlow<List<SearchHistoryConfig>>(emptyList())
 
-    suspend fun insertKeywordHistory(keyword: String) {
-        val historyConfigList = this.historyConfigList.value.toMutableList()
+    init {
+        this.coroutineScope.launch {
+            val history = this@SearchHistoryUseCase.userPreference.getString(KEY_SEARCH_HISTORY, "")
+            if (history.isNullOrBlank()) return@launch
+            val historyConfigList = fromJsonArray<SearchHistoryConfig>(history)
+            this@SearchHistoryUseCase._historyConfigList.update { historyConfigList ?: emptyList() }
+        }
+    }
+
+    val historyConfigList = this._historyConfigList
+        .map { historyConfigList ->
+            if (historyConfigList.size >= 10) {
+                historyConfigList.subList(0, 10)
+            } else historyConfigList
+        }
+        .map { historyConfigList -> historyConfigList.sortedByDescending { it.timestamp }.distinctBy { it.value } }
+        .distinctUntilChanged()
+
+    fun insertKeywordHistory(keyword: String) {
+        val historyConfigList = this._historyConfigList.value.toMutableList()
         historyConfigList += SearchHistoryConfig(keyword, System.currentTimeMillis())
-        withContext(this.coroutineScope.coroutineContext) {
-            this@SearchHistoryUseCase.userPreference.putString(KEY_SEARCH_HISTORY, historyConfigList.toJson())
+        this.coroutineScope.launch {
+            val distinctList = historyConfigList.sortedByDescending { it.timestamp }.distinctBy { it.value }
+            this@SearchHistoryUseCase._historyConfigList.update { distinctList }
+            this@SearchHistoryUseCase.userPreference.putString(KEY_SEARCH_HISTORY, distinctList.toJson())
+            this@SearchHistoryUseCase.userPreference.flush()
+        }
+    }
+
+    fun clearAllHistory() {
+        this.coroutineScope.launch {
+            this@SearchHistoryUseCase._historyConfigList.update { emptyList() }
+            this@SearchHistoryUseCase.userPreference.putString(KEY_SEARCH_HISTORY, emptyList<SearchHistoryConfig>().toJson())
+            this@SearchHistoryUseCase.userPreference.flush()
         }
     }
 

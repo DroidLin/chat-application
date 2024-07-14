@@ -21,21 +21,25 @@ suspend fun HttpClient.serverRequest(
     method: HttpMethod = HttpMethod.Post,
     parameters: Parameters
 ): ApiResult<Any> {
-    val fixPath = if (path.startsWith("/")) path else "/${path}"
-    val httpResponse = this.submitForm(
-        url = "$DEFAULT_HOST_URL$fixPath",
-        formParameters = parameters,
-        encodeInQuery = method == HttpMethod.Get
-    ) {}
+    return kotlin.runCatching {
+        val fixPath = if (path.startsWith("/")) path else "/${path}"
+        val httpResponse = this.submitForm(
+            url = "$DEFAULT_HOST_URL$fixPath",
+            formParameters = parameters,
+            encodeInQuery = method == HttpMethod.Get
+        ) {}
 
-    val bodyTextResponse = httpResponse.bodyAsText()
+        val bodyTextResponse = httpResponse.bodyAsText()
 
-    val jsonObject = kotlin.runCatching { JSONObject(bodyTextResponse) }
+        val jsonObject = kotlin.runCatching { JSONObject(bodyTextResponse) }
+            .onFailure { it.printStackTrace() }
+            .getOrNull()
+
+        val code = jsonObject?.optInt("code", -1) ?: -1
+        val data = jsonObject?.opt("data")
+        val message = jsonObject?.optString("message")
+        return ApiResult<Any>(code = code, data = data, message = message)
+    }
         .onFailure { it.printStackTrace() }
-        .getOrNull()
-
-    val code = jsonObject?.optInt("code", -1) ?: -1
-    val data = jsonObject?.opt("data")
-    val message = jsonObject?.optString("message")
-    return ApiResult<Any>(code = code, data = data, message = message)
+        .getOrElse { throwable -> ApiResult(code = 400, message = throwable.message) }
 }

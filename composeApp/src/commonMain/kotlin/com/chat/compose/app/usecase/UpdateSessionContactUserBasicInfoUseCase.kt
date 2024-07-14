@@ -3,6 +3,7 @@ package com.chat.compose.app.usecase
 import com.application.channel.im.MsgService
 import com.application.channel.im.SessionExtensions
 import com.chat.compose.app.metadata.Profile
+import com.chat.compose.app.util.toJson
 
 /**
  * @author liuzhongao
@@ -16,9 +17,8 @@ class UpdateSessionContactUserBasicInfoUseCase(private val msgService: MsgServic
                 val sessionInfo = profile.sessionInfo ?: return@forEach
                 val sessionId = sessionInfo.sessionId ?: return@forEach
                 val sessionType = sessionInfo.sessionType
-                msgService.updateSessionContactExtensions(sessionId, sessionType) {
-                    this[SessionExtensions.KEY_USER_INFO_NAME] = profile.userInfo?.userName
-                    this[SessionExtensions.KEY_USER_INFO_ID] = profile.userInfo?.userId
+                msgService.updateSessionContactExtensions(sessionId, sessionType, false) {
+                    this[SessionExtensions.KEY_USER_INFO_STRING]  = profile.toJson()
                 }
             }
         }

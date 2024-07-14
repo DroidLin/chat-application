@@ -1,19 +1,22 @@
 package com.application.channel.message.database
 
 import com.application.channel.database.AppMessageDatabase
+import com.application.channel.database.LocalMessageTable
+import com.application.channel.database.LocalSessionTable
+import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.database.meta.LocalSessionContact
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.MessageParser
 import com.application.channel.message.metadata.SessionContact
 import com.application.channel.message.metadata.SessionContacts.toLocalSessionContact
 import com.application.channel.message.metadata.SessionContacts.toSessionContact
+import com.application.channel.message.util.LocalMessageConverter.toMessage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
 /**
  * @author liuzhongao
@@ -37,7 +40,10 @@ interface SessionContactDatabaseApi {
     fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?>
 }
 
-internal fun SessionContactDatabaseApi(database: AppMessageDatabase?, messageParser: MessageParser): SessionContactDatabaseApi {
+internal fun SessionContactDatabaseApi(
+    database: AppMessageDatabase?,
+    messageParser: MessageParser
+): SessionContactDatabaseApi {
     return SessionContactDatabaseImpl(database, messageParser)
 }
 
@@ -65,8 +71,29 @@ private class SessionContactDatabaseImpl(
 
     override fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?> {
         val database = this.database ?: return flowOf(null)
-        return database.sessionContactDao.fetchObservableSessionContact(sessionId, sessionType.value)
-            .map { localSessionContact -> localSessionContact?.toSessionContact(database, this.messageParser) }
+        val localSessionContactFlow =
+            database.sessionContactDao.fetchObservableSessionContact(sessionId, sessionType.value)
+        val recentMessageFlow = database.messageDao.observableRecentMessageWithSomeone(
+            sessionId = database.userSessionId,
+            chatterSessionId = sessionId,
+            sessionTypeCode = sessionType.value
+        )
+        val unreadCountFlow = database.messageDao.observableCalculateUserSessionUnreadCount(
+            sessionId = database.userSessionId,
+            chatterSessionId = sessionId,
+            sessionTypeCode = sessionType.value
+        )
+        return combine(
+            localSessionContactFlow,
+            recentMessageFlow,
+            unreadCountFlow
+        ) { localSessionContact, localMessage, unreadCount ->
+            val message = localMessage?.toMessage()
+            val parseMessage = if (message != null) {
+                this.messageParser.parse(message)
+            } else null
+            localSessionContact?.toSessionContact(parseMessage, unreadCount)
+        }.flowOn(Dispatchers.Default)
     }
 
     override suspend fun accessToSessionContact(sessionId: String, sessionType: SessionType) {
@@ -89,14 +116,27 @@ private class SessionContactDatabaseImpl(
 
     override fun fetchObservableSessionContact(limit: Int): Flow<List<SessionContact>> {
         val database = this.database ?: return flowOf(emptyList())
-        return database.sessionContactDao.observableRecentSessionContacts(limit)
-            .distinctUntilChanged()
-            .map { localSessionContactList ->
-                localSessionContactList.map { localSessionContact ->
-                    localSessionContact.toSessionContact(this.database, this.messageParser)
-                }
+
+        val channelEvent = Channel<Unit>(Channel.CONFLATED)
+        val observer = object : OnTableChangedObserver {
+            override val tables: List<String> = listOf(LocalSessionTable.TABLE_NAME, LocalMessageTable.TABLE_NAME)
+            override fun onTableChanged(tableNames: Set<String>) {
+                channelEvent.trySend(Unit)
             }
-            .distinctUntilChanged()
+        }
+
+        channelEvent.trySend(Unit)
+        return flow {
+            database.addTableObserver(observer)
+            for (event in channelEvent) {
+                val localSessionContactList = database.sessionContactDao.fetchRecentSessionContactList(limit)
+                val sessionContactList = localSessionContactList.map { localSessionContact ->
+                    localSessionContact.toSessionContact(database, this@SessionContactDatabaseImpl.messageParser)
+                }
+                emit(sessionContactList)
+            }
+            database.removeTableObserver(observer)
+        }.distinctUntilChanged()
     }
 
     override suspend fun deleteSessionContact(sessionId: String, sessionType: SessionType) {

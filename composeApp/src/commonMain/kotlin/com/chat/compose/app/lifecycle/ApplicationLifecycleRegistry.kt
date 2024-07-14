@@ -29,6 +29,10 @@ object ApplicationLifecycleRegistry : ApplicationLifecycleObserver {
         this.notifySafely { onUserLogout() }
     }
 
+    override suspend fun onLoginSessionExpired() {
+        this.notifySafely { onLoginSessionExpired() }
+    }
+
     override suspend fun onFirstFrameComplete() {
         this.notifySafely { onFirstFrameComplete() }
     }

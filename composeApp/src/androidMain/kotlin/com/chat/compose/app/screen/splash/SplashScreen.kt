@@ -8,7 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.chat.compose.app.initBiz
+import com.chat.compose.app.init.initBiz
 import com.chat.compose.app.ui.framework.Box
 import kotlinx.coroutines.delay
 
