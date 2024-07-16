@@ -52,9 +52,6 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)
             implementation(libs.moshi)
-            implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-alpha12")
-            implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-alpha12")
-            implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-alpha12")
         }
         val androidMain by getting
         androidMain.dependencies {
@@ -112,12 +109,28 @@ android {
             excludes += "META-INF/io.netty.versions.properties"
         }
     }
+    signingConfigs {
+        maybeCreate("debug").apply {
+            this.keyAlias = "appKey"
+            this.keyPassword = "123456"
+            this.storePassword = "123456"
+            this.storeFile = File(projectDir, "appKey")
+        }
+        maybeCreate("release").apply {
+            this.keyAlias = "appKey"
+            this.keyPassword = "123456"
+            this.storePassword = "123456"
+            this.storeFile = File(projectDir, "appKey")
+        }
+    }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {

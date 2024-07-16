@@ -10,7 +10,7 @@ import org.json.JSONObject
  * @author liuzhongao
  * @since 2024/6/29 19:12
  */
-inline fun <reified T> Class<T>.fromJson(jsonObject: JSONObject): T? {
+inline fun <reified T> fromJson(jsonObject: JSONObject): T? {
     return fromJson(jsonObject.toString())
 }
 

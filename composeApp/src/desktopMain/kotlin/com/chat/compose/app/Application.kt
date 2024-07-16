@@ -7,6 +7,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.window.application
 import com.chat.compose.app.metadata.ApplicationConfiguration
+import com.chat.compose.app.ui.AppSafeArea
+import com.chat.compose.app.ui.LocalAppSafeArea
 
 /**
  * @author liuzhongao
@@ -20,7 +22,8 @@ fun main() {
             ApplicationConfiguration(isDarkMode = isSystemInDarkMode)
         }
         CompositionLocalProvider(
-            LocalApplicationConfiguration provides applicationConfiguration
+            LocalApplicationConfiguration provides applicationConfiguration,
+            LocalAppSafeArea provides remember { AppSafeArea() },
         ) {
             AppWindow(::exitApplication)
         }

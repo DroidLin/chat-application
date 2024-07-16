@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.metadata.UiSessionContact
 import com.chat.compose.app.screen.message.vm.SessionListViewModel
+import com.chat.compose.app.ui.appSafeAreaPadding
 
 /**
  * @author liuzhongao
@@ -36,6 +37,7 @@ fun SessionListScreen(
 
     Column(
         modifier = Modifier.fillMaxSize()
+            .appSafeAreaPadding()
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
     ) {
         TopAppBar(

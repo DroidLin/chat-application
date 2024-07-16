@@ -4,15 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import com.chat.compose.app.router.RouteAction
 import com.chat.compose.app.router.rememberRouterAction
-import com.chat.compose.app.ui.AndroidMaterialTheme
-import com.chat.compose.app.ui.FrameworkScreen
+import com.chat.compose.app.screen.FrameworkScreen
+import com.chat.compose.app.ui.*
 
 val LocalActivity = staticCompositionLocalOf<ComponentActivity> { error("No activity in LocalActivity") }
 
@@ -29,8 +32,14 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(routeAction) {
                 this@MainActivity.routeAction = routeAction
             }
-            CompositionLocalProvider(LocalActivity provides this) {
-                AndroidMaterialTheme {
+            CompositionLocalProvider(
+                LocalActivity provides this,
+                LocalAppSafeArea provides remember { AppSafeArea() },
+                LocalAppWindowInfo provides rememberWindowInfo(),
+            ) {
+                AndroidMaterialTheme(
+                    modifier = Modifier.fillMaxSize()
+                ) {
                     FrameworkScreen(routeAction)
                 }
             }

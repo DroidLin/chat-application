@@ -13,7 +13,7 @@ internal object ChatSessionFactory {
         return when (ctx.targetSessionType) {
             SessionType.P2P -> P2PChatSession(ctx.toChatSessionContext)
             SessionType.Group -> GroupChatSession(ctx.toChatSessionContext)
-            else -> throw IllegalArgumentException("illegal session type.")
+            else -> throw IllegalArgumentException("illegal session type: ${ctx.targetSessionType}.")
         }
     }
 }
