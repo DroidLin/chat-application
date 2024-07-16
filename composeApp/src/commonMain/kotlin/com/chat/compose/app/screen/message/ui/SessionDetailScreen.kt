@@ -29,7 +29,7 @@ fun SessionDetailScreen(
     sessionId: String,
     sessionType: SessionType,
     backPress: () -> Unit = {},
-    navigateToUseBasicInfo: (Long) -> Unit,
+    navigateToUserBasicInfo: (Long) -> Unit,
 ) {
     val viewModel: SessionDetailViewModel = koinViewModel()
     val uiState = viewModel.state.collectAsState()
@@ -43,6 +43,7 @@ fun SessionDetailScreen(
 
     Column(
         modifier = Modifier.fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
     ) {
         TopAppBar(
             title = {
@@ -81,7 +82,7 @@ fun SessionDetailScreen(
                         uiMessageItem = messageItem,
                         onAvatarClick = {
                             val userId = messageItem.uiSessionContact?.sessionContactUserId
-                            if (userId != null) navigateToUseBasicInfo(userId)
+                            if (userId != null) navigateToUserBasicInfo(userId)
                         }
                     )
                 }
@@ -97,9 +98,4 @@ fun SessionDetailScreen(
             )
         }
     }
-}
-
-@Composable
-private fun SessionDetailScreen() {
-
 }

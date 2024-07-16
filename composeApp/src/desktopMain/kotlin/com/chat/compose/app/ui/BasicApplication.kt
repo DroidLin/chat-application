@@ -27,6 +27,7 @@ import com.chat.compose.app.lifecycle.MainFirstFrameContent
 import com.chat.compose.app.metadata.isValid
 import com.chat.compose.app.router.LocalRouteAction
 import com.chat.compose.app.router.rememberRouterAction
+import com.chat.compose.app.screen.HomeScreen
 import com.chat.compose.app.screen.login.LoginScreen
 import com.chat.compose.app.screen.login.RegisterAccountScreen
 import com.chat.compose.app.screen.message.ui.SessionDetailScreen
@@ -78,7 +79,7 @@ fun BasicApplication() {
                             onInitialFinished = {
                                 val profileService = koinInject<ProfileService>()
                                 if (profileService.profile.isValid) {
-                                    navigateTo(NavRoute.ChatSessionList.route)
+                                    navigateTo(NavRoute.HomeScreen.route)
                                 } else navigateTo(NavRoute.LoginRoute.route)
                             }
                         )
@@ -94,7 +95,7 @@ fun BasicApplication() {
                         Surface {
                             LoginScreen(
                                 loginComplete = {
-                                    navigateTo(NavRoute.ChatSessionList.route)
+                                    navigateTo(NavRoute.HomeScreen.route)
                                 }
                             )
                         }
@@ -107,111 +108,114 @@ fun BasicApplication() {
                         }
                     }
                 }
-                composable(
-                    route = NavRoute.ChatSessionList.route,
-                ) {
-                    MainFirstFrameContent()
-                    Surface {
-                        SessionListScreen(
-                            backPress = routeAction::backPress,
-                            sessionItemClick = { sessionContact ->
-                                val route = NavRoute.ChatMessageDetail.buildRoute(
-                                    sessionId = sessionContact.sessionId,
-                                    sessionType = sessionContact.sessionType,
-                                )
-                                routeAction.navigateTo(route)
-                            },
-                            navigateToSearch = {
-                                routeAction.navigateTo(NavRoute.SearchLauncher.route)
-                            }
-                        )
-                    }
+                composable(route = NavRoute.HomeScreen.route) {
+                    HomeScreen()
                 }
-                composable(
-                    route = NavRoute.Settings.route,
-                ) {
-                    Surface {
-                        SettingScreen(
-                            backPressed = routeAction::backPress
-                        )
-                    }
-                }
-                navigationComposable(
-                    route = NavRoute.ChatMessageDetail.route
-                ) { backStackEntry ->
-                    val sessionId: String =
-                        requireNotNull(backStackEntry.arguments?.getString("sessionId"))
-                    val sessionType: SessionType = SessionType.fromValue(
-                        requireNotNull(
-                            backStackEntry.arguments?.getString("sessionType")?.toIntOrNull()
-                        )
-                    )
-                    Surface {
-                        SessionDetailScreen(
-                            sessionId = sessionId,
-                            sessionType = sessionType,
-                            backPress = routeAction::backPress,
-                            navigateToUseBasicInfo = { userId ->
-                                routeAction.navigateTo(
-                                    route = NavRoute.UserBasicInfo.buildRoute(userId = userId)
-                                )
-                            }
-                        )
-                    }
-                }
-                composable(
-                    route = NavRoute.SearchLauncher.route
-                ) {
-                    SearchLauncherScreen(
-                        backPressed = routeAction::backPress,
-                        navigateToSearchResult = { keyword ->
-                            routeAction.navigateTo(
-                                route = NavRoute.SearchComplexResult.buildRoute(keyword)
-                            )
-                        }
-                    )
-                }
-                composable(
-                    route = NavRoute.SearchComplexResult.route,
-                    deepLinks = listOf(
-
-                    )
-                ) { backStackEntry ->
-                    val keyword = requireNotNull(backStackEntry.arguments?.getString("keyword"))
-                    SearchResultScreen(
-                        keyword = keyword,
-                        backPressed = routeAction::backPress,
-                        navigateToUseBasicScreen = { userId ->
-                            routeAction.navigateTo(
-                                route = NavRoute.UserBasicInfo.buildRoute(userId = userId)
-                            )
-                        }
-                    )
-                }
-                composable(
-                    route = NavRoute.UserBasicInfo.route,
-                    arguments = listOf(
-                        navArgument(name = "userId") {
-                            type = NavType.LongType
-                            nullable = false
-                        }
-                    )
-                ) { backStackEntry ->
-                    val userId = requireNotNull(backStackEntry.arguments?.getLong("userId"))
-                    UserBasicInfoScreen(
-                        userId = userId,
-                        backPress = routeAction::backPress,
-                        navigateToChat = { sessionId, sessionType ->
-                            val route = NavRoute.ChatMessageDetail.buildRoute(
-                                sessionId = sessionId,
-                                sessionType = sessionType,
-                            )
-                            routeAction.navigateTo(route)
-                        }
-                    )
-                }
+//                composable(
+//                    route = NavRoute.ChatSessionList.route,
+//                ) {
+//                    MainFirstFrameContent()
+//                    Surface {
+//                        SessionListScreen(
+//                            backPress = routeAction::backPress,
+//                            sessionItemClick = { sessionContact ->
+//                                val route = NavRoute.ChatMessageDetail.buildRoute(
+//                                    sessionId = sessionContact.sessionId,
+//                                    sessionType = sessionContact.sessionType,
+//                                )
+//                                routeAction.navigateTo(route)
+//                            },
+//                            navigateToSearch = {
+//                                routeAction.navigateTo(NavRoute.SearchLauncher.route)
+//                            }
+//                        )
+//                    }
+//                }
+//                composable(
+//                    route = NavRoute.Settings.route,
+//                ) {
+//                    Surface {
+//                        SettingScreen(
+//                            backPressed = routeAction::backPress
+//                        )
+//                    }
+//                }
+//                navigationComposable(
+//                    route = NavRoute.ChatMessageDetail.route
+//                ) { backStackEntry ->
+//                    val sessionId: String =
+//                        requireNotNull(backStackEntry.arguments?.getString("sessionId"))
+//                    val sessionType: SessionType = SessionType.fromValue(
+//                        requireNotNull(
+//                            backStackEntry.arguments?.getString("sessionType")?.toIntOrNull()
+//                        )
+//                    )
+//                    Surface {
+//                        SessionDetailScreen(
+//                            sessionId = sessionId,
+//                            sessionType = sessionType,
+//                            backPress = routeAction::backPress,
+//                            navigateToUserBasicInfo = { userId ->
+//                                routeAction.navigateTo(
+//                                    route = NavRoute.UserBasicInfo.buildRoute(userId = userId)
+//                                )
+//                            }
+//                        )
+//                    }
+//                }
+//                composable(
+//                    route = NavRoute.SearchLauncher.route
+//                ) {
+//                    SearchLauncherScreen(
+//                        backPressed = routeAction::backPress,
+//                        navigateToSearchResult = { keyword ->
+//                            routeAction.navigateTo(
+//                                route = NavRoute.SearchComplexResult.buildRoute(keyword)
+//                            )
+//                        }
+//                    )
+//                }
+//                composable(
+//                    route = NavRoute.SearchComplexResult.route,
+//                    deepLinks = listOf(
+//
+//                    )
+//                ) { backStackEntry ->
+//                    val keyword = requireNotNull(backStackEntry.arguments?.getString("keyword"))
+//                    SearchResultScreen(
+//                        keyword = keyword,
+//                        backPressed = routeAction::backPress,
+//                        navigateToUseBasicScreen = { userId ->
+//                            routeAction.navigateTo(
+//                                route = NavRoute.UserBasicInfo.buildRoute(userId = userId)
+//                            )
+//                        }
+//                    )
+//                }
+//                composable(
+//                    route = NavRoute.UserBasicInfo.route,
+//                    arguments = listOf(
+//                        navArgument(name = "userId") {
+//                            type = NavType.LongType
+//                            nullable = false
+//                        }
+//                    )
+//                ) { backStackEntry ->
+//                    val userId = requireNotNull(backStackEntry.arguments?.getLong("userId"))
+//                    UserBasicInfoScreen(
+//                        userId = userId,
+//                        backPress = routeAction::backPress,
+//                        navigateToChat = { sessionId, sessionType ->
+//                            val route = NavRoute.ChatMessageDetail.buildRoute(
+//                                sessionId = sessionId,
+//                                sessionType = sessionType,
+//                            )
+//                            routeAction.navigateTo(route)
+//                        }
+//                    )
+//                }
             }
-            AppNavigationRail(modifier = Modifier.align(Alignment.CenterStart), navigateTo)
+//            AppNavigationRail(modifier = Modifier.align(Alignment.CenterStart), navigateTo)
         }
     }
 }

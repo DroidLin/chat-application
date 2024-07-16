@@ -56,6 +56,7 @@ fun SearchLauncherScreen(
     FocusClearMan()
     Column(
         modifier = Modifier.fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
     ) {
         TopAppBar(
             title = {

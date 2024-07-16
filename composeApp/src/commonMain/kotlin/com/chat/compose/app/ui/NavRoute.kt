@@ -15,6 +15,8 @@ sealed class NavRoute(val route: String, val deepLinks: List<String> = emptyList
         data object RegisterAccount : NavRoute(route = "registerAccount")
     }
 
+    data object HomeScreen : NavRoute(route = "homeScreen")
+
     data object ChatSessionList : NavRoute(route = "homeRoute")
     data object ChatMessageDetail : NavRoute(
         route = "chatDetail/{sessionId}/{sessionType}",

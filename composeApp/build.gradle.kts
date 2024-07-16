@@ -52,6 +52,9 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)
             implementation(libs.moshi)
+            implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-alpha12")
+            implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-alpha12")
+            implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-alpha12")
         }
         val androidMain by getting
         androidMain.dependencies {

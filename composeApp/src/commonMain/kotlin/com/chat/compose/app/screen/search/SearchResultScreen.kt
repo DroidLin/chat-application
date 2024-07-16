@@ -64,6 +64,7 @@ fun SearchResultScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
         ) {
             val isLoading = isLoadingState.value
             val searchResultResource = resultState.value
