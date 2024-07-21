@@ -16,3 +16,4 @@ local.properties
 /composeApp/preference/
 /app-channel-backend-server/schemas/
 /database/
+/composeApp/release/

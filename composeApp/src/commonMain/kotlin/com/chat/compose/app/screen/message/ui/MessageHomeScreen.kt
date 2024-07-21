@@ -3,6 +3,7 @@ package com.chat.compose.app.screen.message.ui
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.*
 import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
@@ -132,39 +133,41 @@ fun MessageHomeDetailPane(
     startDestinationRoute: String,
     navigateBack: () -> Unit,
 ) {
-    NavHost(
-        navController = routeAction.navController,
-        startDestination = startDestinationRoute,
-        enterTransition = { fadeIn() },
-        exitTransition = { fadeOut() },
-        popEnterTransition = { fadeIn() },
-        popExitTransition = { fadeOut() },
-        route = DETAIL_HOST_ROUTE
-    ) {
-        emptyPlaceholder()
-        chatDetailScreen(
-            backPress = navigateBack,
-            navigateToUserBasicInfo = routeAction::navigateToUserBasicInfo
-        )
-        personalInformationScreen(
-            navigateToSetting = routeAction::navigateToSettings
-        )
-        userBasicInfoScreen(
-            backPress = navigateBack,
-            navigateToChat = routeAction::navigateToChatDetail
-        )
-        searchLauncherScreen(
-            backPressed = navigateBack,
-            navigateToSearchResult = routeAction::navigateToSearchResult,
-        )
-        searchResultScreen(
-            backPressed = navigateBack,
-            navigateToUseBasicScreen = routeAction::navigateToUserBasicInfo
-        )
-        sessionListScreen(
-            sessionItemClick = routeAction::navigateToChatDetail,
-            navigateToSearch = routeAction::navigateToSearchLauncher,
-        )
+    Surface {
+        NavHost(
+            navController = routeAction.navController,
+            startDestination = startDestinationRoute,
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() },
+            popEnterTransition = { fadeIn() },
+            popExitTransition = { fadeOut() },
+            route = DETAIL_HOST_ROUTE
+        ) {
+            emptyPlaceholder()
+            chatDetailScreen(
+                backPress = navigateBack,
+                navigateToUserBasicInfo = routeAction::navigateToUserBasicInfo
+            )
+            personalInformationScreen(
+                navigateToSetting = routeAction::navigateToSettings
+            )
+            userBasicInfoScreen(
+                backPress = navigateBack,
+                navigateToChat = routeAction::navigateToChatDetail
+            )
+            searchLauncherScreen(
+                backPressed = navigateBack,
+                navigateToSearchResult = routeAction::navigateToSearchResult,
+            )
+            searchResultScreen(
+                backPressed = navigateBack,
+                navigateToUseBasicScreen = routeAction::navigateToUserBasicInfo
+            )
+            sessionListScreen(
+                sessionItemClick = routeAction::navigateToChatDetail,
+                navigateToSearch = routeAction::navigateToSearchLauncher,
+            )
+        }
     }
 }
 
