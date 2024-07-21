@@ -1,9 +1,7 @@
 package com.chat.compose.app.screen.search
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
@@ -14,7 +12,6 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,10 +22,13 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
+import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.ime.FocusClearMan
+import com.chat.compose.app.ui.navigationComposable
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_button_clear_search_history
 import com.github.droidlin.composeapp.generated.resources.string_button_search
@@ -39,7 +39,22 @@ import org.jetbrains.compose.resources.stringResource
  * @author liuzhongao
  * @since 2024/7/1 00:00
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
+
+fun NavGraphBuilder.searchLauncherScreen(
+    backPressed: () -> Unit,
+    navigateToSearchResult: (String) -> Unit,
+) {
+    navigationComposable(
+        route = NavRoute.SearchLauncher.route
+    ) {
+        SearchLauncherScreen(
+            backPressed = backPressed,
+            navigateToSearchResult = navigateToSearchResult,
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SearchLauncherScreen(
     backPressed: () -> Unit = {},
@@ -102,10 +117,7 @@ fun SearchLauncherScreen(
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .size(24.dp)
-                                                .clickable(
-                                                    interactionSource = remember { MutableInteractionSource() },
-                                                    indication = rememberRipple(bounded = false)
-                                                ) { viewModel.onInputChange("") }
+                                                .clickable { viewModel.onInputChange("") }
                                                 .padding(all = 2.dp)
                                         )
                                     }

@@ -52,6 +52,13 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)
             implementation(libs.moshi)
+
+            implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta04") {
+                exclude("androidx.compose.foundation", "foundation-desktop")
+            }
+            implementation(libs.material3.adaptive.layout)
+            implementation(libs.material3.adaptive.navigation)
+            implementation(libs.window.core)
         }
         val androidMain by getting
         androidMain.dependencies {
@@ -69,13 +76,13 @@ kotlin {
         val desktopMain by getting
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-
             implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }
 
 dependencies {
+//    implementation(libs.androidx.adaptive.navigation.desktop)
     ksp(libs.moshi.compiler)
 }
 

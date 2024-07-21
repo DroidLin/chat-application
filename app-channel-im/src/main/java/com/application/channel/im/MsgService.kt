@@ -5,6 +5,7 @@ import com.application.channel.database.AppMessageDatabase.Transaction
 import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
+import com.application.channel.message.metadata.MutableSessionContact
 import com.application.channel.message.metadata.SessionContact
 import kotlinx.coroutines.flow.Flow
 
@@ -27,6 +28,11 @@ interface MsgService {
     suspend fun insertSessionContact(sessionContact: SessionContact)
 
     suspend fun updateSessionContact(sessionContact: SessionContact)
+    suspend fun updateSessionContact(
+        sessionId: String,
+        sessionType: SessionType,
+        function: MutableSessionContact.() -> Unit
+    )
     suspend fun updateSessionContactExtensions(
         sessionId: String,
         sessionType: SessionType,

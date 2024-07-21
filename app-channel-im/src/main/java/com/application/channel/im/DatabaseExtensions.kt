@@ -1,5 +1,6 @@
 package com.application.channel.im
 
+import com.application.channel.message.metadata.MutableSessionContact
 import com.application.channel.message.metadata.SessionContact
 
 /**
@@ -15,6 +16,22 @@ interface SessionExtensions {
         const val KEY_USER_INFO_STRING = "user_info_string"
     }
 }
+
+var MutableSessionContact.draftMessage: String?
+    set(value) { this.extensions[SessionExtensions.KEY_DRAFT_MESSAGE_STRING] = value }
+    get() = (this as SessionContact).draftMessage
+
+var MutableSessionContact.userName: String?
+    set(value) { this.extensions[SessionExtensions.KEY_USER_INFO_NAME] = value }
+    get() = (this as SessionContact).userName
+
+var MutableSessionContact.userId: Long?
+    set(value) { this.extensions[SessionExtensions.KEY_USER_INFO_ID] = value }
+    get() = (this as SessionContact).userId
+
+var MutableSessionContact.userInfoString: String
+    set(value) { this.extensions[SessionExtensions.KEY_USER_INFO_STRING] = value }
+    get() = (this as SessionContact).userInfoString
 
 val SessionContact.draftMessage: String?
     get() = this.extensions[SessionExtensions.KEY_DRAFT_MESSAGE_STRING] as? String

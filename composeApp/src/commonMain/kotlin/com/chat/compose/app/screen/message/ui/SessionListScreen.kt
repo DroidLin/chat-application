@@ -12,19 +12,39 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
+import com.chat.compose.app.lifecycle.MainFirstFrameContent
 import com.chat.compose.app.metadata.UiSessionContact
+import com.chat.compose.app.router.LocalRouteAction
 import com.chat.compose.app.screen.message.vm.SessionListViewModel
-import com.chat.compose.app.ui.appSafeAreaPadding
+import com.chat.compose.app.ui.NavRoute
+import com.chat.compose.app.ui.homeNavigationComposable
 
 /**
  * @author liuzhongao
  * @since 2024/6/16 21:56
  */
+
+fun NavGraphBuilder.sessionListScreen(
+    sessionItemClick: (UiSessionContact) -> Unit = {},
+    navigateToSearch: () -> Unit = {}
+) {
+    homeNavigationComposable(
+        route = NavRoute.ChatSessionList.route,
+    ) {
+        Surface {
+            SessionListScreen(
+                sessionItemClick = sessionItemClick,
+                navigateToSearch = navigateToSearch,
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SessionListScreen(
-    backPress: () -> Unit = {},
     sessionItemClick: (UiSessionContact) -> Unit = {},
     navigateToSearch: () -> Unit = {}
 ) {
@@ -37,7 +57,6 @@ fun SessionListScreen(
 
     Column(
         modifier = Modifier.fillMaxSize()
-            .appSafeAreaPadding()
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
     ) {
         TopAppBar(

@@ -1,5 +1,6 @@
 package com.chat.compose.app.di
 
+import com.chat.compose.app.screen.framework.FrameworkViewModel
 import com.chat.compose.app.screen.login.LoginViewModel
 import com.chat.compose.app.screen.login.RegisterAccountViewModel
 import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
@@ -23,4 +24,5 @@ val viewModelModule = module {
     factory { SearchResultViewModel(get()) }
     factory { UserBasicInfoViewModel(get(), get()) }
     factory { PersonalInfoViewModel(get()) }
+    factory { FrameworkViewModel() }
 }

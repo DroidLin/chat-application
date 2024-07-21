@@ -11,16 +11,43 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.ui.NameAvatarImage
+import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.framework.Row
+import com.chat.compose.app.ui.navigationComposable
 
 /**
  * @author liuzhongao
  * @since 2024/7/11 00:19
  */
+
+fun NavGraphBuilder.searchResultScreen(
+    backPressed: () -> Unit,
+    navigateToUseBasicScreen: (Long) -> Unit
+) {
+    navigationComposable(
+        route = NavRoute.SearchComplexResult.route,
+        arguments = listOf(
+            navArgument(name = "keyword") {
+                type = NavType.StringType
+            }
+        )
+    ) {
+        SearchResultScreen(
+            keyword = requireNotNull(it.arguments?.getString("keyword")),
+            backPressed = backPressed,
+            navigateToUseBasicScreen = navigateToUseBasicScreen,
+        )
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultScreen(

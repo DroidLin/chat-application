@@ -1,10 +1,7 @@
 package com.application.channel.im.session
 
 import androidx.paging.PagingSource
-import com.application.channel.im.MsgClient
-import com.application.channel.im.MsgConnectionService
-import com.application.channel.im.MsgService
-import com.application.channel.im.SessionExtensions
+import com.application.channel.im.*
 import com.application.channel.message.Callback
 import com.application.channel.message.MessageReceiveListener
 import com.application.channel.message.MessageReceiveListenerWrapper
@@ -60,8 +57,8 @@ internal abstract class AbstractChatSession(
 
     override suspend fun saveDraftContent(content: String) {
         val msgService = MsgClient.getService(MsgService::class.java)
-        msgService.updateSessionContactExtensions(this.sessionId, this.sessionType) {
-            this[SessionExtensions.KEY_DRAFT_MESSAGE_STRING] = content
+        msgService.updateSessionContact(this.sessionId, this.sessionType) {
+            this.draftMessage = content
         }
     }
 

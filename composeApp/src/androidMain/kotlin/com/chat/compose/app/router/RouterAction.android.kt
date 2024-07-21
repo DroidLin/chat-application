@@ -30,7 +30,7 @@ private class RouteActionImpl(
         this.navController.navigate(route, navOptions)
     }
 
-    override fun backPress() {
-        this.navController.popBackStack()
+    override fun backPress(): Boolean {
+        return this.navController.popBackStack()
     }
 }

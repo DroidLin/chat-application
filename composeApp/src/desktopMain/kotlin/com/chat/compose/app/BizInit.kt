@@ -18,6 +18,7 @@ fun initEntryPoint() {
     initSystemProperties()
     initKoin()
     initApplicationLifecycleObserver()
+    bizInit()
 }
 
 private fun initSystemProperties() {
@@ -43,10 +44,8 @@ private fun initApplicationLifecycleObserver() {
     )
 }
 
-suspend fun bizInit() = coroutineScope {
-    listOf(
-        async { ComponentFacade.autoInit() },
-    ).awaitAll()
+fun bizInit() {
+    ComponentFacade.autoInit()
 }
 
 private fun initKoin() {

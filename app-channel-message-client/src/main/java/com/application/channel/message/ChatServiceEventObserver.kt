@@ -2,6 +2,8 @@ package com.application.channel.message
 
 import com.application.channel.core.client.TcpConnectionObserver
 import com.application.channel.core.model.ChannelContext
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /**
  * @author liuzhongao
@@ -19,10 +21,12 @@ interface ChatServiceEventObserver : TcpConnectionObserver {
 }
 
 class MutableChatServiceEventObserver : ChatServiceEventObserver {
+
+    private val reentrantLock = ReentrantLock()
     private val observerList = mutableListOf<ChatServiceEventObserver>()
 
     fun addObserver(observer: ChatServiceEventObserver) {
-        synchronized(this.observerList) {
+        this.reentrantLock.withLock {
             if (!this.observerList.contains(observer)) {
                 this.observerList.add(observer)
             }
@@ -30,7 +34,7 @@ class MutableChatServiceEventObserver : ChatServiceEventObserver {
     }
 
     fun removeObserver(observer: ChatServiceEventObserver) {
-        synchronized(this.observerList) {
+        this.reentrantLock.withLock {
             if (this.observerList.contains(observer)) {
                 this.observerList.remove(observer)
             }
@@ -38,45 +42,61 @@ class MutableChatServiceEventObserver : ChatServiceEventObserver {
     }
 
     override fun onConnectionSuccess(channelCtx: ChannelContext) {
-        this.notifyObservers { it.onConnectionSuccess(channelCtx) }
+        this.notifyObservers {
+            it.onConnectionSuccess(channelCtx)
+        }
     }
 
     override fun onDatabaseInitialized() {
-        this.notifyObservers { it.onDatabaseInitialized() }
+        this.notifyObservers {
+            it.onDatabaseInitialized()
+        }
     }
 
     override fun onLogin() {
-        this.notifyObservers { it.onLogin() }
+        this.notifyObservers {
+            it.onLogin()
+        }
     }
 
     override fun onLoginFailure(event: FailureType, message: String?) {
-        this.notifyObservers { it.onLoginFailure(event, message) }
+        this.notifyObservers {
+            it.onLoginFailure(event, message)
+        }
     }
 
     override fun onLogout(type: LogoutReason) {
-        this.notifyObservers { it.onLogout(type) }
+        this.notifyObservers {
+            it.onLogout(type)
+        }
     }
 
     override fun onStartConnect() {
-        this.notifyObservers { it.onStartConnect() }
+        this.notifyObservers {
+            it.onStartConnect()
+        }
     }
 
     override fun onConnectionFailure(channelCtx: ChannelContext, throwable: Throwable?) {
-        this.notifyObservers { it.onConnectionFailure(channelCtx, throwable) }
+        this.notifyObservers {
+            it.onConnectionFailure(channelCtx, throwable)
+        }
     }
 
     override fun onConnectionLost(channelCtx: ChannelContext, throwable: Throwable?) {
-        this.notifyObservers { it.onConnectionLost(channelCtx, throwable) }
+        this.notifyObservers {
+            it.onConnectionLost(channelCtx, throwable)
+        }
     }
 
     private inline fun notifyObservers(observer: (ChatServiceEventObserver) -> Unit) {
-        synchronized(this.observerList) {
+        this.reentrantLock.withLock {
             this.observerList.forEach(observer)
         }
     }
 
     fun clear() {
-        synchronized(this.observerList) {
+        this.reentrantLock.withLock {
             this.observerList.clear()
         }
     }

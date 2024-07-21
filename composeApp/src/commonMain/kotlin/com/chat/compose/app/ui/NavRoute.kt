@@ -10,6 +10,8 @@ sealed class NavRoute(val route: String, val deepLinks: List<String> = emptyList
 
     data object SplashScreen : NavRoute(route = "splashScreen")
 
+    data object EmptyPlaceHolder : NavRoute(route = "emptyPlaceHolder")
+
     data object LoginRoute : NavRoute(route = "login") {
         data object Login : NavRoute(route = "loginScreen")
         data object RegisterAccount : NavRoute(route = "registerAccount")
@@ -19,11 +21,11 @@ sealed class NavRoute(val route: String, val deepLinks: List<String> = emptyList
 
     data object ChatSessionList : NavRoute(route = "homeRoute")
     data object ChatMessageDetail : NavRoute(
-        route = "chatDetail/{sessionId}/{sessionType}",
+        route = "chatDetail?sessionId={sessionId}&sessionType={sessionType}",
         deepLinks = listOf("chatter://chatDetail?sessionId={sessionId}&sessionType={sessionType}"),
     ) {
         fun buildRoute(sessionId: String, sessionType: SessionType): String {
-            return "chatDetail/$sessionId/${sessionType.value}"
+            return "chatDetail?sessionId=${sessionId}&sessionType=${sessionType.value}"
         }
     }
 

@@ -6,7 +6,10 @@ import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.MessageRepository
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
+import com.application.channel.message.metadata.MutableSessionContact
 import com.application.channel.message.metadata.SessionContact
+import com.application.channel.message.metadata.immutableSessionContact
+import com.application.channel.message.metadata.mutableSessionContact
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -38,8 +41,21 @@ private class MsgServiceImpl : MsgService {
         function: MutableMap<String, Any?>.() -> Unit
     ) {
         this.messageRepository.updateSessionContact(sessionId, sessionType) {
-            val extensions = this.extensions.toMutableMap().apply(function)
-            this.copy(extensions = extensions)
+            mutableSessionContact()
+                .also { it.extensions.apply(function) }
+                .immutableSessionContact()
+        }
+    }
+
+    override suspend fun updateSessionContact(
+        sessionId: String,
+        sessionType: SessionType,
+        function: MutableSessionContact.() -> Unit
+    ) {
+        this.messageRepository.updateSessionContact(sessionId, sessionType) {
+            mutableSessionContact()
+                .apply(function)
+                .immutableSessionContact()
         }
     }
 
@@ -69,7 +85,9 @@ private class MsgServiceImpl : MsgService {
         function: MutableMap<String, Any?>.() -> Unit
     ) {
         this.messageRepository.updateSessionContact(sessionId, sessionType, updateAccess) {
-            copy(extensions = this.extensions.toMutableMap().apply(function))
+            mutableSessionContact()
+                .also { it.extensions.apply(function) }
+                .immutableSessionContact()
         }
     }
 

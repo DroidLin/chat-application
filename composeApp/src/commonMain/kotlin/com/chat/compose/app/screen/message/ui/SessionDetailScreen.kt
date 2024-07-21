@@ -9,26 +9,65 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.application.channel.message.SessionType
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.paging.collectAsLazyPagingItems
 import com.chat.compose.app.paging.itemContentType
 import com.chat.compose.app.paging.itemKey
+import com.chat.compose.app.router.LocalRouteAction
+import com.chat.compose.app.router.navigateToUserBasicInfo
 import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
+import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.messages.MessageUi
+import com.chat.compose.app.ui.navigationComposable
 
 /**
  * @author liuzhongao
  * @since 2024/6/17 00:00
  */
+
+fun NavGraphBuilder.chatDetailScreen(
+    backPress: () -> Unit,
+    navigateToUserBasicInfo: (Long) -> Unit,
+) {
+    navigationComposable(
+        route = NavRoute.ChatMessageDetail.route,
+        arguments = listOf(
+            navArgument(name = "sessionId") {
+                type = NavType.StringType
+            },
+            navArgument(name = "sessionType") {
+                type = NavType.StringType
+            }
+        )
+    ) { backStackEntry ->
+        Surface {
+            val sessionId: String =
+                requireNotNull(backStackEntry.arguments?.getString("sessionId"))
+            val sessionType: SessionType = SessionType.fromValue(
+                requireNotNull(backStackEntry.arguments?.getString("sessionType")?.toIntOrNull())
+            )
+            SessionDetailScreen(
+                sessionId = sessionId,
+                sessionType = sessionType,
+                backPress = backPress,
+                navigateToUserBasicInfo = navigateToUserBasicInfo
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionDetailScreen(
     sessionId: String,
     sessionType: SessionType,
-    backPress: () -> Unit = {},
+    backPress: () -> Unit,
     navigateToUserBasicInfo: (Long) -> Unit,
 ) {
     val viewModel: SessionDetailViewModel = koinViewModel()

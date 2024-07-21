@@ -11,11 +11,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.application.channel.message.SessionType
 import com.chat.compose.app.di.koinViewModel
+import com.chat.compose.app.router.LocalRouteAction
 import com.chat.compose.app.ui.NameAvatarImage
+import com.chat.compose.app.ui.NavRoute
+import com.chat.compose.app.ui.navigationComposable
 import com.github.droidlin.composeapp.generated.resources.Res
-import com.github.droidlin.composeapp.generated.resources.app_name
 import com.github.droidlin.composeapp.generated.resources.string_send_message_to_user
 import org.jetbrains.compose.resources.stringResource
 
@@ -23,6 +28,30 @@ import org.jetbrains.compose.resources.stringResource
  * @author liuzhongao
  * @since 2024/7/12 00:23
  */
+
+fun NavGraphBuilder.userBasicInfoScreen(
+    backPress: () -> Unit,
+    navigateToChat: (String, SessionType) -> Unit
+) {
+    navigationComposable(
+        route = NavRoute.UserBasicInfo.route,
+        arguments = listOf(
+            navArgument(name = "userId") {
+                type = NavType.LongType
+                nullable = false
+            }
+        )
+    ) { backStackEntry ->
+        val routeAction = LocalRouteAction.current
+        val userId = requireNotNull(backStackEntry.arguments?.getLong("userId"))
+        UserBasicInfoScreen(
+            userId = userId,
+            backPress = backPress,
+            navigateToChat = navigateToChat
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserBasicInfoScreen(

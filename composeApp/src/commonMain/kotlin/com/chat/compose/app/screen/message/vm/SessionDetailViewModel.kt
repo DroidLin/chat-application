@@ -1,6 +1,7 @@
 package com.chat.compose.app.screen.message.vm
 
 import androidx.compose.runtime.Immutable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -31,7 +32,7 @@ class SessionDetailViewModel constructor(
     private val openChatSessionUseCase: OpenChatSessionUseCase,
     private val closeSessionUseCase: CloseSessionUseCase,
     private val fetchSessionContactUseCase: FetchSessionContactUseCase,
-    private val fetchChatDetailListUseCase: FetchChatDetailListUseCase
+    private val fetchChatDetailListUseCase: FetchChatDetailListUseCase,
 ) : ViewModel() {
 
     private val coroutineScope = CoroutineScope(this.viewModelScope.coroutineContext + Dispatchers.Default)

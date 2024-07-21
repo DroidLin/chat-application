@@ -22,7 +22,6 @@ private val exitTransition = fadeOut(animationSpec = tween(FadeAnimationDuration
 private val popEnterTransition = fadeIn(animationSpec = tween(FadeAnimationDuration))
 private val popExitTransition = slideOutHorizontally(animationSpec = tween(AnimationDuration)) { it }
 
-
 fun NavGraphBuilder.homeNavigationComposable(
     route: String,
     arguments: List<NamedNavArgument> = emptyList(),

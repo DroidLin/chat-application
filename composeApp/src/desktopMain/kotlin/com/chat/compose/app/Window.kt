@@ -8,10 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.window.*
 import com.chat.compose.app.screen.FrameworkScreen
 import com.chat.compose.app.ui.*
 
@@ -30,16 +27,14 @@ fun AppWindow(
         state = rememberWindowState(
             placement = WindowPlacement.Floating,
             position = WindowPosition.Aligned(Alignment.Center),
-            size = DpSize(1000.dp, 800.dp)
+            size = DpSize(800.dp, 600.dp),
         )
     ) {
         CompositionLocalProvider(LocalWindow provides this.window) {
-            CompositionLocalProvider(LocalAppWindowInfo provides rememberWindowInfo()) {
-                DesktopMaterialTheme(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    FrameworkScreen()
-                }
+            DesktopMaterialTheme(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                FrameworkScreen()
             }
         }
     }

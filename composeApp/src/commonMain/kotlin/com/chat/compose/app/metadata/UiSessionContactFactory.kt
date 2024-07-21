@@ -1,12 +1,8 @@
 package com.chat.compose.app.metadata
 
 import com.application.channel.im.draftMessage
-import com.application.channel.im.userId
-import com.application.channel.im.userInfoString
-import com.application.channel.im.userName
 import com.application.channel.message.metadata.SessionContact
 import com.chat.compose.app.util.formatTime
-import com.chat.compose.app.util.fromJson
 import com.chat.compose.app.util.profile
 
 /**

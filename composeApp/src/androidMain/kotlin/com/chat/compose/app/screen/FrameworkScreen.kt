@@ -1,260 +1,88 @@
 package com.chat.compose.app.screen
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.*
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.application.channel.core.util.koinInject
-import com.application.channel.message.SessionType
-import com.chat.compose.app.lifecycle.MainFirstFrameContent
-import com.chat.compose.app.metadata.isValid
-import com.chat.compose.app.router.LocalRouteAction
+import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.router.RouteAction
-import com.chat.compose.app.router.rememberRouterAction
-import com.chat.compose.app.screen.login.LoginScreen
-import com.chat.compose.app.screen.login.RegisterAccountScreen
-import com.chat.compose.app.screen.message.ui.SessionDetailScreen
-import com.chat.compose.app.screen.message.ui.SessionListScreen
-import com.chat.compose.app.screen.search.SearchLauncherScreen
-import com.chat.compose.app.screen.search.SearchResultScreen
-import com.chat.compose.app.screen.setting.SettingScreen
-import com.chat.compose.app.screen.splash.SplashScreen
-import com.chat.compose.app.screen.user.PersonalInformationScreen
-import com.chat.compose.app.screen.user.UserBasicInfoScreen
-import com.chat.compose.app.services.ProfileService
-import com.chat.compose.app.ui.NavRoute
+import com.chat.compose.app.router.RouteActionProvider
+import com.chat.compose.app.screen.framework.FrameworkHomeEnum
+import com.chat.compose.app.screen.framework.FrameworkViewModel
+import com.chat.compose.app.screen.message.ui.MessageHomeScreen
+import com.chat.compose.app.screen.user.PersonalInfoHomeScreen
+import com.chat.compose.app.ui.appSafeAreaPadding
 import com.chat.compose.app.ui.applyAppSafeArea
-import com.chat.compose.app.ui.homeNavigationComposable
-import com.chat.compose.app.ui.navigationComposable
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * @author liuzhongao
  * @since 2024/6/20 23:57
  */
 @Composable
+@JvmOverloads
 actual fun FrameworkScreen(routeAction: RouteAction) {
-    val navigateTo = { route: String ->
-        val currentRoute = routeAction.navController.currentDestination?.route
-        routeAction.navigateTo(
-            route = route,
-            navOptions = navOptions {
-                launchSingleTop = true
-                if (!currentRoute.isNullOrEmpty()) {
-                    popUpTo(currentRoute) {
-                        inclusive = true
-                    }
-                }
-            }
-        )
+    val viewModel = koinViewModel<FrameworkViewModel>()
+    val uiState = viewModel.uiState.collectAsState()
+    val homeEnum by remember {
+        derivedStateOf {
+            uiState.value.homeEnum
+        }
     }
-    CompositionLocalProvider(LocalRouteAction provides routeAction) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            NavHost(
-                modifier = Modifier.fillMaxSize(),
-                navController = routeAction.navController,
-                startDestination = NavRoute.SplashScreen.route,
-            ) {
-                homeNavigationComposable(
-                    route = NavRoute.SplashScreen.route
-                ) {
-                    Surface {
-                        SplashScreen {
-                            val profileService = koinInject<ProfileService>()
-                            if (profileService.profile.isValid) {
-                                navigateTo(NavRoute.ChatSessionList.route)
-                            } else navigateTo(NavRoute.LoginRoute.route)
-                        }
-                    }
-                }
-                navigation(
-                    startDestination = NavRoute.LoginRoute.Login.route,
-                    route = NavRoute.LoginRoute.route,
-                ) {
-                    homeNavigationComposable(
-                        route = NavRoute.LoginRoute.Login.route,
-                    ) {
-                        Surface {
-                            LoginScreen(
-                                loginComplete = {
-                                    navigateTo(NavRoute.ChatSessionList.route)
-                                }
-                            )
-                        }
-                    }
-                    homeNavigationComposable(
-                        route = NavRoute.LoginRoute.RegisterAccount.route
-                    ) {
-                        Surface {
-                            RegisterAccountScreen()
-                        }
-                    }
-                }
-//                homeNavigationComposable(
-//                    route = NavRoute.HomeScreen.route
-//                ) {
-//                    MainFirstFrameContent()
-//                    HomeScreen()
-//                }
-                homeNavigationComposable(
-                    route = NavRoute.ChatSessionList.route,
-                ) {
-                    MainFirstFrameContent()
-                    Surface {
-                        SessionListScreen(
-                            backPress = routeAction::backPress,
-                            sessionItemClick = { sessionContact ->
-                                val route = NavRoute.ChatMessageDetail.buildRoute(
-                                    sessionId = sessionContact.sessionId,
-                                    sessionType = sessionContact.sessionType,
-                                )
-                                routeAction.navigateTo(route)
-                            },
-                            navigateToSearch = {
-                                routeAction.navigateTo(NavRoute.SearchLauncher.route)
-                            }
-                        )
-                    }
-                }
-                homeNavigationComposable(
-                    route = NavRoute.PersonalInfo.route
-                ) {
-                    PersonalInformationScreen(
-                        navigateToSetting = {
-                            routeAction.navigateTo(NavRoute.Settings.route)
-                        }
-                    )
-                }
-                navigationComposable(
-                    route = NavRoute.Settings.route,
-                ) {
-                    Surface {
-                        SettingScreen(
-                            backPressed = routeAction::backPress
-                        )
-                    }
-                }
-                navigationComposable(
-                    route = NavRoute.ChatMessageDetail.route,
-                ) { backStackEntry ->
-                    Surface {
-                        val sessionId: String =
-                            requireNotNull(backStackEntry.arguments?.getString("sessionId"))
-                        val sessionType: SessionType = SessionType.fromValue(
-                            requireNotNull(
-                                backStackEntry.arguments?.getString("sessionType")?.toIntOrNull()
-                            )
-                        )
-                        SessionDetailScreen(
-                            sessionId = sessionId,
-                            sessionType = sessionType,
-                            backPress = routeAction::backPress,
-                            navigateToUserBasicInfo = { userId ->
-                                routeAction.navigateTo(
-                                    route = NavRoute.UserBasicInfo.buildRoute(userId = userId)
-                                )
-                            }
-                        )
-                    }
-                }
-                navigationComposable(
-                    route = NavRoute.SearchLauncher.route
-                ) {
-                    SearchLauncherScreen(
-                        backPressed = routeAction::backPress,
-                        navigateToSearchResult = { keyword ->
-                            routeAction.navigateTo(
-                                route = NavRoute.SearchComplexResult.buildRoute(keyword)
-                            )
-                        }
-                    )
-                }
-                navigationComposable(
-                    route = NavRoute.SearchComplexResult.route,
-                    deepLinks = NavRoute.SearchComplexResult.deepLinks.map { deeplink ->
-                        navDeepLink {
-                            uriPattern = deeplink
-                        }
-                    }
-                ) { backStackEntry ->
-                    val keyword = requireNotNull(backStackEntry.arguments?.getString("keyword"))
-                    SearchResultScreen(
-                        keyword = keyword,
-                        backPressed = routeAction::backPress,
-                        navigateToUseBasicScreen = { userId ->
-                            routeAction.navigateTo(
-                                route = NavRoute.UserBasicInfo.buildRoute(userId)
-                            )
-                        }
-                    )
-                }
-                navigationComposable(
-                    route = NavRoute.UserBasicInfo.route,
-                    arguments = listOf(
-                        navArgument(name = "userId") {
-                            type = NavType.LongType
-                            nullable = false
-                        }
-                    )
-                ) { backStackEntry ->
-                    val userId = requireNotNull(backStackEntry.arguments?.getLong("userId"))
-                    UserBasicInfoScreen(
-                        userId = userId,
-                        backPress = routeAction::backPress,
-                        navigateToChat = { sessionId, sessionType ->
-                            val route = NavRoute.ChatMessageDetail.buildRoute(
-                                sessionId = sessionId,
-                                sessionType = sessionType,
-                            )
-                            routeAction.navigateTo(route)
-                        }
-                    )
-                }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .appSafeAreaPadding()
+        ) {
+            when (homeEnum) {
+                FrameworkHomeEnum.Message -> MessageHomeScreen()
+                FrameworkHomeEnum.Personal -> PersonalInfoHomeScreen()
+                else -> {}
             }
-            val currentEntry = routeAction.navController.currentBackStackEntryAsState()
-            val currentRoute by remember { derivedStateOf { currentEntry.value?.destination?.route } }
-            val showNavigationBar = remember {
-                derivedStateOf {
-                    currentRoute == NavRoute.ChatSessionList.route || currentRoute == NavRoute.PersonalInfo.route
-                }
-            }
-            AnimatedVisibility(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                visible = showNavigationBar.value,
-                enter = slideInVertically { it },
-                exit = slideOutVertically { it }
-            ) {
-                NavigationBar(
-                    modifier = Modifier.applyAppSafeArea()
-                ) {
-                    NavigationBarItem(
-                        selected = currentRoute == NavRoute.ChatSessionList.route,
-                        onClick = { navigateTo(NavRoute.ChatSessionList.route) },
-                        icon = {
-                            Icon(imageVector = Icons.Default.Call, contentDescription = null)
-                        },
-                        label = { Text("Chat") },
-                    )
-                    NavigationBarItem(
-                        selected = currentRoute == NavRoute.PersonalInfo.route,
-                        onClick = { navigateTo(NavRoute.PersonalInfo.route) },
-                        icon = {
-                            Icon(imageVector = Icons.Default.Person, contentDescription = null)
-                        },
-                        label = { Text("Settings") },
-                    )
-                }
-            }
+        }
+        AnimatedVisibility(
+            modifier = Modifier.applyAppSafeArea(),
+            visible = false
+        ) {
+            AppNavigationBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter),
+                homeEnum = homeEnum,
+                switchNavigation = viewModel::switchNavigationTo
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppNavigationBar(
+    modifier: Modifier = Modifier,
+    homeEnum: FrameworkHomeEnum,
+    switchNavigation: (FrameworkHomeEnum) -> Unit,
+) {
+    NavigationBar(
+        modifier = modifier
+    ) {
+        FrameworkHomeEnum.entries.forEach { enum ->
+            NavigationBarItem(
+                selected = homeEnum == enum,
+                onClick = { switchNavigation(enum) },
+                icon = {
+                    Icon(imageVector = enum.icon, contentDescription = null)
+                },
+                label = { Text(text = stringResource(enum.title)) },
+            )
         }
     }
 }

@@ -29,4 +29,7 @@
 	<string name="string_send_message_to_user">发消息</string>
 
 	<string name="string_personal_info_title">个人信息</string>
+
+	<string name="string_navigation_message_label">消息</string>
+	<string name="string_navigation_personal_info_label">个人主页</string>
 </resources>

@@ -5,6 +5,8 @@ import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.database.DBProvider
 import com.application.channel.message.meta.Message
 import com.application.channel.message.metadata.SessionContact
+import com.application.channel.message.metadata.immutableSessionContact
+import com.application.channel.message.metadata.mutableSessionContact
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -125,10 +127,12 @@ private class MessageRepositoryImpl(
         val sessionContact = this.databaseProvider.sessionContactDatabaseApi.findSessionContact(sessionId, sessionType)
         val updatedSessionContact = sessionContact?.run(function)
         if (sessionContact != null && updatedSessionContact != null && sessionContact != updatedSessionContact) {
-            val timestampUpdatedSessionContact = if (updateAccess) {
-                updatedSessionContact.copy(lastUpdateTimestamp = System.currentTimeMillis())
-            } else updatedSessionContact
-            this.databaseProvider.sessionContactDatabaseApi.updateSessionContact(timestampUpdatedSessionContact)
+            val immutableSessionContact = (if (updateAccess) {
+                updatedSessionContact.mutableSessionContact().apply {
+                    this.lastUpdateTimestamp = System.currentTimeMillis()
+                }
+            } else updatedSessionContact).immutableSessionContact()
+            this.databaseProvider.sessionContactDatabaseApi.updateSessionContact(immutableSessionContact)
         }
     }
 

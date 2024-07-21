@@ -9,19 +9,32 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
+import com.chat.compose.app.router.LocalRouteAction
+import com.chat.compose.app.router.navigateToSettings
 import com.chat.compose.app.ui.NameAvatarImage
+import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.framework.Row
+import com.chat.compose.app.ui.navigationComposable
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_personal_info_title
 import org.jetbrains.compose.resources.stringResource
 
-/**
- * @author liuzhongao
- * @since 2024/7/13 13:02
- */
+fun NavGraphBuilder.personalInformationScreen(
+    navigateToSetting: () -> Unit
+) {
+    navigationComposable(
+        route = NavRoute.PersonalInfo.route
+    ) {
+        PersonalInformationScreen(
+            navigateToSetting = navigateToSetting
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalInformationScreen(
