@@ -59,14 +59,14 @@ private fun TextUiMessageItem(uiMessage: TextUiMessage, modifier: Modifier = Mod
             modifier = Modifier.heightIn(min = 48.dp),
             contentAlignment = Alignment.Center
         ) {
-            SelectionContainer {
+//            SelectionContainer {
                 val textContent by remember { derivedStateOf { message.textContent } }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                     text = textContent,
                     style = MaterialTheme.typography.bodyMedium,
                 )
-            }
+//            }
         }
     }
 }

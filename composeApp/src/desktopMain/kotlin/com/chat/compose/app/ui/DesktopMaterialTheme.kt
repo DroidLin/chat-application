@@ -28,7 +28,7 @@ fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () 
     }
 
     LaunchedEffect(colorScheme) {
-        window.background = null
+        window.background = java.awt.Color(colorScheme.background.toArgb())
         window.foreground = null
         window.rootPane.putClientProperty("apple.awt.transparentTitleBar", true)
         window.rootPane.putClientProperty("apple.awt.fullWindowContent", true)
