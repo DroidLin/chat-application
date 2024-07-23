@@ -46,19 +46,17 @@ fun NavGraphBuilder.chatDetailScreen(
             }
         )
     ) { backStackEntry ->
-        Surface {
-            val sessionId: String =
-                requireNotNull(backStackEntry.arguments?.getString("sessionId"))
-            val sessionType: SessionType = SessionType.fromValue(
-                requireNotNull(backStackEntry.arguments?.getString("sessionType")?.toIntOrNull())
-            )
-            SessionDetailScreen(
-                sessionId = sessionId,
-                sessionType = sessionType,
-                backPress = backPress,
-                navigateToUserBasicInfo = navigateToUserBasicInfo
-            )
-        }
+        val sessionId: String =
+            requireNotNull(backStackEntry.arguments?.getString("sessionId"))
+        val sessionType: SessionType = SessionType.fromValue(
+            requireNotNull(backStackEntry.arguments?.getString("sessionType")?.toIntOrNull())
+        )
+        SessionDetailScreen(
+            sessionId = sessionId,
+            sessionType = sessionType,
+            backPress = backPress,
+            navigateToUserBasicInfo = navigateToUserBasicInfo
+        )
     }
 }
 

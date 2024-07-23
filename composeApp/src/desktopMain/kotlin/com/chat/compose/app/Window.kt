@@ -28,7 +28,7 @@ fun AppWindow(
     val windowState = rememberWindowState(
         placement = WindowPlacement.Floating,
         position = WindowPosition.Aligned(Alignment.Center),
-        size = DpSize(800.dp, 600.dp),
+        size = DpSize(1000.dp, 600.dp),
     )
     Window(
         onCloseRequest = onCloseRequest,

@@ -3,6 +3,7 @@ package com.chat.compose.app.screen.message.ui
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.*
@@ -37,7 +38,9 @@ private const val DETAIL_HOST_ROUTE = "detail_host_route"
 @Composable
 fun MessageHomeScreen() {
     val navigator = rememberListDetailPaneScaffoldNavigator<Any>(
-        scaffoldDirective = calculatePaneScaffoldDirective(windowAdaptiveInfo = calculateWindowAdaptiveInfo()),
+        scaffoldDirective = calculatePaneScaffoldDirective(
+            windowAdaptiveInfo = calculateWindowAdaptiveInfo()
+        ),
         initialDestinationHistory = listOf(
             ThreePaneScaffoldDestinationItem(pane = ListDetailPaneScaffoldRole.List)
         )
@@ -72,7 +75,7 @@ fun MessageHomeScreen() {
         if (routeAction.backPress()) {
             return
         }
-        if (navigator.navigateBack(BackNavigationBehavior.PopUntilContentChange)) {
+        if (navigator.navigateBack(BackNavigationBehavior.PopLatest)) {
             return
         }
         println("navigate back failure.")
@@ -174,3 +177,7 @@ fun MessageHomeDetailPane(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 private val <T> ThreePaneScaffoldNavigator<T>.isDetailVisible: Boolean
     get() = this.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+private val <T> ThreePaneScaffoldNavigator<T>.isListVisible: Boolean
+    get() = this.scaffoldValue[ListDetailPaneScaffoldRole.List] == PaneAdaptedValue.Expanded

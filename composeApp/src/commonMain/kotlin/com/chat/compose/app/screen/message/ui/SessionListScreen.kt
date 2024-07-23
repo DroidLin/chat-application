@@ -33,12 +33,10 @@ fun NavGraphBuilder.sessionListScreen(
     homeNavigationComposable(
         route = NavRoute.ChatSessionList.route,
     ) {
-        Surface {
-            SessionListScreen(
-                sessionItemClick = sessionItemClick,
-                navigateToSearch = navigateToSearch,
-            )
-        }
+        SessionListScreen(
+            sessionItemClick = sessionItemClick,
+            navigateToSearch = navigateToSearch,
+        )
     }
 }
 
