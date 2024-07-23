@@ -7,8 +7,6 @@ import com.chat.compose.app.di.*
 import com.chat.compose.app.lifecycle.ApplicationLifecycleObserver
 import com.chat.compose.app.lifecycle.ApplicationLifecycleRegistry
 import com.chat.compose.app.metadata.Profile
-import com.formdev.flatlaf.FlatLightLaf
-import kotlinx.coroutines.*
 import org.koin.core.context.startKoin
 
 /**
@@ -23,7 +21,6 @@ fun initEntryPoint() {
 }
 
 private fun initSystemProperties() {
-    FlatLightLaf.setup()
     System.setProperty("apple.awt.application.appearance", "system")
     System.setProperty("apple.awt.application.name", "True")
 }

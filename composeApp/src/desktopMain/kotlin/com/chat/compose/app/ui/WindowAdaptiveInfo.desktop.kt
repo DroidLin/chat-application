@@ -1,53 +1,28 @@
 package com.chat.compose.app.ui
 
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.Posture
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.window.core.layout.WindowSizeClass
-import com.chat.compose.app.LocalWindow
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
+import com.chat.compose.app.LocalWindowState
 
 /**
  * @author liuzhongao
  * @since 2024/7/21 11:53
  */
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 actual fun calculateWindowAdaptiveInfo(): WindowAdaptiveInfo {
-    val window = LocalWindow.current
-    var windowWidthDp by remember {
-        val widthDp = window.width.dp
-        mutableStateOf(widthDp)
-    }
-    var windowHeightDp by remember {
-        val heightDp = window.height.dp
-        mutableStateOf(heightDp)
-    }
-
-    val componentListener = remember {
-        object : ComponentAdapter() {
-            override fun componentResized(p0: ComponentEvent?) {
-                windowWidthDp = window.width.dp
-                windowHeightDp = window.height.dp
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        window.addComponentListener(componentListener)
-        onDispose {
-            window.removeComponentListener(componentListener)
-        }
-    }
-
+    val windowState = LocalWindowState.current
     return remember {
         derivedStateOf {
+            val widthDp = windowState.size.width
+            val heightDp = windowState.size.height
+
+            val windowSizeClass = WindowSizeClass.compute(widthDp.value, heightDp.value)
             WindowAdaptiveInfo(
-                windowSizeClass = WindowSizeClass.compute(windowWidthDp.value, windowHeightDp.value),
+                windowSizeClass = windowSizeClass,
                 windowPosture = Posture(false, emptyList())
             )
         }

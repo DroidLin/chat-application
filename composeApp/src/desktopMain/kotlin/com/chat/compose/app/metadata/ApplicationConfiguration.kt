@@ -1,17 +1,22 @@
 package com.chat.compose.app.metadata
 
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.*
 import com.application.channel.im.IMInitConfig
-import com.application.channel.im.Token
 import com.application.channel.message.Account
 
 /**
  * @author liuzhongao
  * @since 2024/6/16 12:16
  */
+@Composable
+fun rememberAppConfiguration(): ApplicationConfiguration {
+    val isSystemInDarkMode = isSystemInDarkTheme()
+    return remember(isSystemInDarkMode) {
+        ApplicationConfiguration(isDarkMode = isSystemInDarkMode)
+    }
+}
+
 @Stable
 class ApplicationConfiguration(
     title: String = "",

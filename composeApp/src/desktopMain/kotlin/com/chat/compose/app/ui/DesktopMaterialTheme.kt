@@ -17,13 +17,13 @@ import org.koin.compose.KoinContext
 fun DesktopMaterialTheme(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val window = LocalWindow.current
     val windowConfiguration = LocalApplicationConfiguration.current
-    val (light, dark) = remember { YellowTheme }
+    val (lightColor, darkColor) = remember { YellowTheme }
 
     val colorScheme by remember {
         derivedStateOf {
             if (windowConfiguration.isDarkMode) {
-                dark
-            } else light
+                darkColor
+            } else lightColor
         }
     }
 

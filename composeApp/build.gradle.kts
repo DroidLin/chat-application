@@ -75,9 +75,10 @@ kotlin {
         }
         val desktopMain by getting
         desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            implementation(compose.desktop.currentOs) {
+                exclude(group = "org.jetbrains.compose.material")
+            }
             implementation(libs.kotlinx.coroutines.swing)
-            implementation("com.formdev:flatlaf:3.5")
         }
     }
 }
