@@ -25,6 +25,8 @@ interface ProfileService {
     suspend fun refreshProfile(): Profile
 
     fun refreshProfileAsync()
+
+    fun logout()
 }
 
 fun ProfileService(fetchUserInfoUserCase: FetchUserInfoUseCase): ProfileService {
@@ -66,6 +68,13 @@ private class ProfileServiceImpl(
         this.coroutineScope.launch {
             this@ProfileServiceImpl.refreshProfile()
         }
+    }
+
+    override fun logout() {
+        val profile = Profile()
+        this._profileFlow.update { profile }
+        this._preference.putString(KEY_PROFILE, profile.toJson())
+        this._preference.flush()
     }
 
     companion object {

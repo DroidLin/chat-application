@@ -1,6 +1,6 @@
 package com.application.channel.im
 
-import com.application.channel.message.metadata.SessionContact
+import com.application.channel.message.metadata.RecentContact
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -15,8 +15,8 @@ object SingleIMManager {
         this.startService(initConfig, true)
     }
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val _sessionContactFlow = MutableStateFlow<List<SessionContact>>(emptyList())
-    val sessionContact = _sessionContactFlow.asStateFlow()
+    private val _recentContactFlow = MutableStateFlow<List<RecentContact>>(emptyList())
+    val recentContact = _recentContactFlow.asStateFlow()
 
     val connectionService = MsgClient.getService(MsgConnectionService::class.java)
     val msgService = MsgClient.getService(MsgService::class.java)
@@ -35,8 +35,8 @@ object SingleIMManager {
         }
         this.databaseInitConfig = initConfig
         this.connectionService.initDatabase(initConfig)
-        this.connectionService.messageRepository.fetchObservableSessionContactList(Int.MAX_VALUE)
-            .onEach { sessionContactList -> this._sessionContactFlow.emit(sessionContactList) }
+        this.connectionService.messageRepository.fetchRecentContactsFlow(Int.MAX_VALUE)
+            .onEach { recentContactList -> this._recentContactFlow.emit(recentContactList) }
             .let { this.flowCoroutineJob?.cancel(); this.flowCoroutineJob = this.coroutineScope.launch { it.collect() } }
     }
 

@@ -28,7 +28,7 @@ dependencies {
     implementation(libs.spring.boot.framework.starter.web)
     testImplementation(libs.spring.boot.framework.starter.test)
     implementation(libs.jetbrains.kotlinx.coroutines.core)
-//    implementation(libs.jetbrains.kotlinx.coroutines.reactor)
+    implementation(libs.jetbrains.kotlinx.coroutines.reactor)
     implementation(libs.jackson.module.kotlin)
     implementation(libs.kotlin.reflect)
 

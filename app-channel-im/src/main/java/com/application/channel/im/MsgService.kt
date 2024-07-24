@@ -5,7 +5,9 @@ import com.application.channel.database.AppMessageDatabase.Transaction
 import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
+import com.application.channel.message.metadata.MutableRecentContact
 import com.application.channel.message.metadata.MutableSessionContact
+import com.application.channel.message.metadata.RecentContact
 import com.application.channel.message.metadata.SessionContact
 import kotlinx.coroutines.flow.Flow
 
@@ -33,11 +35,13 @@ interface MsgService {
         sessionType: SessionType,
         function: MutableSessionContact.() -> Unit
     )
+
     suspend fun updateSessionContactExtensions(
         sessionId: String,
         sessionType: SessionType,
         function: MutableMap<String, Any?>.() -> Unit
     )
+
     suspend fun updateSessionContactExtensions(
         sessionId: String,
         sessionType: SessionType,
@@ -51,8 +55,26 @@ interface MsgService {
     suspend fun deleteSessionContact(sessionId: String, sessionType: SessionType)
     suspend fun deleteSessionContact(sessionContact: SessionContact)
 
-    suspend fun fetchRecentSessionContactList(limit: Int): List<SessionContact>
-    fun fetchObservableRecentSessionContactList(limit: Int): Flow<List<SessionContact>>
+    // RecentContacts
+    suspend fun insertRecentContact(sessionId: String, sessionType: SessionType)
+
+    fun fetchRecentContactFlow(sessionId: String, sessionType: SessionType): Flow<RecentContact?>
+    suspend fun fetchRecentContact(sessionId: String, sessionType: SessionType): RecentContact?
+
+    suspend fun fetchSessionContactList(limit: Int): List<SessionContact>
+    fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>>
+
+    suspend fun fetchRecentContactList(limit: Int): List<RecentContact>
+    fun fetchRecentContactsFlow(limit: Int): Flow<List<RecentContact>>
+
+    suspend fun updateRecentContact(
+        sessionId: String,
+        sessionType: SessionType,
+        function: MutableRecentContact.() -> Unit
+    )
+
+    suspend fun deleteRecentContact(sessionId: String, sessionType: SessionType)
+    suspend fun deleteRecentContact(recentContact: RecentContact)
 
     // Messages
     suspend fun insertMessage(message: Message)

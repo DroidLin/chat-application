@@ -29,6 +29,6 @@ class SessionListViewModel constructor(
         val sessionIdList = this.sessionList.first { it.isNotEmpty() }
             .map { it.sessionId }
         val profileList = this.fetchUserInfoUseCase.fetchProfileBySessionId(sessionIdList)
-        this.updateSessionContactUserBasicInfoUseCase.updateSessionContactUserInfo(profileList)
+        this.updateSessionContactUserBasicInfoUseCase.updateContactUserInfo(profileList)
     }
 }

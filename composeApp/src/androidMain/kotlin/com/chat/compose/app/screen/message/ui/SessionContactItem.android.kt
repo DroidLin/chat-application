@@ -9,22 +9,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.chat.compose.app.metadata.UiSessionContact
+import com.chat.compose.app.metadata.UiRecentContact
 import com.chat.compose.app.ui.NameAvatarImage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 actual fun SessionContactItem(
-    value: UiSessionContact,
+    value: UiRecentContact,
     modifier: Modifier,
     onPrimaryMouseClick: () -> Unit,
     onSecondaryMouseClick: () -> Unit

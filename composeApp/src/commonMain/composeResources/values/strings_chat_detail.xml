@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<string name="string_send_message_to_user">发消息</string>
+
+	<string name="message_detail_text_field_place_holder">聊点什么吧！</string>
+	<string name="message_detail_send_button_hint">发送</string>
+
+</resources>

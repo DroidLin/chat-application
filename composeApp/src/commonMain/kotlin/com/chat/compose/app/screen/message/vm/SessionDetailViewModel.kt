@@ -1,14 +1,13 @@
 package com.chat.compose.app.screen.message.vm
 
 import androidx.compose.runtime.Immutable
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.application.channel.im.draftMessage
 import com.application.channel.im.session.ChatSession
 import com.application.channel.message.SessionType
-import com.application.channel.message.metadata.SessionContact
+import com.application.channel.message.metadata.RecentContact
 import com.chat.compose.app.metadata.UiMessageItem
 import com.chat.compose.app.metadata.toUiSessionContact
 import com.chat.compose.app.usecase.CloseSessionUseCase
@@ -37,8 +36,8 @@ class SessionDetailViewModel constructor(
 
     private val coroutineScope = CoroutineScope(this.viewModelScope.coroutineContext + Dispatchers.Default)
 
-    private val _state = MutableStateFlow(SessionDetailState())
-    val state: StateFlow<SessionDetailState> = this._state.asStateFlow()
+    private val _state = MutableStateFlow(RecentDetailState())
+    val state: StateFlow<RecentDetailState> = this._state.asStateFlow()
 
     private var chatSession: ChatSession? = null
     private var observerJob: Job? = null
@@ -46,9 +45,9 @@ class SessionDetailViewModel constructor(
     fun openSession(sessionId: String, sessionType: SessionType): StateFlow<PagingData<UiMessageItem>> {
         this.observerJob?.cancel()
         this.observerJob = this.fetchSessionContactUseCase
-            .fetchObservableSessionContactOrCreate(sessionId, sessionType)
-            .onFirst { sessionContact ->
-                val draftMessage = sessionContact.draftMessage
+            .fetchObservableRecentContactOrCreate(sessionId, sessionType)
+            .onFirst { recentContact ->
+                val draftMessage = recentContact.draftMessage
                 if (!draftMessage.isNullOrBlank()) {
                     this._state.update { it.copy(inputText = draftMessage) }
                 }
@@ -113,9 +112,9 @@ class SessionDetailViewModel constructor(
 }
 
 @Immutable
-data class SessionDetailState(
+data class RecentDetailState(
     val isLoading: Boolean = false,
-    val sessionContact: SessionContact? = null,
+    val recentContact: RecentContact? = null,
     val title: String = "",
     val inputText: String = "",
 )

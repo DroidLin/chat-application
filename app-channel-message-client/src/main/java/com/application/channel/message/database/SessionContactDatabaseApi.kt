@@ -2,7 +2,7 @@ package com.application.channel.message.database
 
 import com.application.channel.database.AppMessageDatabase
 import com.application.channel.database.LocalMessageTable
-import com.application.channel.database.LocalSessionTable
+import com.application.channel.database.LocalSessionContactTable
 import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.database.meta.LocalSessionContact
 import com.application.channel.message.SessionType
@@ -119,7 +119,7 @@ private class SessionContactDatabaseImpl(
 
         val channelEvent = Channel<Unit>(Channel.CONFLATED)
         val observer = object : OnTableChangedObserver {
-            override val tables: List<String> = listOf(LocalSessionTable.TABLE_NAME, LocalMessageTable.TABLE_NAME)
+            override val tables: List<String> = listOf(LocalSessionContactTable.TABLE_NAME, LocalMessageTable.TABLE_NAME)
             override fun onTableChanged(tableNames: Set<String>) {
                 channelEvent.trySend(Unit)
             }

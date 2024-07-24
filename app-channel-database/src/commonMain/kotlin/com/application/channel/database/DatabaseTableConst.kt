@@ -16,7 +16,18 @@ interface LocalMessageTable {
     }
 }
 
-interface LocalSessionTable {
+interface LocalRecentContactTable {
+    companion object {
+        const val TABLE_NAME = "table_recent_contact"
+
+        const val RECENT_SESSION_ID = "recent_session_id"
+        const val RECENT_SESSION_TYPE_CODE = "recent_session_type_code"
+        const val RECENT_TIMESTAMP = "recent_timestamp"
+        const val RECENT_EXTENSIONS = "extensions"
+    }
+}
+
+interface LocalSessionContactTable {
     companion object {
         const val TABLE_NAME = "table_session_contact"
 

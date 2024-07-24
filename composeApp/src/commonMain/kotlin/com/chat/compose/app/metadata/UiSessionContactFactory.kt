@@ -1,7 +1,7 @@
 package com.chat.compose.app.metadata
 
 import com.application.channel.im.draftMessage
-import com.application.channel.message.metadata.SessionContact
+import com.application.channel.message.metadata.RecentContact
 import com.chat.compose.app.util.formatTime
 import com.chat.compose.app.util.profile
 
@@ -9,9 +9,9 @@ import com.chat.compose.app.util.profile
  * @author liuzhongao
  * @since 2024/6/18 21:50
  */
-fun SessionContact.toUiSessionContact(): UiSessionContact {
+fun RecentContact.toUiSessionContact(): UiRecentContact {
     val profile = this.profile
-    return UiSessionContact(
+    return UiRecentContact(
         sessionId = this.sessionId,
         sessionType = this.sessionType,
         sessionContactName = profile?.userInfo?.userName ?: "${this.sessionId} [Test]",
@@ -19,7 +19,7 @@ fun SessionContact.toUiSessionContact(): UiSessionContact {
         unreadCount = this.unreadCount,
         draftMessage = this.draftMessage,
         showingContent = this.recentMessage?.showingContent ?: "",
-        timestamp = this.recentMessage?.timestamp ?: this.lastUpdateTimestamp,
-        time = formatTime(this.recentMessage?.timestamp ?: this.lastUpdateTimestamp)
+        timestamp = this.recentMessage?.timestamp ?: this.recentTimestamp,
+        time = formatTime(this.recentMessage?.timestamp ?: this.recentTimestamp)
     )
 }

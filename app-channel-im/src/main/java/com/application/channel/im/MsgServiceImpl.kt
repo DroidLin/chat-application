@@ -6,10 +6,7 @@ import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.MessageRepository
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.Message
-import com.application.channel.message.metadata.MutableSessionContact
-import com.application.channel.message.metadata.SessionContact
-import com.application.channel.message.metadata.immutableSessionContact
-import com.application.channel.message.metadata.mutableSessionContact
+import com.application.channel.message.metadata.*
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -107,12 +104,54 @@ private class MsgServiceImpl : MsgService {
         this.messageRepository.deleteSessionContact(sessionContact)
     }
 
-    override suspend fun fetchRecentSessionContactList(limit: Int): List<SessionContact> {
-        return this.messageRepository.fetchRecentSessionContactList(limit)
+    override suspend fun fetchSessionContactList(limit: Int): List<SessionContact> {
+        return this.messageRepository.fetchSessionContactList(limit)
     }
 
-    override fun fetchObservableRecentSessionContactList(limit: Int): Flow<List<SessionContact>> {
+    override fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>> {
         return this.messageRepository.fetchObservableSessionContactList(limit)
+    }
+
+    override suspend fun fetchRecentContactList(limit: Int): List<RecentContact> {
+        return this.messageRepository.fetchRecentContactList(limit)
+    }
+
+    override fun fetchRecentContactsFlow(limit: Int): Flow<List<RecentContact>> {
+        return this.messageRepository.fetchRecentContactsFlow(limit)
+    }
+
+    override suspend fun updateRecentContact(
+        sessionId: String,
+        sessionType: SessionType,
+        function: MutableRecentContact.() -> Unit
+    ) {
+        this.messageRepository.updateRecentContact(sessionId, sessionType) {
+            this.mutableRecentContact()
+                .apply(function)
+                .immutableRecentContact()
+        }
+    }
+
+    override suspend fun deleteRecentContact(sessionId: String, sessionType: SessionType) {
+        val recentContact = this.messageRepository.fetchRecentContact(sessionId, sessionType) ?: return
+        this.messageRepository.deleteRecentContact(recentContact)
+    }
+
+    override suspend fun deleteRecentContact(recentContact: RecentContact) {
+        this.messageRepository.deleteRecentContact(recentContact)
+    }
+
+    override suspend fun insertRecentContact(sessionId: String, sessionType: SessionType) {
+        val recentContact = RecentContact(sessionId, sessionType)
+        this.messageRepository.insertRecentContact(recentContact)
+    }
+
+    override fun fetchRecentContactFlow(sessionId: String, sessionType: SessionType): Flow<RecentContact?> {
+        return this.messageRepository.fetchRecentContactFlow(sessionId, sessionType)
+    }
+
+    override suspend fun fetchRecentContact(sessionId: String, sessionType: SessionType): RecentContact? {
+        return this.messageRepository.fetchRecentContact(sessionId, sessionType)
     }
 
     override suspend fun insertMessage(message: Message) {

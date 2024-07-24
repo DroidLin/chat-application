@@ -44,3 +44,8 @@ fun AppWindow(
         }
     }
 }
+
+@Composable
+fun LoginWindow(onCloseRequest: () -> Unit) {
+
+}

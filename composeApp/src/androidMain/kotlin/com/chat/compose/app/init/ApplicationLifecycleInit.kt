@@ -2,11 +2,13 @@ package com.chat.compose.app.init
 
 import android.content.Context
 import androidx.lifecycle.*
+import com.application.channel.core.util.koinInject
 import com.chat.compose.app.AndroidChatService
 import com.chat.compose.app.initChatService
 import com.chat.compose.app.lifecycle.ApplicationLifecycleObserver
 import com.chat.compose.app.lifecycle.ApplicationLifecycleRegistry
 import com.chat.compose.app.metadata.Profile
+import com.chat.compose.app.services.ProfileService
 
 /**
  * @author liuzhongao
@@ -22,6 +24,7 @@ fun initApplicationLifecycleObserver(applicationContext: Context) {
 
         override suspend fun onUserLogout() {
             AndroidChatService.stop(applicationContext)
+            koinInject<ProfileService>().logout()
         }
 
         override suspend fun onFirstFrameComplete() {

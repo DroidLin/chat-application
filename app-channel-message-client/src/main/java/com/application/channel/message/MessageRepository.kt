@@ -4,6 +4,7 @@ import com.application.channel.database.AppMessageDatabase.Transaction
 import com.application.channel.database.OnTableChangedObserver
 import com.application.channel.message.database.DBProvider
 import com.application.channel.message.meta.Message
+import com.application.channel.message.metadata.RecentContact
 import com.application.channel.message.metadata.SessionContact
 import com.application.channel.message.metadata.immutableSessionContact
 import com.application.channel.message.metadata.mutableSessionContact
@@ -28,6 +29,7 @@ interface MessageRepository {
         sessionType: SessionType,
         function: SessionContact.() -> SessionContact
     )
+
     suspend fun updateSessionContact(
         sessionId: String,
         sessionType: SessionType,
@@ -41,8 +43,24 @@ interface MessageRepository {
     suspend fun fetchSessionContact(sessionId: String, sessionType: SessionType): SessionContact?
     fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?>
 
-    suspend fun fetchRecentSessionContactList(limit: Int): List<SessionContact>
+    suspend fun fetchSessionContactList(limit: Int): List<SessionContact>
     fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>>
+
+    suspend fun insertRecentContact(recentContact: RecentContact)
+
+    suspend fun fetchRecentContactList(limit: Int): List<RecentContact>
+    fun fetchRecentContactsFlow(limit: Int): Flow<List<RecentContact>>
+
+    suspend fun fetchRecentContact(sessionId: String, sessionType: SessionType): RecentContact?
+    fun fetchRecentContactFlow(sessionId: String, sessionType: SessionType): Flow<RecentContact?>
+
+    suspend fun updateRecentContact(
+        sessionId: String,
+        sessionType: SessionType,
+        function: RecentContact.() -> RecentContact
+    )
+
+    suspend fun deleteRecentContact(sessionContact: RecentContact)
 
     suspend fun fetchMessagesAtTime(
         chatterSessionId: String,
@@ -155,12 +173,49 @@ private class MessageRepositoryImpl(
         return this.databaseProvider.sessionContactDatabaseApi.fetchObservableSessionContact(sessionId, sessionType)
     }
 
-    override suspend fun fetchRecentSessionContactList(limit: Int): List<SessionContact> {
+    override suspend fun fetchSessionContactList(limit: Int): List<SessionContact> {
         return this.databaseProvider.sessionContactDatabaseApi.fetchRecentSessionContact(limit)
     }
 
     override fun fetchObservableSessionContactList(limit: Int): Flow<List<SessionContact>> {
         return this.databaseProvider.sessionContactDatabaseApi.fetchObservableSessionContact(limit)
+    }
+
+    override suspend fun fetchRecentContactList(limit: Int): List<RecentContact> {
+        return this.databaseProvider.recentContactDatabaseApi.fetchRecentContacts(limit)
+    }
+
+    override fun fetchRecentContactsFlow(limit: Int): Flow<List<RecentContact>> {
+        return this.databaseProvider.recentContactDatabaseApi.fetchRecentContactFlow(limit)
+    }
+
+    override suspend fun updateRecentContact(
+        sessionId: String,
+        sessionType: SessionType,
+        function: RecentContact.() -> RecentContact
+    ) {
+        val recentApi = this.databaseProvider.recentContactDatabaseApi
+        val recentContact = recentApi.fetchRecentContact(sessionId, sessionType) ?: return
+        val updatedRecentContact = recentContact.run(function)
+        if (recentContact != updatedRecentContact) {
+            recentApi.updateRecentContact(updatedRecentContact)
+        }
+    }
+
+    override suspend fun fetchRecentContact(sessionId: String, sessionType: SessionType): RecentContact? {
+        return this.databaseProvider.recentContactDatabaseApi.fetchRecentContact(sessionId, sessionType)
+    }
+
+    override suspend fun insertRecentContact(recentContact: RecentContact) {
+        return this.databaseProvider.recentContactDatabaseApi.insertRecentContact(recentContact)
+    }
+
+    override fun fetchRecentContactFlow(sessionId: String, sessionType: SessionType): Flow<RecentContact?> {
+        return this.databaseProvider.recentContactDatabaseApi.fetchRecentContactFlow(sessionId, sessionType)
+    }
+
+    override suspend fun deleteRecentContact(sessionContact: RecentContact) {
+        this.databaseProvider.recentContactDatabaseApi.deleteRecentContact(sessionContact)
     }
 
     override suspend fun fetchMessagesAtTime(

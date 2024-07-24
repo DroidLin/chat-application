@@ -3,7 +3,7 @@ package com.chat.compose.app.router
 import androidx.navigation.navOptions
 import com.application.channel.core.util.koinInject
 import com.application.channel.message.SessionType
-import com.chat.compose.app.metadata.UiSessionContact
+import com.chat.compose.app.metadata.UiRecentContact
 import com.chat.compose.app.metadata.isValid
 import com.chat.compose.app.services.ProfileService
 import com.chat.compose.app.ui.NavRoute
@@ -40,7 +40,7 @@ fun RouteAction.navigateWhenLoginComplete() {
     this.navigateTo(NavRoute.HomeScreen.route)
 }
 
-fun RouteAction.navigateToChatDetail(sessionContact: UiSessionContact) {
+fun RouteAction.navigateToChatDetail(sessionContact: UiRecentContact) {
     this.navigateToChatDetail(sessionContact.sessionId, sessionContact.sessionType)
 }
 
@@ -49,7 +49,13 @@ fun RouteAction.navigateToChatDetail(sessionId: String, sessionType: SessionType
         sessionId = sessionId,
         sessionType = sessionType,
     )
-    this.navigateTo(route)
+    this.navigateTo(
+        route = route,
+        navOptions = navOptions {
+            launchSingleTop = true
+            popUpTo(NavRoute.ChatMessageDetail.route) { inclusive = true }
+        }
+    )
 }
 
 fun RouteAction.navigateToSearchLauncher() {

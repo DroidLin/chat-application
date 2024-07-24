@@ -14,9 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
-import com.chat.compose.app.lifecycle.MainFirstFrameContent
-import com.chat.compose.app.metadata.UiSessionContact
-import com.chat.compose.app.router.LocalRouteAction
+import com.chat.compose.app.metadata.UiRecentContact
 import com.chat.compose.app.screen.message.vm.SessionListViewModel
 import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.homeNavigationComposable
@@ -27,7 +25,7 @@ import com.chat.compose.app.ui.homeNavigationComposable
  */
 
 fun NavGraphBuilder.sessionListScreen(
-    sessionItemClick: (UiSessionContact) -> Unit = {},
+    sessionItemClick: (UiRecentContact) -> Unit = {},
     navigateToSearch: () -> Unit = {}
 ) {
     homeNavigationComposable(
@@ -43,7 +41,7 @@ fun NavGraphBuilder.sessionListScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SessionListScreen(
-    sessionItemClick: (UiSessionContact) -> Unit = {},
+    sessionItemClick: (UiRecentContact) -> Unit = {},
     navigateToSearch: () -> Unit = {}
 ) {
     val viewModel: SessionListViewModel = koinViewModel()

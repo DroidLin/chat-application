@@ -36,7 +36,9 @@ private const val DETAIL_HOST_ROUTE = "detail_host_route"
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MessageHomeScreen() {
+fun MessageHomeScreen(
+    confirmLogout: () -> Unit = {}
+) {
     val navigator = rememberListDetailPaneScaffoldNavigator<Any>(
         scaffoldDirective = calculatePaneScaffoldDirective(
             windowAdaptiveInfo = calculateWindowAdaptiveInfo()
@@ -121,7 +123,8 @@ fun MessageHomeScreen() {
                         MessageHomeDetailPane(
                             routeAction = routeAction,
                             startDestinationRoute = startDestinationRoute,
-                            navigateBack = ::navigateBack
+                            navigateBack = ::navigateBack,
+                            confirmLogout = confirmLogout,
                         )
                     }
                 }
@@ -135,6 +138,7 @@ fun MessageHomeDetailPane(
     routeAction: RouteAction,
     startDestinationRoute: String,
     navigateBack: () -> Unit,
+    confirmLogout: () -> Unit,
 ) {
     Surface {
         NavHost(
@@ -152,7 +156,8 @@ fun MessageHomeDetailPane(
                 navigateToUserBasicInfo = routeAction::navigateToUserBasicInfo
             )
             personalInformationScreen(
-                navigateToSetting = routeAction::navigateToSettings
+                navigateToSetting = routeAction::navigateToSettings,
+                onConfirmLogout = confirmLogout
             )
             userBasicInfoScreen(
                 backPress = navigateBack,

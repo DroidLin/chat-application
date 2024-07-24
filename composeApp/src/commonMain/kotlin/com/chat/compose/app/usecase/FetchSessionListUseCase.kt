@@ -2,8 +2,9 @@ package com.chat.compose.app.usecase
 
 import com.application.channel.im.SingleIMManager
 import com.application.channel.message.SessionType
+import com.application.channel.message.metadata.RecentContact
 import com.application.channel.message.metadata.SessionContact
-import com.chat.compose.app.metadata.UiSessionContact
+import com.chat.compose.app.metadata.UiRecentContact
 import com.chat.compose.app.metadata.toUiSessionContact
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,9 +25,9 @@ val sessionContactV2 = SessionContact(
 
 class FetchSessionListUseCase {
 
-    val sessionList: Flow<List<UiSessionContact>>
-        get() = SingleIMManager.sessionContact
-            .map { sessionContactList -> sessionContactList.map(SessionContact::toUiSessionContact) }
-            .map { sessionContactList -> sessionContactList.sortedByDescending { it.timestamp } }
+    val sessionList: Flow<List<UiRecentContact>>
+        get() = SingleIMManager.recentContact
+            .map { recentContacts -> recentContacts.map(RecentContact::toUiSessionContact) }
+            .map { recentContacts -> recentContacts.sortedByDescending { it.timestamp } }
             .distinctUntilChanged()
 }

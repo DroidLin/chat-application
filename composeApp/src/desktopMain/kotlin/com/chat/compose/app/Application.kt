@@ -1,13 +1,15 @@
 package com.chat.compose.app
 
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.window.application
 import com.chat.compose.app.metadata.ApplicationConfiguration
+import com.chat.compose.app.metadata.isValid
 import com.chat.compose.app.metadata.rememberAppConfiguration
+import com.chat.compose.app.services.ProfileService
 import com.chat.compose.app.ui.AppSafeArea
 import com.chat.compose.app.ui.LocalAppSafeArea
+import org.koin.compose.koinInject
 
 fun main() {
     val appSafeArea = AppSafeArea()
@@ -18,7 +20,11 @@ fun main() {
             LocalApplicationConfiguration provides appConfiguration,
             LocalAppSafeArea provides appSafeArea,
         ) {
-            AppWindow(::exitApplication)
+            val profileState = koinInject<ProfileService>().profileFlow.collectAsState()
+            val isLogin = remember { derivedStateOf { profileState.value.isValid } }
+            if (isLogin.value) {
+                AppWindow(::exitApplication)
+            } else LoginWindow(::exitApplication)
         }
     }
 }

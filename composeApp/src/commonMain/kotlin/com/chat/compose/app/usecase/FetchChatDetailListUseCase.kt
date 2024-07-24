@@ -36,25 +36,25 @@ class FetchChatDetailListUseCase(private val fetchSessionContactUseCase: FetchSe
         )
             .flow
             .map { pagingData ->
-                val selfUserSessionContact = this.fetchSessionContactUseCase.fetchSessionContactOrCreate(
+                val selfUserSessionContact = this.fetchSessionContactUseCase.fetchRecentContactOrCreate(
                     sessionId = chatSessionContext.selfUserSessionId,
                     sessionType = SessionType.P2P
                 )?.toUiSessionContact()
-                val chatterSessionContact = this.fetchSessionContactUseCase.fetchSessionContact(
+                val chatterSessionContact = this.fetchSessionContactUseCase.fetchRecentContact(
                     sessionId = chatSessionContext.chatterSessionId,
                     sessionType = chatSessionContext.chatterSessionType
                 )?.toUiSessionContact()
                 pagingData.map { message ->
                     val isSenderMessage = message.sender.sessionId == chatSession.context.selfUserSessionId
                     val isReceiverMessage = message.sender.sessionId == chatSession.context.chatterSessionId || message.receiver.sessionId == chatSession.context.chatterSessionId
-                    val uiSessionContact = when {
+                    val uiRecentContact = when {
                         isSenderMessage && isReceiverMessage -> selfUserSessionContact
                         isSenderMessage -> selfUserSessionContact
                         isReceiverMessage -> chatterSessionContact
                         else -> null
                     }
                     UiMessageItem(
-                        uiSessionContact = uiSessionContact,
+                        uiRecentContact = uiRecentContact,
                         uiMessage = message.toUiMessage(
                             isSenderMessage = isSenderMessage,
                             isReceiverMessage = isReceiverMessage,

@@ -1,6 +1,5 @@
 package com.application.channel.core.util
 
-import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier

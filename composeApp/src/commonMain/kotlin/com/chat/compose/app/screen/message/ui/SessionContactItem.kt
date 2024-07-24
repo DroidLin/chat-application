@@ -7,21 +7,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import com.chat.compose.app.metadata.UiSessionContact
+import com.chat.compose.app.metadata.UiRecentContact
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_draft_message_hint
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 expect fun SessionContactItem(
-    value: UiSessionContact,
+    value: UiRecentContact,
     modifier: Modifier = Modifier,
     onPrimaryMouseClick: () -> Unit,
     onSecondaryMouseClick: () -> Unit,
 )
 
 @Composable
-internal fun UiSessionContact.rememberShowingContent(): AnnotatedString {
+internal fun UiRecentContact.rememberShowingContent(): AnnotatedString {
     val colorScheme = MaterialTheme.colorScheme
     val draftMessage = this.draftMessage
     val showingContent = this.showingContent

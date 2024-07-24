@@ -2,7 +2,6 @@ package com.chat.compose.app.ui.messages
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,7 +21,7 @@ import com.chat.compose.app.ui.NameAvatarImage
 fun SenderMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
     val messageItem = rememberUpdatedState(uiMessageItem)
 
-    val sessionContact by remember { derivedStateOf { messageItem.value.uiSessionContact } }
+    val sessionContact by remember { derivedStateOf { messageItem.value.uiRecentContact } }
     val message by remember { derivedStateOf { messageItem.value.uiMessage } }
 
     Row(

@@ -12,12 +12,11 @@ import com.application.channel.message.meta.MessageParser
 interface DBProvider {
 
     val userSessionId: String
-
     val isDatabaseAvailable: Boolean
 
     val sessionContactDatabaseApi: SessionContactDatabaseApi
-
     val messageDatabaseApi: MessageDatabaseApi
+    val recentContactDatabaseApi: RecentContactDatabaseApi
 
     suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.() -> T): T
 
@@ -30,9 +29,7 @@ interface DBProvider {
 internal fun DBProvider(
     database: AppMessageDatabase?,
     messageParser: MessageParser
-): DBProvider {
-    return DBProviderImpl(database, messageParser)
-}
+): DBProvider = DBProviderImpl(database, messageParser)
 
 private class DBProviderImpl(
     private val database: AppMessageDatabase?,
@@ -42,9 +39,9 @@ private class DBProviderImpl(
     override val userSessionId: String get() = this.database?.userSessionId ?: ""
     override val isDatabaseAvailable: Boolean get() = this.database != null
 
-    override val sessionContactDatabaseApi: SessionContactDatabaseApi =
-        SessionContactDatabaseApi(this.database, messageParser)
+    override val sessionContactDatabaseApi: SessionContactDatabaseApi = SessionContactDatabaseApi(this.database, messageParser)
     override val messageDatabaseApi: MessageDatabaseApi = MessageDatabaseApi(this.database, messageParser)
+    override val recentContactDatabaseApi: RecentContactDatabaseApi = RecentContactDatabaseApi(this.database, messageParser)
 
     override suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.() -> T): T {
         return requireNotNull(this.database).withTransaction(readOnly, block)

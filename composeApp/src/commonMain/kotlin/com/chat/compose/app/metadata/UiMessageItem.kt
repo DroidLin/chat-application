@@ -8,6 +8,6 @@ import androidx.compose.runtime.Immutable
  */
 @Immutable
 data class UiMessageItem(
-    val uiSessionContact: UiSessionContact?,
+    val uiRecentContact: UiRecentContact?,
     val uiMessage: UiMessage,
 )

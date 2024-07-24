@@ -17,8 +17,6 @@ import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.paging.collectAsLazyPagingItems
 import com.chat.compose.app.paging.itemContentType
 import com.chat.compose.app.paging.itemKey
-import com.chat.compose.app.router.LocalRouteAction
-import com.chat.compose.app.router.navigateToUserBasicInfo
 import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
 import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.framework.Box
@@ -118,7 +116,7 @@ fun SessionDetailScreen(
                             .fillParentMaxWidth(),
                         uiMessageItem = messageItem,
                         onAvatarClick = {
-                            val userId = messageItem.uiSessionContact?.sessionContactUserId
+                            val userId = messageItem.uiRecentContact?.sessionContactUserId
                             if (userId != null) navigateToUserBasicInfo(userId)
                         }
                     )

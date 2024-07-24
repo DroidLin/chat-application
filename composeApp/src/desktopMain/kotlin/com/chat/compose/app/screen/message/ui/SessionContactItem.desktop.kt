@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.chat.compose.app.metadata.UiSessionContact
+import com.chat.compose.app.metadata.UiRecentContact
 import com.chat.compose.app.ui.NameAvatarImage
 
 /**
@@ -26,7 +26,7 @@ import com.chat.compose.app.ui.NameAvatarImage
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 actual fun SessionContactItem(
-    value: UiSessionContact,
+    value: UiRecentContact,
     modifier: Modifier,
     onPrimaryMouseClick: () -> Unit,
     onSecondaryMouseClick: () -> Unit,

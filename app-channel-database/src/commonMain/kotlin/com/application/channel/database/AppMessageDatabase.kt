@@ -2,14 +2,11 @@ package com.application.channel.database
 
 import androidx.room.*
 import com.application.channel.database.dao.LocalMessageDao
+import com.application.channel.database.dao.LocalRecentContactDao
 import com.application.channel.database.dao.LocalSessionContactDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -23,6 +20,8 @@ interface AppMessageDatabase {
     val sessionContactDao: LocalSessionContactDao
 
     val messageDao: LocalMessageDao
+
+    val recentContactDao: LocalRecentContactDao
 
     suspend fun <T> withTransaction(readOnly: Boolean, block: suspend Transaction<T>.() -> T): T
 
@@ -53,8 +52,10 @@ private class AppMessageDatabaseImpl(
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
-    override val sessionContactDao: LocalSessionContactDao = this.database.sessionDao
-    override val messageDao: LocalMessageDao = this.database.messageDao
+    override val sessionContactDao: LocalSessionContactDao get() = this.database.sessionDao
+    override val messageDao: LocalMessageDao get() = this.database.messageDao
+    override val recentContactDao: LocalRecentContactDao = this.database.recentContactDao
+
     private val observerMapping: MutableMap<OnTableChangedObserver, InvalidationTracker.Observer> = ConcurrentHashMap()
 
     override suspend fun <T> withTransaction(
@@ -116,12 +117,13 @@ private class AppMessageDatabaseImpl(
         }
     }
 
-    private class EmptyTransaction<T>: AppMessageDatabase.Transaction<T> {
+    private class EmptyTransaction<T> : AppMessageDatabase.Transaction<T> {
         override suspend fun rollback(result: T) {
         }
     }
 
-    private class TransactionScopedTransaction<T>(private val transactionScope: TransactionScope<T>): AppMessageDatabase.Transaction<T> {
+    private class TransactionScopedTransaction<T>(private val transactionScope: TransactionScope<T>) :
+        AppMessageDatabase.Transaction<T> {
         override suspend fun rollback(result: T) {
             this.transactionScope.rollback(result)
         }

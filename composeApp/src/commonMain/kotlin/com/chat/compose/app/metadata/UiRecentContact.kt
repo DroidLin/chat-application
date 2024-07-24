@@ -8,7 +8,7 @@ import com.application.channel.message.SessionType
  * @since 2024/6/18 01:26
  */
 @Immutable
-data class UiSessionContact(
+data class UiRecentContact(
     val sessionId: String,
     val sessionType: SessionType,
     val sessionContactName: String,
