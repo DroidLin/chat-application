@@ -19,7 +19,10 @@ import kotlinx.coroutines.flow.map
  * @author liuzhongao
  * @since 2024/6/22 12:08
  */
-class FetchChatDetailListUseCase(private val fetchSessionContactUseCase: FetchSessionContactUseCase) {
+class FetchChatDetailListUseCase(
+    private val fetchRecentContactUseCase: FetchRecentContactUseCase,
+    private val fetchSessionContactUseCase: FetchSessionContactUseCase,
+) {
 
     fun openPagerListFlow(chatSession: ChatSession): Flow<PagingData<UiMessageItem>> {
         val chatSessionContext = chatSession.context
@@ -36,25 +39,25 @@ class FetchChatDetailListUseCase(private val fetchSessionContactUseCase: FetchSe
         )
             .flow
             .map { pagingData ->
-                val selfUserSessionContact = this.fetchSessionContactUseCase.fetchRecentContactOrCreate(
+                val selfUserSessionContact = this.fetchSessionContactUseCase.fetchSessionContactOrCreate(
                     sessionId = chatSessionContext.selfUserSessionId,
                     sessionType = SessionType.P2P
                 )?.toUiSessionContact()
-                val chatterSessionContact = this.fetchSessionContactUseCase.fetchRecentContact(
+                val chatterSessionContact = this.fetchSessionContactUseCase.fetchSessionContact(
                     sessionId = chatSessionContext.chatterSessionId,
                     sessionType = chatSessionContext.chatterSessionType
                 )?.toUiSessionContact()
                 pagingData.map { message ->
                     val isSenderMessage = message.sender.sessionId == chatSession.context.selfUserSessionId
                     val isReceiverMessage = message.sender.sessionId == chatSession.context.chatterSessionId || message.receiver.sessionId == chatSession.context.chatterSessionId
-                    val uiRecentContact = when {
+                    val uiSessionContact = when {
                         isSenderMessage && isReceiverMessage -> selfUserSessionContact
                         isSenderMessage -> selfUserSessionContact
                         isReceiverMessage -> chatterSessionContact
                         else -> null
                     }
                     UiMessageItem(
-                        uiRecentContact = uiRecentContact,
+                        uiSessionContact = uiSessionContact,
                         uiMessage = message.toUiMessage(
                             isSenderMessage = isSenderMessage,
                             isReceiverMessage = isReceiverMessage,

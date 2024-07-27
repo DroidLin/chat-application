@@ -9,12 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.application.channel.message.SessionType
 import com.chat.compose.app.di.koinViewModel
-import com.chat.compose.app.router.LocalRouteAction
+import com.chat.compose.app.route.LocalRouteAction
 import com.chat.compose.app.ui.NameAvatarImage
 import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.navigationComposable
@@ -61,7 +62,7 @@ fun UserBasicInfoScreen(
     LaunchedEffect(userId) {
         viewModel.fetchUserInfo(userId)
     }
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     val isLoading = remember { derivedStateOf { uiState.value.isLoading } }
     if (isLoading.value) {
@@ -85,6 +86,13 @@ fun UserBasicInfoScreen(
                 }
             }
         )
+
+        val sessionInfoAvailable = remember {
+            derivedStateOf {
+                val basicInfoUiState = uiState.value
+                basicInfoUiState.sessionId.isNotEmpty() && basicInfoUiState.sessionType != SessionType.Unknown
+            }
+        }
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
@@ -101,18 +109,20 @@ fun UserBasicInfoScreen(
             ) {
                 Text(text = basicInfoUiState.userName, style = MaterialTheme.typography.titleMedium)
             }
-            item(
-                key = "operations"
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            if (sessionInfoAvailable.value) {
+                item(
+                    key = "operations"
                 ) {
-                    FilledTonalButton(
-                        onClick = {
-                            navigateToChat(basicInfoUiState.sessionId, basicInfoUiState.sessionType)
-                        }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                     ) {
-                        Text(text = stringResource(Res.string.string_send_message_to_user))
+                        FilledTonalButton(
+                            onClick = {
+                                navigateToChat(basicInfoUiState.sessionId, basicInfoUiState.sessionType)
+                            }
+                        ) {
+                            Text(text = stringResource(Res.string.string_send_message_to_user))
+                        }
                     }
                 }
             }

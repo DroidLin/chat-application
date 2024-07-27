@@ -5,7 +5,7 @@ import com.application.channel.message.SessionType
 import com.application.channel.message.metadata.RecentContact
 import com.application.channel.message.metadata.SessionContact
 import com.chat.compose.app.metadata.UiRecentContact
-import com.chat.compose.app.metadata.toUiSessionContact
+import com.chat.compose.app.metadata.toUiRecentContact
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -23,11 +23,11 @@ val sessionContactV2 = SessionContact(
     sessionType = SessionType.P2P,
 )
 
-class FetchSessionListUseCase {
+class FetchRecentContactListUseCase {
 
-    val sessionList: Flow<List<UiRecentContact>>
+    val recentList: Flow<List<UiRecentContact>>
         get() = SingleIMManager.recentContact
-            .map { recentContacts -> recentContacts.map(RecentContact::toUiSessionContact) }
+            .map { recentContacts -> recentContacts.map(RecentContact::toUiRecentContact) }
             .map { recentContacts -> recentContacts.sortedByDescending { it.timestamp } }
             .distinctUntilChanged()
 }

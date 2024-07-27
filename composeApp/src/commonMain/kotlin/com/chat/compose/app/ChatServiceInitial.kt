@@ -75,3 +75,8 @@ private fun innerStartService(remoteAddress: String, account: Account) {
     )
     SingleIMManager.startService(initConfig)
 }
+
+fun stopChatService() {
+    SingleIMManager.stopService()
+    SingleIMManager.release()
+}

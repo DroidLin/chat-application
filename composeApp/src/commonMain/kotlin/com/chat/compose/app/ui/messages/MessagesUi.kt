@@ -12,7 +12,6 @@ import com.chat.compose.app.metadata.UiMessageItem
 fun MessageUi(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
     val messageItem = rememberUpdatedState(uiMessageItem)
 
-    val sessionContact by remember { derivedStateOf { messageItem.value.uiRecentContact } }
     val message by remember { derivedStateOf { messageItem.value.uiMessage } }
 
     val isSenderMessage by remember { derivedStateOf { message.isSenderMessage } }

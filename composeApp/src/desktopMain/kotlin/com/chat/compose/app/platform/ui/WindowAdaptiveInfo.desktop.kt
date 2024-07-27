@@ -1,4 +1,4 @@
-package com.chat.compose.app.ui
+package com.chat.compose.app.platform.ui
 
 import androidx.compose.material3.adaptive.Posture
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo

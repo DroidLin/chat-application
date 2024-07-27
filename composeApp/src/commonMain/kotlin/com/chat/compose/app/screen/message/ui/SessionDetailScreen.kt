@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -67,7 +68,7 @@ fun SessionDetailScreen(
     navigateToUserBasicInfo: (Long) -> Unit,
 ) {
     val viewModel: SessionDetailViewModel = koinViewModel()
-    val uiState = viewModel.state.collectAsState()
+    val uiState = viewModel.state.collectAsStateWithLifecycle()
 
     DisposableEffect(viewModel, sessionId, sessionType) {
         onDispose {
@@ -116,7 +117,7 @@ fun SessionDetailScreen(
                             .fillParentMaxWidth(),
                         uiMessageItem = messageItem,
                         onAvatarClick = {
-                            val userId = messageItem.uiRecentContact?.sessionContactUserId
+                            val userId = messageItem.uiSessionContact?.userId
                             if (userId != null) navigateToUserBasicInfo(userId)
                         }
                     )

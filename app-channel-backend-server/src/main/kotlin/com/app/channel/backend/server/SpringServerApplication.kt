@@ -16,4 +16,3 @@ class SpringServerApplication
 fun main(args: Array<String>) {
     runApplication<SpringServerApplication>(*args)
 }
-

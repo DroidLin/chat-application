@@ -7,13 +7,16 @@ import com.chat.compose.app.storage.MutableMapStorage
  * @since 2024/7/1 00:05
  */
 object PreferenceCenter {
+    private const val KEY_COOKIE = "cookieStorage"
+    private const val KEY_LOGIN_PREFERENCE = "loginPreference"
 
-    val imPreference = lazy { MutableMapStorage(KEY_IM_PREFERENCE) }
     val cookieStorage = lazy { MutableMapStorage(KEY_COOKIE) }
     val loginPreference = lazy { MutableMapStorage(KEY_LOGIN_PREFERENCE) }
     val userBasicPreference get() = lazy { MutableMapStorage(KEY_LOGIN_PREFERENCE) }
 
-    private const val KEY_IM_PREFERENCE = "imPreferences"
-    private const val KEY_COOKIE = "cookieStorage"
-    private const val KEY_LOGIN_PREFERENCE = "loginPreference"
+    fun logout() {
+        this.cookieStorage.value.clearAndFlush()
+        this.loginPreference.value.clearAndFlush()
+        this.userBasicPreference.value.clearAndFlush()
+    }
 }

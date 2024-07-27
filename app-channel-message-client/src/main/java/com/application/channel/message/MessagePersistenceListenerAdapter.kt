@@ -21,7 +21,6 @@ class MessagePersistenceListenerAdapter(
     private val coroutineContext: CoroutineContext = EmptyCoroutineContext
 ) : MessageReceiveListener {
 
-    private val coroutineMutex = Mutex(false)
     private val coroutineScope = CoroutineScope(
         context = if (this.coroutineContext == EmptyCoroutineContext) {
             Dispatchers.Default
@@ -40,13 +39,16 @@ class MessagePersistenceListenerAdapter(
             message.sender.sessionId
         } else return
 
-        val sessionContactDao = databaseProvider.sessionContactDatabaseApi
-        val messageApi = databaseProvider.messageDatabaseApi
         this.coroutineScope.launch {
-            this@MessagePersistenceListenerAdapter.coroutineMutex.withLock {
-                sessionContactDao.accessToSessionContact(sessionId, message.sessionType)
-                messageApi.insertMessage(message)
-            }
+            databaseProvider.persistMessageAndContact(sessionId, message)
+        }
+    }
+
+    private suspend fun DBProvider.persistMessageAndContact(userSessionId: String, message: Message) {
+        withTransaction(false) {
+            sessionContactDatabaseApi.accessToSessionContact(userSessionId, message.sessionType)
+            recentContactDatabaseApi.accessToRecentContact(userSessionId, message.sessionType)
+            messageDatabaseApi.insertMessage(message)
         }
     }
 }

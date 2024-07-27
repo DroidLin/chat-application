@@ -143,6 +143,10 @@ private class MsgServiceImpl : MsgService {
 
     override suspend fun insertRecentContact(sessionId: String, sessionType: SessionType) {
         val recentContact = RecentContact(sessionId, sessionType)
+        this.insertRecentContact(recentContact)
+    }
+
+    override suspend fun insertRecentContact(recentContact: RecentContact) {
         this.messageRepository.insertRecentContact(recentContact)
     }
 

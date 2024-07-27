@@ -132,6 +132,7 @@ private class MsgConnectionServiceImpl : MsgConnectionService {
 
     override fun release() {
         this.globalMessageReceiveListener.clear()
+        this.databaseInitConfig = null
         this.initConfig = null
         this.stopService()
         this.chatService.release()

@@ -15,9 +15,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
+import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
+import com.chat.compose.app.ui.homeNavigationComposable
 import com.github.droidlin.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -26,12 +30,21 @@ import org.jetbrains.compose.resources.stringResource
  * @author liuzhongao
  * @since 2024/6/25 00:19
  */
+fun NavGraphBuilder.loginScreen(loginComplete: () -> Unit) {
+    homeNavigationComposable(
+        route = NavRoute.LoginRoute.Login.route
+    ) {
+        LoginScreen(loginComplete)
+    }
+}
+
+
 @Composable
 fun LoginScreen(
     loginComplete: () -> Unit,
 ) {
     val viewModel = koinViewModel<LoginViewModel>()
-    val uiState = viewModel.state.collectAsState()
+    val uiState = viewModel.state.collectAsStateWithLifecycle()
 
     val launchLogin = {
         viewModel.launchLogin(loginComplete)

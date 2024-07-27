@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface LocalRecentContactDao {
 
+    @Upsert
+    suspend fun upsert(contact: LocalRecentContact)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(contact: LocalRecentContact)
 

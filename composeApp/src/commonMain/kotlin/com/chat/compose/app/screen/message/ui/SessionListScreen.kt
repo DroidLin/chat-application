@@ -8,10 +8,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.metadata.UiRecentContact
@@ -41,18 +41,15 @@ fun NavGraphBuilder.sessionListScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SessionListScreen(
+    modifier: Modifier = Modifier,
     sessionItemClick: (UiRecentContact) -> Unit = {},
     navigateToSearch: () -> Unit = {}
 ) {
     val viewModel: SessionListViewModel = koinViewModel()
-    val sessionListState = remember(viewModel) { viewModel.sessionList }.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.updateSessionContactInfo()
-    }
+    val sessionListState = remember(viewModel) { viewModel.recentContactList }.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
     ) {
         TopAppBar(

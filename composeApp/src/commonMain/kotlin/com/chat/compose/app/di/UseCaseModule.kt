@@ -1,9 +1,6 @@
 package com.chat.compose.app.di
 
 import com.chat.compose.app.usecase.*
-import com.chat.compose.app.usecase.network.LoginUserUseCase
-import com.chat.compose.app.usecase.network.RegistrationUseCase
-import com.chat.compose.app.usecase.network.UserAccountCheckForRegistrationUseCase
 import org.koin.dsl.module
 
 /**
@@ -13,9 +10,12 @@ import org.koin.dsl.module
 val useCaseModule = module {
     factory { OpenChatSessionUseCase(get()) }
     factory { CloseSessionUseCase(get()) }
+    factory { FetchRecentContactUseCase(get(), get(), get()) }
     factory { FetchSessionContactUseCase(get(), get(), get()) }
-    factory { FetchSessionListUseCase() }
-    factory { FetchChatDetailListUseCase(get()) }
+    factory { FetchRecentContactListUseCase() }
+    factory { FetchChatDetailListUseCase(get(), get()) }
     factory { UpdateSessionContactUserBasicInfoUseCase(get()) }
     factory { SearchHistoryUseCase() }
+    factory { InsertSessionContactUseCase(get()) }
+    factory { InsertRecentContactUseCase(get()) }
 }

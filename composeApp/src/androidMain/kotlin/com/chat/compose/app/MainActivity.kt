@@ -9,7 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
-import com.chat.compose.app.screen.FrameworkScreen
+import com.chat.compose.app.platform.ui.FrameworkScreen
+import com.chat.compose.app.platform.ui.WindowAdaptiveInfoProvider
 import com.chat.compose.app.ui.AndroidMaterialTheme
 import com.chat.compose.app.ui.AppSafeArea
 import com.chat.compose.app.ui.LocalAppSafeArea
@@ -25,12 +26,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             CompositionLocalProvider(
                 LocalActivity provides this,
-                LocalAppSafeArea provides remember { AppSafeArea() },
+                LocalAppSafeArea provides remember { AppSafeArea() }
             ) {
-                AndroidMaterialTheme(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    FrameworkScreen()
+                WindowAdaptiveInfoProvider {
+                    AndroidMaterialTheme(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        FrameworkScreen()
+                    }
                 }
             }
         }

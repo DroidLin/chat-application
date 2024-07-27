@@ -1,4 +1,4 @@
-package com.chat.compose.app.router
+package com.chat.compose.app.route
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -24,7 +24,7 @@ interface RouteAction {
 }
 
 @Composable
-expect fun rememberRouterAction(): RouteAction
+expect fun rememberRouteAction(): RouteAction
 
 @Composable
 fun RouteAction.RouteActionProvider(content: @Composable () -> Unit) {

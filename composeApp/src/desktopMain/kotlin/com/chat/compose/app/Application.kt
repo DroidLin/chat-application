@@ -20,11 +20,7 @@ fun main() {
             LocalApplicationConfiguration provides appConfiguration,
             LocalAppSafeArea provides appSafeArea,
         ) {
-            val profileState = koinInject<ProfileService>().profileFlow.collectAsState()
-            val isLogin = remember { derivedStateOf { profileState.value.isValid } }
-            if (isLogin.value) {
-                AppWindow(::exitApplication)
-            } else LoginWindow(::exitApplication)
+            AppWindow(::exitApplication)
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.chat.compose.app.di
 
-import com.chat.compose.app.screen.framework.FrameworkViewModel
+import com.chat.compose.app.screen.framework.AppViewModel
 import com.chat.compose.app.screen.login.LoginViewModel
 import com.chat.compose.app.screen.login.RegisterAccountViewModel
 import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
@@ -22,7 +22,7 @@ val viewModelModule = module {
     factory { RegisterAccountViewModel(get(), get(), get(), get()) }
     factory { SearchLauncherViewModel(get()) }
     factory { SearchResultViewModel(get()) }
-    factory { UserBasicInfoViewModel(get(), get()) }
+    factory { UserBasicInfoViewModel(get(), get(), get(), get(), get(), get()) }
     factory { PersonalInfoViewModel(get()) }
-    factory { FrameworkViewModel() }
+    factory { AppViewModel() }
 }

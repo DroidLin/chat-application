@@ -3,15 +3,15 @@ package com.chat.compose.app
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import com.chat.compose.app.screen.FrameworkScreen
-import com.chat.compose.app.ui.*
+import com.chat.compose.app.platform.ui.FrameworkScreen
+import com.chat.compose.app.platform.ui.WindowAdaptiveInfoProvider
+import com.chat.compose.app.ui.DesktopMaterialTheme
 
 /**
  * @author liuzhongao
@@ -35,17 +35,17 @@ fun AppWindow(
         title = appConfiguration.title,
         state = windowState
     ) {
-        CompositionLocalProvider(LocalWindow provides this.window, LocalWindowState provides windowState) {
-            DesktopMaterialTheme(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                FrameworkScreen()
+        CompositionLocalProvider(
+            LocalWindow provides this.window,
+            LocalWindowState provides windowState
+        ) {
+            WindowAdaptiveInfoProvider {
+                DesktopMaterialTheme(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    FrameworkScreen()
+                }
             }
         }
     }
-}
-
-@Composable
-fun LoginWindow(onCloseRequest: () -> Unit) {
-
 }

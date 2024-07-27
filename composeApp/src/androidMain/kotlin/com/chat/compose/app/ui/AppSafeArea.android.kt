@@ -8,6 +8,8 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowWidthSizeClass
+import com.chat.compose.app.platform.ui.LocalWindowAdaptiveInfo
 
 /**
  * @author liuzhongao
@@ -34,7 +36,13 @@ actual fun Modifier.applyAppSafeArea(): Modifier = composed {
 
 @Stable
 actual fun Modifier.appSafeAreaPadding(): Modifier = composed {
+    val windowAdaptiveInfo = LocalWindowAdaptiveInfo.current
     val appSafeArea = LocalAppSafeArea.current
-    val height = remember { derivedStateOf { appSafeArea.navigationHeight } }
-    padding(bottom = height.value)
+    if (windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED) {
+        val width = remember { derivedStateOf { appSafeArea.navigationWidth } }
+        padding(start = width.value)
+    } else {
+        val height = remember { derivedStateOf { appSafeArea.navigationHeight } }
+        padding(bottom = height.value)
+    }
 }

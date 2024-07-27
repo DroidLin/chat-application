@@ -7,4 +7,9 @@
 	<string name="login_input_password">密码</string>
 
 	<string name="string_logout_label">退出登录</string>
+
+	<string name="string_title_confirm_logout">确定要退出吗？</string>
+	<string name="string_all_personal_information_will_delete">所有的个人信息将被清除</string>
+	<string name="string_confirm">确定</string>
+	<string name="string_cancel">取消</string>
 </resources>

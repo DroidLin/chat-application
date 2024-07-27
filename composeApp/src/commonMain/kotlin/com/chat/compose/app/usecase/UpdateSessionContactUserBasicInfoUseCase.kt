@@ -11,7 +11,21 @@ import com.chat.compose.app.util.toJson
  */
 class UpdateSessionContactUserBasicInfoUseCase(private val msgService: MsgService) {
 
-    suspend fun updateContactUserInfo(userInfoList: List<Profile>) {
+    suspend fun updateRecentContactProfile(userInfoList: List<Profile>) {
+        this.msgService.withTransaction(readOnly = false) { msgService ->
+            userInfoList.forEach { profile ->
+                val sessionInfo = profile.sessionInfo ?: return@forEach
+                val sessionId = sessionInfo.sessionId ?: return@forEach
+                val sessionType = sessionInfo.sessionType
+                val profileJSONString = profile.toJson()
+                msgService.updateRecentContact(sessionId, sessionType) {
+                    this.userInfoString = profileJSONString
+                }
+            }
+        }
+    }
+
+    suspend fun updateSessionContactProfile(userInfoList: List<Profile>) {
         this.msgService.withTransaction(readOnly = false) { msgService ->
             userInfoList.forEach { profile ->
                 val sessionInfo = profile.sessionInfo ?: return@forEach
@@ -19,9 +33,6 @@ class UpdateSessionContactUserBasicInfoUseCase(private val msgService: MsgServic
                 val sessionType = sessionInfo.sessionType
                 val profileJSONString = profile.toJson()
                 msgService.updateSessionContact(sessionId, sessionType) {
-                    this.userInfoString = profileJSONString
-                }
-                msgService.updateRecentContact(sessionId, sessionType) {
                     this.userInfoString = profileJSONString
                 }
             }

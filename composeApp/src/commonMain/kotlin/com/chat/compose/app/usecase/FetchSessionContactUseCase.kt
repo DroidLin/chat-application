@@ -2,7 +2,6 @@ package com.chat.compose.app.usecase
 
 import com.application.channel.im.MsgService
 import com.application.channel.message.SessionType
-import com.application.channel.message.metadata.RecentContact
 import com.application.channel.message.metadata.SessionContact
 import com.chat.compose.app.usecase.network.FetchUserInfoUseCase
 import kotlinx.coroutines.flow.Flow
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 
 /**
  * @author liuzhongao
- * @since 2024/6/20 21:43
+ * @since 2024/7/26 21:17
  */
 class FetchSessionContactUseCase(
     private val msgService: MsgService,
@@ -19,33 +18,33 @@ class FetchSessionContactUseCase(
     private val updateSessionContactUserBasicInfoUseCase: UpdateSessionContactUserBasicInfoUseCase
 ) {
 
-    suspend fun fetchRecentContact(sessionId: String, sessionType: SessionType): RecentContact? {
-        return this.msgService.fetchRecentContact(sessionId, sessionType)
+    suspend fun fetchSessionContact(sessionId: String, sessionType: SessionType): SessionContact? {
+        return this.msgService.fetchSessionContact(sessionId, sessionType)
     }
 
-    suspend fun fetchRecentContactOrCreate(sessionId: String, sessionType: SessionType): RecentContact? {
-        val sessionContact = this.msgService.fetchRecentContact(sessionId, sessionType)
+    suspend fun fetchSessionContactOrCreate(sessionId: String, sessionType: SessionType): SessionContact? {
+        val sessionContact = this.msgService.fetchSessionContact(sessionId, sessionType)
         if (sessionContact == null) {
-            this@FetchSessionContactUseCase.msgService.insertRecentContact(sessionId, sessionType)
+            this@FetchSessionContactUseCase.msgService.insertSessionContact(sessionId, sessionType)
             val profileList = this@FetchSessionContactUseCase.fetchUserInfoUseCase.fetchProfileBySessionId(listOf(sessionId))
-            this@FetchSessionContactUseCase.updateSessionContactUserBasicInfoUseCase.updateContactUserInfo(profileList)
+            this@FetchSessionContactUseCase.updateSessionContactUserBasicInfoUseCase.updateSessionContactProfile(profileList)
         }
-        return this.msgService.fetchRecentContact(sessionId, sessionType)
+        return this.msgService.fetchSessionContact(sessionId, sessionType)
     }
 
-    fun fetchObservableRecentContact(sessionId: String, sessionType: SessionType): Flow<RecentContact?> {
-        return this.msgService.fetchRecentContactFlow(sessionId, sessionType)
+    fun fetchObservableSessionContact(sessionId: String, sessionType: SessionType): Flow<SessionContact?> {
+        return this.msgService.fetchObservableSessionContact(sessionId, sessionType)
     }
 
-    fun fetchObservableRecentContactOrCreate(sessionId: String, sessionType: SessionType): Flow<RecentContact> {
+    fun fetchObservableSessionContactOrCreate(sessionId: String, sessionType: SessionType): Flow<SessionContact> {
         return flow {
-            val sessionContact = this@FetchSessionContactUseCase.fetchRecentContact(sessionId, sessionType)
+            val sessionContact = this@FetchSessionContactUseCase.fetchSessionContact(sessionId, sessionType)
             if (sessionContact == null) {
                 this@FetchSessionContactUseCase.msgService.insertSessionContact(sessionId, sessionType)
                 val profileList = this@FetchSessionContactUseCase.fetchUserInfoUseCase.fetchProfileBySessionId(listOf(sessionId))
-                this@FetchSessionContactUseCase.updateSessionContactUserBasicInfoUseCase.updateContactUserInfo(profileList)
+                this@FetchSessionContactUseCase.updateSessionContactUserBasicInfoUseCase.updateSessionContactProfile(profileList)
             }
-            this@FetchSessionContactUseCase.fetchObservableRecentContact(sessionId, sessionType)
+            this@FetchSessionContactUseCase.fetchObservableSessionContact(sessionId, sessionType)
                 .filterNotNull()
                 .collect(this)
         }

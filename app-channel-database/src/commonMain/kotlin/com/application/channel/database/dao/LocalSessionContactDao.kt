@@ -14,7 +14,7 @@ interface LocalSessionContactDao {
     @Upsert
     suspend fun upsertSessionContact(sessionContact: LocalSessionContact)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert
     suspend fun insertSessionContact(sessionContact: LocalSessionContact)
 
     @Update

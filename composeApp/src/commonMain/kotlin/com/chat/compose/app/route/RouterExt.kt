@@ -1,4 +1,4 @@
-package com.chat.compose.app.router
+package com.chat.compose.app.route
 
 import androidx.navigation.navOptions
 import com.application.channel.core.util.koinInject

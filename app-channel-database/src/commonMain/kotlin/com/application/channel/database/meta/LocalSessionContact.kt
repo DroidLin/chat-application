@@ -11,11 +11,7 @@ import com.application.channel.database.LocalSessionContactTable
  * @since 2024/6/8 20:01
  */
 @Entity(
-    tableName = LocalSessionContactTable.TABLE_NAME,
-    indices = [
-        Index(value = [LocalSessionContactTable.SESSION_ID], unique = true),
-        Index(value = [LocalSessionContactTable.SESSION_TYPE_CODE], unique = true)
-    ]
+    tableName = LocalSessionContactTable.TABLE_NAME
 )
 data class LocalSessionContact(
     @PrimaryKey

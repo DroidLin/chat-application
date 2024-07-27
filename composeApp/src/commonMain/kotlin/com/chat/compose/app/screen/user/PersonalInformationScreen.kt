@@ -9,12 +9,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.metadata.Profile
 import com.chat.compose.app.metadata.isValid
 import com.chat.compose.app.ui.NameAvatarImage
 import com.chat.compose.app.ui.NavRoute
+import com.chat.compose.app.ui.appSafeAreaPadding
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.framework.Row
@@ -45,10 +47,12 @@ fun PersonalInformationScreen(
     onConfirmLogout: () -> Unit,
 ) {
     val viewModel = koinViewModel<PersonalInfoViewModel>()
-    val uiState = viewModel.uiState.collectAsState()
-    val userInfo = viewModel.userProfile.collectAsState()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val userInfo = viewModel.userProfile.collectAsStateWithLifecycle()
 
-    Column {
+    Column(
+        modifier = Modifier.appSafeAreaPadding()
+    ) {
         TopAppBar(
             title = {
                 Text(stringResource(Res.string.string_personal_info_title))
@@ -110,11 +114,22 @@ private fun LazyListContent(
             item(
                 key = "personal_info_item_logout"
             ) {
+                var showConfirmDialog by remember { mutableStateOf(false) }
                 Button(
-                    onClick = onConfirmLogout
+                    onClick = { showConfirmDialog = true }
                 ) {
                     Text(text = stringResource(Res.string.string_logout_label))
                 }
+                LogoutConfirmDialog(
+                    enable = showConfirmDialog,
+                    onConfirm = {
+                        onConfirmLogout()
+                        showConfirmDialog = false
+                    },
+                    onDismiss = {
+                        showConfirmDialog = false
+                    }
+                )
             }
         }
     }

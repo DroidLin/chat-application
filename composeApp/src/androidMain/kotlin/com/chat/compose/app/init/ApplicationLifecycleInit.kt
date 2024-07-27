@@ -9,6 +9,7 @@ import com.chat.compose.app.lifecycle.ApplicationLifecycleObserver
 import com.chat.compose.app.lifecycle.ApplicationLifecycleRegistry
 import com.chat.compose.app.metadata.Profile
 import com.chat.compose.app.services.ProfileService
+import com.chat.compose.app.util.PreferenceCenter
 
 /**
  * @author liuzhongao
@@ -24,6 +25,7 @@ fun initApplicationLifecycleObserver(applicationContext: Context) {
 
         override suspend fun onUserLogout() {
             AndroidChatService.stop(applicationContext)
+            PreferenceCenter.logout()
             koinInject<ProfileService>().logout()
         }
 

@@ -1,4 +1,4 @@
-package com.chat.compose.app.router
+package com.chat.compose.app.route
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
  * @since 2024/6/21 11:24
  */
 @Composable
-actual fun rememberRouterAction(): RouteAction {
+actual fun rememberRouteAction(): RouteAction {
     val navigator = rememberNavController()
     return remember(navigator) { RouteActionImpl(navigator) }
 }

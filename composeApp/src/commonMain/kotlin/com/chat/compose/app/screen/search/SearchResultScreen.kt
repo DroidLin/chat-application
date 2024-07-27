@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -58,11 +59,11 @@ fun SearchResultScreen(
     val inputText = rememberUpdatedState(keyword)
     val viewModel = koinViewModel<SearchResultViewModel>()
 
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     val resultState = remember(viewModel, inputText.value) {
         viewModel.searchComplexFlow(query = inputText.value)
-    }.collectAsState()
+    }.collectAsStateWithLifecycle()
 
     Column {
         TopAppBar(

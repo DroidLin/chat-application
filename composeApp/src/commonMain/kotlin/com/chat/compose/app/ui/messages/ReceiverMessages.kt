@@ -2,6 +2,7 @@ package com.chat.compose.app.ui.messages
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,7 +23,7 @@ import com.chat.compose.app.ui.NameAvatarImage
 fun ReceiverMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
     val messageItem = rememberUpdatedState(uiMessageItem)
 
-    val sessionContact by remember { derivedStateOf { messageItem.value.uiRecentContact } }
+    val sessionContact by remember { derivedStateOf { messageItem.value.uiSessionContact } }
     val message by remember { derivedStateOf { messageItem.value.uiMessage } }
 
     Row(
@@ -31,7 +32,7 @@ fun ReceiverMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modif
         horizontalArrangement = Arrangement.Start
     ) {
         NameAvatarImage(
-            name = sessionContact?.sessionContactName ?: "",
+            name = sessionContact?.userName ?: "",
             modifier = Modifier,
             onClick = onAvatarClick
         )
@@ -59,14 +60,14 @@ private fun TextUiMessageItem(uiMessage: TextUiMessage, modifier: Modifier = Mod
             modifier = Modifier.heightIn(min = 48.dp),
             contentAlignment = Alignment.Center
         ) {
-//            SelectionContainer {
+            SelectionContainer {
                 val textContent by remember { derivedStateOf { message.textContent } }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                     text = textContent,
                     style = MaterialTheme.typography.bodyMedium,
                 )
-//            }
+            }
         }
     }
 }

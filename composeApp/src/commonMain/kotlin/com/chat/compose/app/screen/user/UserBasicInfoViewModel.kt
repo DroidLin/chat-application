@@ -2,7 +2,8 @@ package com.chat.compose.app.screen.user
 
 import androidx.lifecycle.ViewModel
 import com.application.channel.message.SessionType
-import com.chat.compose.app.usecase.UpdateSessionContactUserBasicInfoUseCase
+import com.chat.compose.app.metadata.Profile
+import com.chat.compose.app.usecase.*
 import com.chat.compose.app.usecase.network.FetchUserInfoUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,11 @@ import kotlinx.coroutines.flow.update
  */
 class UserBasicInfoViewModel(
     private val fetchUserInfoUseCase: FetchUserInfoUseCase,
-    private val updateSessionContactUserBasicInfoUseCase: UpdateSessionContactUserBasicInfoUseCase
+    private val fetchSessionContactUseCase: FetchSessionContactUseCase,
+    private val fetchRecentContactUseCase: FetchRecentContactUseCase,
+    private val updateSessionContactUserBasicInfoUseCase: UpdateSessionContactUserBasicInfoUseCase,
+    private val insertSessionContactUseCase: InsertSessionContactUseCase,
+    private val insertRecentContactUseCase: InsertRecentContactUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UserBasicInfoUiState())
@@ -24,6 +29,11 @@ class UserBasicInfoViewModel(
         this._uiState.update { it.copy(isLoading = true) }
         val profile = this.fetchUserInfoUseCase.fetchProfile(userId = userId)
         if (profile != null) {
+            val sessionId = profile.sessionInfo?.sessionId
+            val sessionType = profile.sessionInfo?.sessionType
+            if (!sessionId.isNullOrEmpty() && sessionType != null) {
+                this.updateUserBasicContact(sessionId, sessionType, profile)
+            }
             this._uiState.update {
                 it.copy(
                     userName = profile.userInfo?.userName ?: "",
@@ -36,6 +46,24 @@ class UserBasicInfoViewModel(
         this._uiState.update { it.copy(isLoading = false) }
     }
 
+    private suspend fun updateUserBasicContact(sessionId: String, sessionType: SessionType, profile: Profile) {
+        val profileList = listOf(profile)
+
+        val sessionContactExist = (this.fetchSessionContactUseCase.fetchSessionContact(sessionId, sessionType) ?: run {
+            this.insertSessionContactUseCase.insertSessionContact(sessionId, sessionType)
+            this.fetchSessionContactUseCase.fetchSessionContact(sessionId, sessionType)
+        }) != null
+        if (sessionContactExist) {
+            this.updateSessionContactUserBasicInfoUseCase.updateSessionContactProfile(profileList)
+        }
+        val recentContactExist = (this.fetchRecentContactUseCase.fetchRecentContact(sessionId, sessionType) ?: run {
+            this.insertRecentContactUseCase.insertRecentContact(sessionId, sessionType)
+            this.fetchRecentContactUseCase.fetchRecentContact(sessionId, sessionType)
+        }) != null
+        if (recentContactExist) {
+            this.updateSessionContactUserBasicInfoUseCase.updateRecentContactProfile(profileList)
+        }
+    }
 }
 
 data class UserBasicInfoUiState(

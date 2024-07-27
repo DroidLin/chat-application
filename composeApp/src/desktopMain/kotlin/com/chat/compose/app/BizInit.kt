@@ -2,11 +2,14 @@ package com.chat.compose.app
 
 import com.android.dependencies.common.ComponentFacade
 import com.application.channel.core.client.TcpClientModule
+import com.application.channel.core.util.koinInject
 import com.application.channel.message.ChatServiceModule
 import com.chat.compose.app.di.*
 import com.chat.compose.app.lifecycle.ApplicationLifecycleObserver
 import com.chat.compose.app.lifecycle.ApplicationLifecycleRegistry
 import com.chat.compose.app.metadata.Profile
+import com.chat.compose.app.services.ProfileService
+import com.chat.compose.app.util.PreferenceCenter
 import org.koin.core.context.startKoin
 
 /**
@@ -33,7 +36,9 @@ private fun initApplicationLifecycleObserver() {
             }
 
             override suspend fun onUserLogout() {
-
+                stopChatService()
+                PreferenceCenter.logout()
+                koinInject<ProfileService>().logout()
             }
 
             override suspend fun onFirstFrameComplete() {

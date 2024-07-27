@@ -17,17 +17,17 @@ import org.jetbrains.compose.resources.StringResource
  * @author liuzhongao
  * @since 2024/7/21 19:13
  */
-class FrameworkViewModel : ViewModel() {
+class AppViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(FrameworkUiState())
+    private val _uiState = MutableStateFlow(AppUiState())
     val uiState = this._uiState.asStateFlow()
 
-    fun switchNavigationTo(enum: FrameworkHomeEnum) {
+    fun switchNavigationTo(enum: AppHomeEnum) {
         this._uiState.update { it.copy(homeEnum = enum) }
     }
 }
 
-enum class FrameworkHomeEnum(
+enum class AppHomeEnum(
     val icon: ImageVector,
     val title: StringResource
 ) {
@@ -41,6 +41,6 @@ enum class FrameworkHomeEnum(
     );
 }
 
-data class FrameworkUiState(
-    val homeEnum: FrameworkHomeEnum = FrameworkHomeEnum.Message,
+data class AppUiState(
+    val homeEnum: AppHomeEnum = AppHomeEnum.Message,
 )

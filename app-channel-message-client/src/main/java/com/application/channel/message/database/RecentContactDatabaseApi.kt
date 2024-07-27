@@ -4,6 +4,8 @@ import com.application.channel.database.AppMessageDatabase
 import com.application.channel.database.LocalMessageTable
 import com.application.channel.database.LocalRecentContactTable
 import com.application.channel.database.OnTableChangedObserver
+import com.application.channel.database.meta.LocalRecentContact
+import com.application.channel.database.meta.LocalSessionContact
 import com.application.channel.message.SessionType
 import com.application.channel.message.meta.MessageParser
 import com.application.channel.message.metadata.RecentContact
@@ -18,6 +20,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  * @since 2024/7/24 23:20
  */
 interface RecentContactDatabaseApi {
+
+    suspend fun accessToRecentContact(sessionId: String, sessionType: SessionType)
 
     fun fetchRecentContactFlow(limit: Int): Flow<List<RecentContact>>
     suspend fun fetchRecentContacts(limit: Int): List<RecentContact>
@@ -41,6 +45,14 @@ private class RecentContactDatabaseImpl(
     private val database: AppMessageDatabase?,
     private val messageParser: MessageParser,
 ) : RecentContactDatabaseApi {
+
+    override suspend fun accessToRecentContact(sessionId: String, sessionType: SessionType) {
+        val database = this.database ?: return
+        val recentContact = database.recentContactDao.fetchRecentContact(sessionId, sessionType.value)
+        if (recentContact != null) return
+        val newRecentContact = LocalRecentContact(sessionId, sessionType.value, System.currentTimeMillis(), null)
+        database.recentContactDao.upsert(newRecentContact)
+    }
 
     override fun fetchRecentContactFlow(limit: Int): Flow<List<RecentContact>> {
         val database = this.database ?: return flowOf(emptyList())

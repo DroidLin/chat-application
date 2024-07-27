@@ -13,18 +13,6 @@ import com.application.channel.database.LocalSessionContactTable
  */
 @Entity(
     tableName = LocalRecentContactTable.TABLE_NAME,
-    foreignKeys = [
-        ForeignKey(
-            entity = LocalSessionContact::class,
-            parentColumns = [LocalSessionContactTable.SESSION_ID],
-            childColumns = [LocalRecentContactTable.RECENT_SESSION_ID]
-        ),
-        ForeignKey(
-            entity = LocalSessionContact::class,
-            parentColumns = [LocalSessionContactTable.SESSION_TYPE_CODE],
-            childColumns = [LocalRecentContactTable.RECENT_SESSION_TYPE_CODE]
-        )
-    ]
 )
 data class LocalRecentContact(
     @PrimaryKey(autoGenerate = false)

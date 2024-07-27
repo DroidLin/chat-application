@@ -99,9 +99,9 @@ private class SessionContactDatabaseImpl(
     override suspend fun accessToSessionContact(sessionId: String, sessionType: SessionType) {
         val database = this.database ?: return
         val sessionContact = database.sessionContactDao.fetchSessionContact(sessionId, sessionType.value)
-            ?.copy(lastModifyTimestamp = System.currentTimeMillis())
-            ?: LocalSessionContact(sessionId, sessionType.value, System.currentTimeMillis())
-        database.sessionContactDao.upsertSessionContact(sessionContact)
+        if (sessionContact != null) return
+        val newSessionContact = LocalSessionContact(sessionId, sessionType.value, System.currentTimeMillis())
+        database.sessionContactDao.upsertSessionContact(newSessionContact)
     }
 
     override suspend fun fetchRecentSessionContact(limit: Int): List<SessionContact> {

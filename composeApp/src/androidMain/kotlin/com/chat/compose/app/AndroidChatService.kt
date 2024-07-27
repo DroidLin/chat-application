@@ -49,6 +49,7 @@ class AndroidChatService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopForeground(STOP_FOREGROUND_REMOVE)
+        stopChatService()
     }
 
     companion object {

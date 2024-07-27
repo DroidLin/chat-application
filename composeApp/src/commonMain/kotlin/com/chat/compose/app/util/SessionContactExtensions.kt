@@ -2,6 +2,7 @@ package com.chat.compose.app.util
 
 import com.application.channel.im.userInfoString
 import com.application.channel.message.metadata.RecentContact
+import com.application.channel.message.metadata.SessionContact
 import com.chat.compose.app.metadata.Profile
 
 /**
@@ -9,4 +10,7 @@ import com.chat.compose.app.metadata.Profile
  * @since 2024/7/13 11:39
  */
 val RecentContact.profile: Profile?
+    get() = kotlin.runCatching { fromJson<Profile>(this.userInfoString) }.getOrNull()
+
+val SessionContact.profile: Profile?
     get() = kotlin.runCatching { fromJson<Profile>(this.userInfoString) }.getOrNull()

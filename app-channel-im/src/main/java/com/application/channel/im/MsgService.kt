@@ -57,6 +57,7 @@ interface MsgService {
 
     // RecentContacts
     suspend fun insertRecentContact(sessionId: String, sessionType: SessionType)
+    suspend fun insertRecentContact(recentContact: RecentContact)
 
     fun fetchRecentContactFlow(sessionId: String, sessionType: SessionType): Flow<RecentContact?>
     suspend fun fetchRecentContact(sessionId: String, sessionType: SessionType): RecentContact?

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.ui.NavRoute
@@ -61,7 +62,7 @@ fun SearchLauncherScreen(
     navigateToSearchResult: (String) -> Unit = {},
 ) {
     val viewModel = koinViewModel<SearchLauncherViewModel>()
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     val searchDefault = {
         viewModel.onSearch()
@@ -175,7 +176,7 @@ fun SearchLauncherScreen(
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                val historyConfig by viewModel.historyConfig.collectAsState()
+                val historyConfig by viewModel.historyConfig.collectAsStateWithLifecycle()
                 historyConfig.forEach { config ->
                     AssistChip(
                         onClick = {

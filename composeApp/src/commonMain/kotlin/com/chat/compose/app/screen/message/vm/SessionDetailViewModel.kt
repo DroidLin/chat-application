@@ -9,10 +9,10 @@ import com.application.channel.im.session.ChatSession
 import com.application.channel.message.SessionType
 import com.application.channel.message.metadata.RecentContact
 import com.chat.compose.app.metadata.UiMessageItem
-import com.chat.compose.app.metadata.toUiSessionContact
+import com.chat.compose.app.metadata.toUiRecentContact
 import com.chat.compose.app.usecase.CloseSessionUseCase
 import com.chat.compose.app.usecase.FetchChatDetailListUseCase
-import com.chat.compose.app.usecase.FetchSessionContactUseCase
+import com.chat.compose.app.usecase.FetchRecentContactUseCase
 import com.chat.compose.app.usecase.OpenChatSessionUseCase
 import com.chat.compose.app.util.collect
 import com.chat.compose.app.util.mainCoroutineScope
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 class SessionDetailViewModel constructor(
     private val openChatSessionUseCase: OpenChatSessionUseCase,
     private val closeSessionUseCase: CloseSessionUseCase,
-    private val fetchSessionContactUseCase: FetchSessionContactUseCase,
+    private val fetchRecentContactUseCase: FetchRecentContactUseCase,
     private val fetchChatDetailListUseCase: FetchChatDetailListUseCase,
 ) : ViewModel() {
 
@@ -44,7 +44,7 @@ class SessionDetailViewModel constructor(
 
     fun openSession(sessionId: String, sessionType: SessionType): StateFlow<PagingData<UiMessageItem>> {
         this.observerJob?.cancel()
-        this.observerJob = this.fetchSessionContactUseCase
+        this.observerJob = this.fetchRecentContactUseCase
             .fetchObservableRecentContactOrCreate(sessionId, sessionType)
             .onFirst { recentContact ->
                 val draftMessage = recentContact.draftMessage
@@ -52,11 +52,11 @@ class SessionDetailViewModel constructor(
                     this._state.update { it.copy(inputText = draftMessage) }
                 }
             }
-            .map { sessionContact -> sessionContact.toUiSessionContact() }
+            .map { recentContact -> recentContact.toUiRecentContact() }
             .filterNotNull()
             .distinctUntilChanged()
-            .onEach { uiSessionContact ->
-                this._state.update { state -> state.copy(title = uiSessionContact.sessionContactName) }
+            .onEach { uiRecentContact ->
+                this._state.update { state -> state.copy(title = uiRecentContact.sessionContactName) }
             }
             .collect(this.coroutineScope)
 
