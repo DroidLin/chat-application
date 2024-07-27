@@ -2,5 +2,6 @@
 <resources>
 
 	<string name="string_draft_message_hint">[草稿]</string>
+	<string name="string_recent_contact_title">消息</string>
 
 </resources>

@@ -2,6 +2,7 @@ package com.chat.compose.app.screen.message.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -99,7 +100,9 @@ fun SessionDetailScreen(
                 viewModel.openSession(sessionId, sessionType)
             }
                 .collectAsLazyPagingItems()
+            val lazyListState = rememberLazyListState()
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 reverseLayout = true,

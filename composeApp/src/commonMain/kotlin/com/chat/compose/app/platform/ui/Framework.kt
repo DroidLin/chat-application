@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chat.compose.app.metadata.isValid
 import com.chat.compose.app.services.ProfileService
+import com.chat.compose.app.ui.ProfileProviderScope
 import org.koin.compose.koinInject
 
 /**
@@ -32,7 +33,10 @@ fun FrameworkScreen() {
         }
     ) {
         if (it) {
-            AppScreen(modifier = Modifier.fillMaxSize())
+            val profile by profileState
+            profile.ProfileProviderScope {
+                AppScreen(modifier = Modifier.fillMaxSize())
+            }
         } else LoginLogicScreen(modifier = Modifier.fillMaxSize())
     }
 }
