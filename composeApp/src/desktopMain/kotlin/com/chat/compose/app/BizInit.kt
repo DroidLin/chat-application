@@ -26,6 +26,7 @@ fun initEntryPoint() {
 private fun initSystemProperties() {
     System.setProperty("apple.awt.application.appearance", "system")
     System.setProperty("apple.awt.application.name", "True")
+    System.setProperty("skiko.renderApi", "OPENGL")
 }
 
 private fun initApplicationLifecycleObserver() {
