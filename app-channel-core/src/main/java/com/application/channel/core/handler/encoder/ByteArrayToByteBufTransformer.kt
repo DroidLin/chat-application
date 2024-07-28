@@ -37,7 +37,8 @@ val ByteBuf.byteArray: ByteArray?
     get() {
         var byteArray: ByteArray? = null
         val outputStream: ByteArrayOutputStream = threadLocalOutputStream.get()
-        while (this.isReadable) {
+        var deadLoopMonitorCount = 0
+        while (this.isReadable || deadLoopMonitorCount >= 5) {
             var shouldResetReaderIndex = false
             val readerIndex = this.readerIndex()
             val dataType = this.withAvailableCount(Int.SIZE_BYTES) { this.readInt() }
@@ -61,9 +62,11 @@ val ByteBuf.byteArray: ByteArray?
                 } else shouldResetReaderIndex = true
             } else shouldResetReaderIndex = true
 
+            // we consider drop some unsupported bytes, if data breaks up with max dead loop monitor count reached.
             if (shouldResetReaderIndex) {
                 this.readerIndex(readerIndex)
-            }
+                deadLoopMonitorCount++
+            } else break
         }
         return byteArray
     }
