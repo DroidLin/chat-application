@@ -9,7 +9,9 @@ import com.chat.compose.app.lifecycle.ApplicationLifecycleObserver
 import com.chat.compose.app.lifecycle.ApplicationLifecycleRegistry
 import com.chat.compose.app.metadata.Profile
 import com.chat.compose.app.services.ProfileService
+import com.chat.compose.app.util.Platform
 import com.chat.compose.app.util.PreferenceCenter
+import com.chat.compose.app.util.currentPlatform
 import org.koin.core.context.startKoin
 
 /**
@@ -26,7 +28,9 @@ fun initEntryPoint() {
 private fun initSystemProperties() {
     System.setProperty("apple.awt.application.appearance", "system")
     System.setProperty("apple.awt.application.name", "True")
-    System.setProperty("skiko.renderApi", "OPENGL")
+    if (currentPlatform == Platform.Windows) {
+        System.setProperty("skiko.renderApi", "OPENGL")
+    }
 }
 
 private fun initApplicationLifecycleObserver() {

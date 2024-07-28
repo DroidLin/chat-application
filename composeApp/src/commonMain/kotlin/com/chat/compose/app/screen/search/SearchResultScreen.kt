@@ -1,11 +1,13 @@
 package com.chat.compose.app.screen.search
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +24,10 @@ import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.framework.Row
 import com.chat.compose.app.ui.navigationComposable
+import com.github.droidlin.composeapp.generated.resources.Res
+import com.github.droidlin.composeapp.generated.resources.string_search_empty_result
+import com.github.droidlin.composeapp.generated.resources.string_search_result_type_user_info
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * @author liuzhongao
@@ -104,39 +110,59 @@ fun SearchResultScreen(
                         CircularProgressIndicator()
                     }
                 }
-            } else if (searchResultResource == null) {
+            } else if (searchResultResource == null || searchResultResource.isEmpty) {
                 item(
                     key = "empty"
                 ) {
-                    Box(modifier = Modifier.fillParentMaxSize()) {
-
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column {
+                            Image(Icons.Default.Home, contentDescription = "")
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = stringResource(Res.string.string_search_empty_result))
+                        }
                     }
                 }
             } else {
-                items(
-                    items = searchResultResource.userInfo,
-                    key = { it.userInfo?.userId ?: -1 },
-                    contentType = { it.javaClass.name }
-                ) { profile ->
-                    Surface(
-                        onClick = {
-                            val userId = profile.userInfo?.userId
-                            if (userId != null) {
-                                navigateToUseBasicScreen(userId)
-                            }
-                        },
-                        modifier = Modifier.fillParentMaxWidth()
+                if (searchResultResource.userInfo.isNotEmpty()) {
+                    item(
+                        key = "user_info_header",
+                        contentType = "user_info_header_content_type",
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillParentMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
                         ) {
-                            NameAvatarImage(
-                                name = profile.userInfo?.userName ?: "N",
-                                modifier = Modifier.size(56.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = profile.userInfo?.userName ?: "N", style = MaterialTheme.typography.bodyMedium)
+                            Text(text = stringResource(Res.string.string_search_result_type_user_info))
+                        }
+                    }
+                    items(
+                        items = searchResultResource.userInfo,
+                        key = { it.userInfo?.userId ?: -1 },
+                        contentType = { it.javaClass.name }
+                    ) { profile ->
+                        Surface(
+                            onClick = {
+                                val userId = profile.userInfo?.userId
+                                if (userId != null) {
+                                    navigateToUseBasicScreen(userId)
+                                }
+                            },
+                            modifier = Modifier.fillParentMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                NameAvatarImage(
+                                    name = profile.userInfo?.userName ?: "N",
+                                    modifier = Modifier.size(56.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(text = profile.userInfo?.userName ?: "N", style = MaterialTheme.typography.bodyMedium)
+                            }
                         }
                     }
                 }

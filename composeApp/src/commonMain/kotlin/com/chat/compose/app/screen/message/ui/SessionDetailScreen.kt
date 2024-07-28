@@ -1,14 +1,18 @@
 package com.chat.compose.app.screen.message.ui
 
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -21,10 +25,12 @@ import com.chat.compose.app.paging.itemContentType
 import com.chat.compose.app.paging.itemKey
 import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
 import com.chat.compose.app.ui.NavRoute
+import com.chat.compose.app.ui.fastScrollToPosition
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.messages.MessageUi
 import com.chat.compose.app.ui.navigationComposable
+import kotlinx.coroutines.launch
 
 /**
  * @author liuzhongao
@@ -71,6 +77,8 @@ fun SessionDetailScreen(
     val viewModel: SessionDetailViewModel = koinViewModel()
     val uiState = viewModel.state.collectAsStateWithLifecycle()
 
+    val coroutineScope = rememberCoroutineScope()
+
     DisposableEffect(viewModel, sessionId, sessionType) {
         onDispose {
             viewModel.saveDraft()
@@ -95,6 +103,7 @@ fun SessionDetailScreen(
         )
         Box(
             modifier = Modifier.weight(1f)
+                .graphicsLayer { clip = true }
         ) {
             val lazyPagingItems = remember(sessionId, sessionType) {
                 viewModel.openSession(sessionId, sessionType)
@@ -124,6 +133,27 @@ fun SessionDetailScreen(
                             if (userId != null) navigateToUserBasicInfo(userId)
                         }
                     )
+                }
+            }
+            val scrollToBottomVisible = remember {
+                derivedStateOf {
+                    lazyListState.firstVisibleItemIndex > 0
+                }
+            }
+            androidx.compose.animation.AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                visible = scrollToBottomVisible.value,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }
+            ) {
+                FilledTonalIconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            lazyListState.fastScrollToPosition(0)
+                        }
+                    }
+                ) {
+                    Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = null)
                 }
             }
         }

@@ -33,7 +33,8 @@ fun AppWindow(
     Window(
         onCloseRequest = onCloseRequest,
         title = appConfiguration.title,
-        state = windowState
+        state = windowState,
+        alwaysOnTop = appConfiguration.alwaysOnTop
     ) {
         CompositionLocalProvider(
             LocalWindow provides this.window,

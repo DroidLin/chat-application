@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
@@ -98,14 +99,14 @@ fun SearchLauncherScreen(
                             value = inputText,
                             onValueChange = viewModel::onInputChange,
                             textStyle = MaterialTheme.typography.bodyLarge.copy(color = contentColor),
-                            decorationBox = { basicField ->
+                            decorationBox = { basicTextField ->
                                 Row(
-                                    modifier = Modifier.padding(vertical = 8.dp)
-                                        .padding(start = 16.dp, end = 8.dp),
+                                    modifier = Modifier
+                                        .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Box(modifier = Modifier.weight(1f)) {
-                                        basicField()
+                                        basicTextField()
                                     }
                                     val clearBtnVisible by remember { derivedStateOf { uiState.value.searchInputKeyword.isNotEmpty() } }
                                     AnimatedVisibility(
@@ -118,6 +119,7 @@ fun SearchLauncherScreen(
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .size(24.dp)
+                                                .clip(CircleShape)
                                                 .clickable { viewModel.onInputChange("") }
                                                 .padding(all = 2.dp)
                                         )

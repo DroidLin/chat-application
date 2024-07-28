@@ -28,31 +28,36 @@ actual fun ChatInputArea(
 ) {
     FocusClearMan()
     val inputText = rememberUpdatedState(text)
-    Row(
-        modifier = modifier.padding(all = 8.dp)
+    Column(
+        modifier = modifier
+            .padding(all = 8.dp)
             .imePadding()
-            .navigationBarsPadding(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .navigationBarsPadding()
     ) {
-        OutlinedTextField(
-            modifier = Modifier
-                .weight(1f)
-                .heightIn(max = 180.dp),
-            value = inputText.value,
-            onValueChange = onTextChange,
-            shape = MaterialTheme.shapes.large,
-            placeholder = {
-                Text(text = stringResource(Res.string.message_detail_text_field_place_holder))
-            }
-        )
-        val sendButtonEnable by remember { derivedStateOf { inputText.value.isNotEmpty() } }
-        Button(
-            modifier = Modifier,
-            onClick = onSendClick,
-            enabled = sendButtonEnable
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = stringResource(Res.string.message_detail_send_button_hint))
+            OutlinedTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(max = 180.dp),
+                value = inputText.value,
+                onValueChange = onTextChange,
+                shape = MaterialTheme.shapes.large,
+                placeholder = {
+                    Text(text = stringResource(Res.string.message_detail_text_field_place_holder))
+                }
+            )
+            val sendButtonEnable by remember { derivedStateOf { inputText.value.isNotEmpty() } }
+            Button(
+                modifier = Modifier,
+                onClick = onSendClick,
+                enabled = sendButtonEnable
+            ) {
+                Text(text = stringResource(Res.string.message_detail_send_button_hint))
+            }
         }
     }
 }

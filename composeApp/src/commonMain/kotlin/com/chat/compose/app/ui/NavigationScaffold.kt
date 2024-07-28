@@ -31,7 +31,8 @@ fun NavigationScaffold(
         when (windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass) {
             WindowWidthSizeClass.EXPANDED -> {
                 AnimatedVisibility(
-                    modifier = Modifier.align(Alignment.CenterStart)
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
                         .applyAppSafeArea(),
                     visible = showNavigation,
                     enter = slideInHorizontally { -it },
