@@ -35,8 +35,12 @@ class MutableChatServiceEventObserver : ChatServiceEventObserver {
 
     fun removeObserver(observer: ChatServiceEventObserver) {
         this.reentrantLock.withLock {
-            if (this.observerList.contains(observer)) {
-                this.observerList.remove(observer)
+            val iterator = this.observerList.iterator()
+            while (iterator.hasNext()) {
+                val tmpObserver = iterator.next()
+                if (tmpObserver == observer) {
+                    this.observerList.remove(observer)
+                }
             }
         }
     }

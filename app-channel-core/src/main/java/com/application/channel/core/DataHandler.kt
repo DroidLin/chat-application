@@ -72,5 +72,6 @@ abstract class DataHandler<T : Any?> : SimpleChannelInboundHandler<T>(), SocketC
     final override fun exceptionCaught(ctx: ChannelHandlerContext?, cause: Throwable?) {
         ctx ?: return
         this.handleException(ctx.channel().channelContext, cause)
+        super.exceptionCaught(ctx, cause)
     }
 }

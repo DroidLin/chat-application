@@ -59,6 +59,9 @@ internal class ChatServiceImpl @Inject constructor(
                 this@ChatServiceImpl.controller.handle(context, any)
             }
         }
+        onExceptionCreated { _, throwable ->
+            throwable?.printStackTrace()
+        }
         onConnectionLoss(this@ChatServiceImpl.authorizationMapping::removeAuthContext)
         initAdapter {
             val decoderFactories = listOf(

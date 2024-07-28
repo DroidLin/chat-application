@@ -18,4 +18,9 @@ class DataReader(
         if (ctx == null || msg == null) return
         this.onReceive(ctx.channel().channelContext, msg)
     }
+
+    override fun exceptionCaught(ctx: ChannelHandlerContext?, cause: Throwable?) {
+        super.exceptionCaught(ctx, cause)
+        cause?.printStackTrace()
+    }
 }
