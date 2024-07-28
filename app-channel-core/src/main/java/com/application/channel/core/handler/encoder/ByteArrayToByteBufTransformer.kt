@@ -35,6 +35,7 @@ private val threadLocalOutputStream = object : ThreadLocal<ByteArrayOutputStream
 
 val ByteBuf.byteArray: ByteArray?
     get() {
+        // todo: replace with list and return.
         var byteArray: ByteArray? = null
         val outputStream: ByteArrayOutputStream = threadLocalOutputStream.get()
         var deadLoopMonitorCount = 0
