@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandler.Sharable
 import java.io.ByteArrayOutputStream
+import java.util.LinkedList
 import javax.inject.Inject
 
 /**
@@ -33,10 +34,9 @@ private val threadLocalOutputStream = object : ThreadLocal<ByteArrayOutputStream
     override fun initialValue(): ByteArrayOutputStream = ByteArrayOutputStream()
 }
 
-val ByteBuf.byteArray: ByteArray?
+val ByteBuf.byteArray: List<ByteArray>?
     get() {
-        // todo: replace with list and return.
-        var byteArray: ByteArray? = null
+        var byteArray: MutableList<ByteArray>? = null
         val outputStream: ByteArrayOutputStream = threadLocalOutputStream.get()
         var deadLoopMonitorCount = 0
         while (this.isReadable || deadLoopMonitorCount >= 5) {
@@ -49,7 +49,7 @@ val ByteBuf.byteArray: ByteArray?
             }
             val dataCount = this.withAvailableCount(Int.SIZE_BYTES) { this.readInt() }
             if (dataCount != null) {
-                val _byteArray = this.withAvailableCount(dataCount) {
+                val data = this.withAvailableCount(dataCount) {
                     outputStream.reset()
                     outputStream.use { outputStream ->
                         for (index in 0 until dataCount) {
@@ -58,8 +58,11 @@ val ByteBuf.byteArray: ByteArray?
                         outputStream.toByteArray()
                     }
                 }
-                if (_byteArray != null) {
-                    byteArray = _byteArray
+                if (data != null) {
+                    if (byteArray == null) {
+                        byteArray = LinkedList<ByteArray>()
+                    }
+                    byteArray += data
                 } else shouldResetReaderIndex = true
             } else shouldResetReaderIndex = true
 
