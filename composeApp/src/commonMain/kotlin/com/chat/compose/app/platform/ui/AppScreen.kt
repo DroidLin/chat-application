@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,7 +61,7 @@ fun AppScreen(modifier: Modifier) {
     AppConfigProvider {
         val appConfig = LocalAppConfig.current
         NavigationScaffold(
-            modifier = modifier,
+            modifier = modifier ,
             showNavigation = appConfig.showNavigationBar,
             navigationContent = {
                 if (this is RowScope) {

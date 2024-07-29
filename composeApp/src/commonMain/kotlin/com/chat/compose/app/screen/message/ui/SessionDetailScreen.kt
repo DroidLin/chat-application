@@ -1,7 +1,8 @@
 package com.chat.compose.app.screen.message.ui
 
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -28,6 +29,7 @@ import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.fastScrollToPosition
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
+import com.chat.compose.app.ui.ime.FocusClearMan
 import com.chat.compose.app.ui.messages.MessageUi
 import com.chat.compose.app.ui.navigationComposable
 import kotlinx.coroutines.launch
@@ -66,7 +68,7 @@ fun NavGraphBuilder.chatDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun SessionDetailScreen(
     sessionId: String,
@@ -79,13 +81,18 @@ fun SessionDetailScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val lazyPagingItems = remember(sessionId, sessionType) {
+        viewModel.openSession(sessionId, sessionType)
+    }
+        .collectAsLazyPagingItems()
+
     DisposableEffect(viewModel, sessionId, sessionType) {
         onDispose {
             viewModel.saveDraft()
             viewModel.release()
         }
     }
-
+    FocusClearMan()
     Column(
         modifier = Modifier.fillMaxSize()
             .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
@@ -93,7 +100,10 @@ fun SessionDetailScreen(
         TopAppBar(
             title = {
                 val title by remember { derivedStateOf { uiState.value.title } }
-                Text(text = title)
+                Text(
+                    modifier = Modifier,
+                    text = title
+                )
             },
             navigationIcon = {
                 IconButton(onClick = backPress) {
@@ -105,10 +115,6 @@ fun SessionDetailScreen(
             modifier = Modifier.weight(1f)
                 .graphicsLayer { clip = true }
         ) {
-            val lazyPagingItems = remember(sessionId, sessionType) {
-                viewModel.openSession(sessionId, sessionType)
-            }
-                .collectAsLazyPagingItems()
             val lazyListState = rememberLazyListState()
             LazyColumn(
                 state = lazyListState,
@@ -141,10 +147,11 @@ fun SessionDetailScreen(
                 }
             }
             androidx.compose.animation.AnimatedVisibility(
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp),
                 visible = scrollToBottomVisible.value,
-                enter = slideInVertically { it },
-                exit = slideOutVertically { it }
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
                 FilledTonalIconButton(
                     onClick = {

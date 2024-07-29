@@ -106,7 +106,9 @@ fun ListDetailBizScaffold(
             AnimatedPane(
                 modifier = Modifier.fillMaxSize()
             ) {
-                listPanel(::navigateTo)
+                Provider {
+                    listPanel(::navigateTo)
+                }
             }
         },
         detailPane = {
@@ -114,8 +116,10 @@ fun ListDetailBizScaffold(
                 modifier = Modifier.fillMaxSize()
             ) {
                 routeAction.RouteActionProvider {
-                    key(nestedNavKey) {
-                        detailPanel(startDestinationRoute, ::navigateBack, routeAction)
+                    Provider {
+                        key(nestedNavKey) {
+                            detailPanel(startDestinationRoute, ::navigateBack, routeAction)
+                        }
                     }
                 }
             }

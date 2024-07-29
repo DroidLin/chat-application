@@ -1,5 +1,6 @@
 package com.chat.compose.app.screen.message.ui
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -19,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.chat.compose.app.metadata.UiRecentContact
 import com.chat.compose.app.ui.NameAvatarImage
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 actual fun SessionContactItem(
     value: UiRecentContact,

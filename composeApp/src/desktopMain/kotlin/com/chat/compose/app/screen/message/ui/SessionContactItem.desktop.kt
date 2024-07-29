@@ -1,5 +1,6 @@
 package com.chat.compose.app.screen.message.ui
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.layout.*
@@ -23,7 +24,7 @@ import com.chat.compose.app.ui.NameAvatarImage
  * @author liuzhongao
  * @since 2024/6/18 22:10
  */
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 actual fun SessionContactItem(
     value: UiRecentContact,
@@ -68,7 +69,7 @@ actual fun SessionContactItem(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row {
-                    val text= uiSessionContact.rememberShowingContent()
+                    val text = uiSessionContact.rememberShowingContent()
                     Text(
                         modifier = Modifier.weight(1f),
                         text = text,

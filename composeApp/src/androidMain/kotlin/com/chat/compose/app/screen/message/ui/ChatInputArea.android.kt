@@ -26,8 +26,6 @@ actual fun ChatInputArea(
     onSendClick: () -> Unit,
     modifier: Modifier
 ) {
-    FocusClearMan()
-    val inputText = rememberUpdatedState(text)
     Column(
         modifier = modifier
             .padding(all = 8.dp)
@@ -39,6 +37,7 @@ actual fun ChatInputArea(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            val inputText = rememberUpdatedState(text)
             OutlinedTextField(
                 modifier = Modifier
                     .weight(1f)
