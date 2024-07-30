@@ -93,9 +93,13 @@ class MutableChatServiceEventObserver : ChatServiceEventObserver {
         }
     }
 
-    private inline fun notifyObservers(observer: (ChatServiceEventObserver) -> Unit) {
+    private fun notifyObservers(observer: (ChatServiceEventObserver) -> Unit) {
         this.reentrantLock.withLock {
-            this.observerList.forEach(observer)
+            val iterator = this.observerList.iterator()
+            while (iterator.hasNext()) {
+                val tmpObserver = iterator.next()
+                tmpObserver.apply(observer)
+            }
         }
     }
 

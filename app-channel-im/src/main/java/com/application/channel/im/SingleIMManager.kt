@@ -12,7 +12,10 @@ object SingleIMManager {
 
     private val reConnectProcessor = ReConnectProcessor(maxReConnectCount = 5) {
         val initConfig = this.imInitConfig ?: return@ReConnectProcessor
-        this.startService(initConfig, true)
+        this.coroutineScope.launch {
+            delay(5000)
+            this@SingleIMManager.startService(initConfig, true)
+        }
     }
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _recentContactFlow = MutableStateFlow<List<RecentContact>>(emptyList())
