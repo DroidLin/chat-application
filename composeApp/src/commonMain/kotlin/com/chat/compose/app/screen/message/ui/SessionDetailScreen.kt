@@ -68,7 +68,7 @@ fun NavGraphBuilder.chatDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionDetailScreen(
     sessionId: String,
@@ -153,7 +153,7 @@ fun SessionDetailScreen(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                FilledTonalIconButton(
+                FilledIconButton(
                     onClick = {
                         coroutineScope.launch {
                             lazyListState.fastScrollToPosition(0)

@@ -27,6 +27,7 @@ fun FrameworkScreen() {
     }
 
     AnimatedContent(
+        modifier = Modifier.fillMaxSize(),
         targetState = isLogin,
         contentAlignment = Alignment.Center,
         transitionSpec = {

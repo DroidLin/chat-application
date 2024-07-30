@@ -36,16 +36,3 @@ actual fun Modifier.applyAppSafeArea(): Modifier = composed {
         }
     }
 }
-
-@Stable
-actual fun Modifier.appSafeAreaPadding(): Modifier = composed {
-    val windowAdaptiveInfo = LocalWindowAdaptiveInfo.current
-    val appSafeArea = LocalAppSafeArea.current
-    if (windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED) {
-        val width = remember { derivedStateOf { appSafeArea.navigationWidth } }
-        padding(start = width.value)
-    } else {
-        val height = remember { derivedStateOf { appSafeArea.navigationHeight } }
-        padding(bottom = height.value)
-    }
-}

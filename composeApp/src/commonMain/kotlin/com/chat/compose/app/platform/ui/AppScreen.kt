@@ -4,10 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +22,7 @@ import com.chat.compose.app.ui.NameAvatarImage
 import com.chat.compose.app.ui.NavigationScaffold
 import com.chat.compose.app.ui.framework.Box
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * @author liuzhongao
@@ -61,42 +59,64 @@ fun AppScreen(modifier: Modifier) {
     AppConfigProvider {
         val appConfig = LocalAppConfig.current
         NavigationScaffold(
-            modifier = modifier ,
+            modifier = modifier,
             showNavigation = appConfig.showNavigationBar,
-            navigationContent = {
-                if (this is RowScope) {
-                    AppHomeEnum.entries.forEach { enum ->
-                        NavigationBarItem(
-                            selected = homeEnum == enum,
-                            onClick = { viewModel.switchNavigationTo(enum) },
-                            icon = { Icon(imageVector = enum.icon, contentDescription = null) },
-                        )
-                    }
-                } else if (this is ColumnScope) {
-                    Spacer(modifier = Modifier.height(32.dp))
-                    Box {
-                        val profile = LocalProfile.current
-                        val userName by remember {
-                            derivedStateOf {
-                                profile.userInfo?.userName ?: ""
-                            }
-                        }
-                        if (userName.isNotEmpty()) {
-                            NameAvatarImage(name = userName)
-                        }
+            navigationDrawerContent = {
+                PermanentDrawerSheet(
+                    modifier = Modifier.width(240.dp)
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        Text(text = stringResource(homeEnum.title), style = MaterialTheme.typography.titleMedium)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     AppHomeEnum.entries.forEach { enum ->
-                        NavigationRailItem(
+                        NavigationDrawerItem(
+                            label = { Text(text = stringResource(enum.title)) },
                             selected = homeEnum == enum,
                             onClick = { viewModel.switchNavigationTo(enum) },
                             icon = { Icon(imageVector = enum.icon, contentDescription = null) },
                         )
                     }
                 }
-            }
+            },
+            navigationRailContent = {
+                Spacer(modifier = Modifier.height(32.dp))
+                Box {
+                    val profile = LocalProfile.current
+                    val userName by remember {
+                        derivedStateOf {
+                            profile.userInfo?.userName ?: ""
+                        }
+                    }
+                    if (userName.isNotEmpty()) {
+                        NameAvatarImage(name = userName)
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                AppHomeEnum.entries.forEach { enum ->
+                    NavigationRailItem(
+                        selected = homeEnum == enum,
+                        onClick = { viewModel.switchNavigationTo(enum) },
+                        icon = { Icon(imageVector = enum.icon, contentDescription = null) },
+                    )
+                }
+            },
+            navigationBarContent = {
+                AppHomeEnum.entries.forEach { enum ->
+                    NavigationBarItem(
+                        selected = homeEnum == enum,
+                        onClick = { viewModel.switchNavigationTo(enum) },
+                        icon = { Icon(imageVector = enum.icon, contentDescription = null) },
+                    )
+                }
+            },
         ) {
             AnimatedContent(
+                modifier = Modifier.fillMaxSize(),
                 targetState = homeEnum,
                 contentAlignment = Alignment.Center,
                 transitionSpec = {
