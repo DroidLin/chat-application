@@ -3,6 +3,8 @@ package com.chat.compose.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -19,6 +21,7 @@ val LocalActivity = staticCompositionLocalOf<ComponentActivity> { error("No acti
 
 class MainActivity : ComponentActivity() {
 
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
         super.onCreate(savedInstanceState)
@@ -26,7 +29,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             CompositionLocalProvider(
                 LocalActivity provides this,
-                LocalAppSafeArea provides remember { AppSafeArea() }
+                LocalAppSafeArea provides remember { AppSafeArea() },
+                LocalOverscrollConfiguration provides null,
             ) {
                 WindowAdaptiveInfoProvider {
                     AndroidMaterialTheme(

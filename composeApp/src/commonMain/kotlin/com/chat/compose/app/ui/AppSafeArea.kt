@@ -33,7 +33,8 @@ fun Modifier.appSafeAreaPadding(): Modifier  = composed {
     val windowAdaptiveInfo = LocalWindowAdaptiveInfo.current
     val appSafeArea = LocalAppSafeArea.current
     when (windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass) {
-        WindowWidthSizeClass.EXPANDED, WindowWidthSizeClass.MEDIUM -> {
+        WindowWidthSizeClass.EXPANDED,
+        WindowWidthSizeClass.MEDIUM -> {
             val width = remember { derivedStateOf { appSafeArea.navigationWidth } }
             padding(start = width.value)
         }

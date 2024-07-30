@@ -20,6 +20,7 @@ import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.homeNavigationComposable
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_recent_contact_title
+import com.mplayer.common.ui.OverScrollableLazyColumn
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -53,7 +54,6 @@ fun SessionListScreen(
 
     Column(
         modifier = modifier.fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
     ) {
         TopAppBar(
             title = { Text(text = stringResource(Res.string.string_recent_contact_title)) },
@@ -61,14 +61,15 @@ fun SessionListScreen(
                 IconButton(onClick = navigateToSearch) {
                     Icon(Icons.Filled.Search, contentDescription = "search")
                 }
-            }
+            },
+            windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Top)
         )
         com.chat.compose.app.ui.framework.Box(
             modifier = Modifier.weight(1f)
         ) {
             val lazyListState = rememberLazyListState()
-            LazyColumn(
-                modifier = Modifier,
+            OverScrollableLazyColumn(
+                modifier = Modifier.fillMaxSize(),
                 state = lazyListState,
             ) {
                 val sessionList = sessionListState.value

@@ -32,6 +32,7 @@ import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.ime.FocusClearMan
 import com.chat.compose.app.ui.messages.MessageUi
 import com.chat.compose.app.ui.navigationComposable
+import com.mplayer.common.ui.OverScrollableLazyColumn
 import kotlinx.coroutines.launch
 
 /**
@@ -116,7 +117,7 @@ fun SessionDetailScreen(
                 .graphicsLayer { clip = true }
         ) {
             val lazyListState = rememberLazyListState()
-            LazyColumn(
+            OverScrollableLazyColumn(
                 state = lazyListState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),

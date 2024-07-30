@@ -27,6 +27,7 @@ import com.chat.compose.app.ui.navigationComposable
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_search_empty_result
 import com.github.droidlin.composeapp.generated.resources.string_search_result_type_user_info
+import com.mplayer.common.ui.OverScrollableLazyColumn
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -94,7 +95,7 @@ fun SearchResultScreen(
             }
         )
         val isLoadingState = remember { derivedStateOf { uiState.value.isLoading } }
-        LazyColumn(
+        OverScrollableLazyColumn(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
@@ -118,7 +119,11 @@ fun SearchResultScreen(
                         modifier = Modifier.fillParentMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column {
+                        Column(
+                            modifier = Modifier,
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             Image(Icons.Default.Home, contentDescription = "")
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(text = stringResource(Res.string.string_search_empty_result))

@@ -36,48 +36,41 @@ fun NavigationScaffold(
         modifier = modifier
     ) {
         val windowAdaptiveInfo = LocalWindowAdaptiveInfo.current
-        when (windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass) {
-            WindowWidthSizeClass.EXPANDED -> {
-                PermanentNavigationDrawer(
-                    drawerContent = navigationDrawerContentUpdated,
-                    content = contentUpdated
+        val windowSizeClass = windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass
+        if (windowSizeClass == WindowWidthSizeClass.MEDIUM) {
+            AnimatedVisibility(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .applyAppSafeArea(),
+                visible = showNavigationUpdated,
+                enter = slideInHorizontally { -it },
+                exit = slideOutHorizontally { -it }
+            ) {
+                NavigationRail(
+                    modifier = Modifier.fillMaxHeight(),
+                    content = navigationRailContentUpdated
                 )
             }
-
-            WindowWidthSizeClass.MEDIUM -> {
-                contentUpdated()
-                AnimatedVisibility(
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .applyAppSafeArea(),
-                    visible = showNavigationUpdated,
-                    enter = slideInHorizontally { -it },
-                    exit = slideOutHorizontally { -it }
-                ) {
-                    NavigationRail(
-                        modifier = Modifier.fillMaxHeight(),
-                        content = navigationRailContentUpdated
-                    )
-                }
+        }
+        Row {
+            if (windowSizeClass == WindowWidthSizeClass.EXPANDED) {
+                navigationDrawerContentUpdated()
             }
-
-            WindowWidthSizeClass.COMPACT -> {
-                contentUpdated()
-                AnimatedVisibility(
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                        .applyAppSafeArea(),
-                    visible = showNavigationUpdated,
-                    enter = slideInVertically { it },
-                    exit = slideOutVertically { it }
-                ) {
-                    NavigationBar(
-                        modifier = Modifier.fillMaxWidth(),
-                        content = navigationBarContentUpdated
-                    )
-                }
+            contentUpdated()
+        }
+        if (windowSizeClass == WindowWidthSizeClass.COMPACT) {
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .applyAppSafeArea(),
+                visible = showNavigationUpdated,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }
+            ) {
+                NavigationBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    content = navigationBarContentUpdated
+                )
             }
-
-            else -> {}
         }
     }
 }
