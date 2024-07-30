@@ -44,6 +44,7 @@ class TcpClient {
                 observer.onConnectionFailure(channelContext, future.cause())
             } else observer.onConnectionSuccess(channelContext)
         }
+        this.runningChannel?.channel()?.close()?.awaitUninterruptibly()
         this.runningChannel = Bootstrap()
             .channel(NioSocketChannel::class.java)
             .handler(channelInitializer)
