@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -18,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import com.chat.compose.app.di.koinViewModel
+import com.chat.compose.app.platform.viewmodel.ReceiveIntentEffect
 import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.framework.Box
 import com.chat.compose.app.ui.framework.Column
@@ -38,17 +42,32 @@ fun NavGraphBuilder.loginScreen(loginComplete: () -> Unit) {
     }
 }
 
-
 @Composable
 fun LoginScreen(
     loginComplete: () -> Unit,
 ) {
     val viewModel = koinViewModel<LoginViewModel>()
-    val uiState = viewModel.state.collectAsStateWithLifecycle()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     val launchLogin = {
         viewModel.launchLogin(loginComplete)
     }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    viewModel.ReceiveIntentEffect { event ->
+        when (event) {
+            is LoginEvent.LoginFailureEvent -> {
+                snackbarHostState.showSnackbar(event.message)
+            }
+
+            else -> {}
+        }
+    }
+
+    val inputTextState by remember { derivedStateOf { uiState.value.inputUserName } }
+    val inputText by remember { derivedStateOf { inputTextState.inputText } }
+    val isError by remember { derivedStateOf { inputTextState.isError } }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -61,9 +80,6 @@ fun LoginScreen(
         ) {
             Text(text = stringResource(Res.string.app_name), style = MaterialTheme.typography.displayMedium)
             Box {
-                val inputTextState by remember { derivedStateOf { uiState.value.inputUserName } }
-                val inputText by remember { derivedStateOf { inputTextState.inputText } }
-                val isError by remember { derivedStateOf { inputTextState.isError } }
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = viewModel::updateUserName,
@@ -80,9 +96,6 @@ fun LoginScreen(
                 )
             }
             Box {
-                val inputTextState by remember { derivedStateOf { uiState.value.inputPassword } }
-                val inputText by remember { derivedStateOf { inputTextState.inputText } }
-                val isError by remember { derivedStateOf { inputTextState.isError } }
                 val showRawPassword by remember { derivedStateOf { uiState.value.showRawPassword } }
                 OutlinedTextField(
                     value = inputText,
@@ -146,6 +159,7 @@ fun LoginScreen(
                 }
             }
         }
+        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 

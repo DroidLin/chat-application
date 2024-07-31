@@ -1,16 +1,14 @@
 package com.chat.compose.app.screen.login
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chat.compose.app.lifecycle.ApplicationLifecycleRegistry
 import com.chat.compose.app.metadata.isValid
 import com.chat.compose.app.network.isSuccess
+import com.chat.compose.app.platform.viewmodel.AbstractStatefulViewModel
+import com.chat.compose.app.platform.viewmodel.Event
+import com.chat.compose.app.platform.viewmodel.State
 import com.chat.compose.app.services.ProfileService
-import com.chat.compose.app.storage.MutableMapStorage
 import com.chat.compose.app.usecase.network.LoginUserUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
@@ -20,14 +18,13 @@ import kotlinx.coroutines.launch
 class LoginViewModel(
     private val loginUserUseCase: LoginUserUseCase,
     private val profileService: ProfileService
-) : ViewModel() {
+) : AbstractStatefulViewModel<LoginState, LoginEvent>() {
 
-    private val _state = MutableStateFlow(LoginState())
-    val state = this._state.asStateFlow()
+    override val initialState: LoginState get() = LoginState()
 
     fun updateUserName(inputText: String) {
         if (inputText.isBlank() || inputText.isEmpty()) {
-            this._state.update {
+            this.updateState {
                 it.copy(
                     inputUserName = it.inputUserName.copy(
                         inputText = inputText,
@@ -38,7 +35,7 @@ class LoginViewModel(
             }
             return
         } else if (!inputText.matches(userNameCheckRegex)) {
-            this._state.update {
+            this.updateState {
                 it.copy(
                     inputUserName = it.inputUserName.copy(
                         isError = true,
@@ -48,29 +45,36 @@ class LoginViewModel(
             }
             return
         }
-        this._state.update { it.copy(inputUserName = InputTextState(inputText)) }
+        this.updateState { it.copy(inputUserName = InputTextState(inputText)) }
     }
 
     fun launchLogin(onComplete: () -> Unit) {
-        val userAccount = this._state.value.inputUserName.inputText
-        val password = this._state.value.inputPassword.inputText
-        this._state.update { it.copy(isLoading = true) }
+        val userAccount = this.state.inputUserName.inputText
+        val password = this.state.inputPassword.inputText
+        this.updateState { it.copy(isLoading = true) }
         this.viewModelScope.launch {
             val loginResult = this@LoginViewModel.loginUserUseCase.loginUserAccount(userAccount, password)
             if (loginResult.isSuccess && this@LoginViewModel.profileService.refreshProfile().isValid) {
                 ApplicationLifecycleRegistry.onUserLogin(this@LoginViewModel.profileService.profile)
                 onComplete()
             }
-            this@LoginViewModel._state.update { it.copy(isLoading = false) }
+            if (!loginResult.isSuccess) {
+                val message = loginResult.message ?: "未知错误"
+                emitEvent { LoginEvent.LoginFailureEvent(message) }
+            }
+            if (!this@LoginViewModel.profileService.profile.isValid) {
+                emitEvent { LoginEvent.LoginFailureEvent("获取用户信息失败！") }
+            }
+            this@LoginViewModel.updateState { it.copy(isLoading = false) }
         }
     }
 
     fun updatePassword(inputText: String) {
-        this._state.update { it.copy(inputPassword = it.inputPassword.copy(inputText = inputText)) }
+        this.updateState { it.copy(inputPassword = it.inputPassword.copy(inputText = inputText)) }
     }
 
     fun updateShowPassword(showPassword: Boolean) {
-        this._state.update { it.copy(showRawPassword = showPassword) }
+        this.updateState { it.copy(showRawPassword = showPassword) }
     }
 
     companion object {
@@ -78,12 +82,19 @@ class LoginViewModel(
     }
 }
 
+sealed interface LoginEvent : Event {
+
+    data class LoginFailureEvent(
+        val message: String
+    ) : LoginEvent
+}
+
 data class LoginState(
     val isLoading: Boolean = false,
     val inputUserName: InputTextState = InputTextState(),
     val inputPassword: InputTextState = InputTextState(),
     val showRawPassword: Boolean = false,
-)
+) : State.Success
 
 data class InputTextState(
     val inputText: String = "",

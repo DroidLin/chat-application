@@ -4,26 +4,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.ViewModel
+import com.chat.compose.app.platform.viewmodel.AbstractStatefulViewModel
+import com.chat.compose.app.platform.viewmodel.Event
+import com.chat.compose.app.platform.viewmodel.State
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_navigation_message_label
 import com.github.droidlin.composeapp.generated.resources.string_navigation_personal_info_label
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import org.jetbrains.compose.resources.StringResource
 
 /**
  * @author liuzhongao
  * @since 2024/7/21 19:13
  */
-class AppViewModel : ViewModel() {
+class AppViewModel : AbstractStatefulViewModel<AppUiState, AppEvent>() {
 
-    private val _uiState = MutableStateFlow(AppUiState())
-    val uiState = this._uiState.asStateFlow()
+    override val initialState: AppUiState get() = AppUiState()
 
     fun switchNavigationTo(enum: AppHomeEnum) {
-        this._uiState.update { it.copy(homeEnum = enum) }
+        this.updateState { it.copy(homeEnum = enum) }
     }
 }
 
@@ -41,6 +39,8 @@ enum class AppHomeEnum(
     );
 }
 
+interface AppEvent : Event
+
 data class AppUiState(
     val homeEnum: AppHomeEnum = AppHomeEnum.Message,
-)
+) : State.Success

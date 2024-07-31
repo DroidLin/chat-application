@@ -1,10 +1,8 @@
 package com.chat.compose.app.screen.message.ui
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -84,8 +82,7 @@ fun SessionDetailScreen(
 
     val lazyPagingItems = remember(sessionId, sessionType) {
         viewModel.openSession(sessionId, sessionType)
-    }
-        .collectAsLazyPagingItems()
+    }.collectAsLazyPagingItems()
 
     DisposableEffect(viewModel, sessionId, sessionType) {
         onDispose {

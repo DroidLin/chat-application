@@ -1,8 +1,10 @@
 package com.chat.compose.app.screen.user
 
-import androidx.lifecycle.ViewModel
 import com.application.channel.message.SessionType
 import com.chat.compose.app.metadata.Profile
+import com.chat.compose.app.platform.viewmodel.AbstractStatefulViewModel
+import com.chat.compose.app.platform.viewmodel.Event
+import com.chat.compose.app.platform.viewmodel.State
 import com.chat.compose.app.usecase.*
 import com.chat.compose.app.usecase.network.FetchUserInfoUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,13 +22,12 @@ class UserBasicInfoViewModel(
     private val updateSessionContactUserBasicInfoUseCase: UpdateSessionContactUserBasicInfoUseCase,
     private val insertSessionContactUseCase: InsertSessionContactUseCase,
     private val insertRecentContactUseCase: InsertRecentContactUseCase,
-) : ViewModel() {
+) : AbstractStatefulViewModel<UserBasicInfoState, UserBasicInfoEvent>() {
 
-    private val _uiState = MutableStateFlow(UserBasicInfoUiState())
-    val uiState = this._uiState.asStateFlow()
+    override val initialState: UserBasicInfoState get() = UserBasicInfoState.Loading
 
     suspend fun fetchUserInfo(userId: Long) {
-        this._uiState.update { it.copy(isLoading = true) }
+        this.updateState { UserBasicInfoState.Loading }
         val profile = this.fetchUserInfoUseCase.fetchProfile(userId = userId)
         if (profile != null) {
             val sessionId = profile.sessionInfo?.sessionId
@@ -34,16 +35,21 @@ class UserBasicInfoViewModel(
             if (!sessionId.isNullOrEmpty() && sessionType != null) {
                 this.updateUserBasicContact(sessionId, sessionType, profile)
             }
-            this._uiState.update {
-                it.copy(
+            this.updateState {
+                UserBasicInfoState.UserBasicInfoUiState(
                     userName = profile.userInfo?.userName ?: "",
                     userId = profile.userInfo?.userId ?: -1,
                     sessionId = profile.sessionInfo?.sessionId ?: "",
                     sessionType = profile.sessionInfo?.sessionType ?: SessionType.Unknown
                 )
             }
+        } else {
+            this.updateState {
+                UserBasicInfoState.Error(
+                    message = "获取用户信息失败"
+                )
+            }
         }
-        this._uiState.update { it.copy(isLoading = false) }
     }
 
     private suspend fun updateUserBasicContact(sessionId: String, sessionType: SessionType, profile: Profile) {
@@ -66,10 +72,20 @@ class UserBasicInfoViewModel(
     }
 }
 
-data class UserBasicInfoUiState(
-    val isLoading: Boolean = true,
-    val userName: String = "",
-    val userId: Long = -1,
-    val sessionId: String = "",
-    val sessionType: SessionType = SessionType.Unknown
-)
+sealed interface UserBasicInfoState : State {
+
+    data object Loading : UserBasicInfoState, State.Loading
+
+    data class Error(
+        val message: String
+    ) : UserBasicInfoState, State.Error
+
+    data class UserBasicInfoUiState(
+        val userName: String = "",
+        val userId: Long = -1,
+        val sessionId: String = "",
+        val sessionType: SessionType = SessionType.Unknown
+    ) : UserBasicInfoState, State.Success
+}
+
+interface UserBasicInfoEvent : Event
