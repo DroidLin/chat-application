@@ -10,19 +10,15 @@ import com.chat.compose.app.metadata.UiMessageItem
  */
 @Composable
 fun MessageUi(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
-    val messageItem = rememberUpdatedState(uiMessageItem)
-
-    val message by remember { derivedStateOf { messageItem.value.uiMessage } }
-
-    val isSenderMessage by remember { derivedStateOf { message.isSenderMessage } }
-    val isReceiverMessage by remember { derivedStateOf { message.isReceiverMessage } }
+    val isSenderMessage = uiMessageItem.uiMessage.isSenderMessage
+    val isReceiverMessage = uiMessageItem.uiMessage.isReceiverMessage
 
     if (isSenderMessage && isReceiverMessage) {
         // chat with self condition
-        SenderMessageItem(messageItem.value, modifier, onAvatarClick)
+        SenderMessageItem(uiMessageItem, modifier, onAvatarClick)
     } else if (isSenderMessage && !isReceiverMessage) {
-        SenderMessageItem(messageItem.value, modifier, onAvatarClick)
+        SenderMessageItem(uiMessageItem, modifier, onAvatarClick)
     } else if (isReceiverMessage && !isSenderMessage) {
-        ReceiverMessageItem(messageItem.value, modifier, onAvatarClick)
+        ReceiverMessageItem(uiMessageItem, modifier, onAvatarClick)
     }
 }

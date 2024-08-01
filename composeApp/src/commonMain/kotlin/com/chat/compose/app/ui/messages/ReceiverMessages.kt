@@ -21,11 +21,8 @@ import com.chat.compose.app.ui.NameAvatarImage
 
 @Composable
 fun ReceiverMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
-    val messageItem = rememberUpdatedState(uiMessageItem)
-
-    val sessionContact by remember { derivedStateOf { messageItem.value.uiSessionContact } }
-    val message by remember { derivedStateOf { messageItem.value.uiMessage } }
-
+    val sessionContact = uiMessageItem.uiSessionContact
+    val message = uiMessageItem.uiMessage
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Top,
@@ -41,8 +38,8 @@ fun ReceiverMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modif
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.CenterStart
         ) {
-            when (val uiMessage = message) {
-                is TextUiMessage -> TextUiMessageItem(uiMessage)
+            when (message) {
+                is TextUiMessage -> TextUiMessageItem(message)
             }
         }
     }
@@ -50,7 +47,6 @@ fun ReceiverMessageItem(uiMessageItem: UiMessageItem, modifier: Modifier = Modif
 
 @Composable
 private fun TextUiMessageItem(uiMessage: TextUiMessage, modifier: Modifier = Modifier) {
-    val message by rememberUpdatedState(uiMessage)
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium.copy(topStart = CornerSize(0.dp)),
@@ -61,10 +57,9 @@ private fun TextUiMessageItem(uiMessage: TextUiMessage, modifier: Modifier = Mod
             contentAlignment = Alignment.Center
         ) {
             SelectionContainer {
-                val textContent by remember { derivedStateOf { message.textContent } }
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    text = textContent,
+                    text = uiMessage.textContent,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
