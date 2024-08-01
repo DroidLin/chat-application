@@ -1,5 +1,6 @@
 package com.chat.compose.app.metadata
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.application.channel.message.SessionType
 
@@ -7,7 +8,7 @@ import com.application.channel.message.SessionType
  * @author liuzhongao
  * @since 2024/6/16 19:37
  */
-@Stable
+@Immutable
 sealed interface UiMessage {
 
     val uuid: String

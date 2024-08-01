@@ -20,7 +20,6 @@ import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.homeNavigationComposable
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_recent_contact_title
-import com.mplayer.common.ui.OverScrollableLazyColumn
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -42,7 +41,7 @@ fun NavGraphBuilder.sessionListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionListScreen(
     modifier: Modifier = Modifier,
@@ -51,6 +50,7 @@ fun SessionListScreen(
 ) {
     val viewModel: SessionListViewModel = koinViewModel()
     val sessionListState = remember(viewModel) { viewModel.recentContactList }.collectAsStateWithLifecycle()
+    val lazyListState = rememberLazyListState()
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -64,27 +64,24 @@ fun SessionListScreen(
             },
             windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Top)
         )
-        com.chat.compose.app.ui.framework.Box(
-            modifier = Modifier.weight(1f)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            state = lazyListState,
         ) {
-            val lazyListState = rememberLazyListState()
-            OverScrollableLazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = lazyListState,
-            ) {
-                val sessionList = sessionListState.value
-                items(
-                    items = sessionList,
-                    key = { it.sessionId },
-                    contentType = { it.javaClass.name }
-                ) { uiSessionContact ->
-                    SessionContactItem(
-                        value = uiSessionContact,
-                        modifier = Modifier.fillParentMaxWidth().animateItemPlacement(),
-                        onPrimaryMouseClick = { sessionItemClick(uiSessionContact) },
-                        onSecondaryMouseClick = {}
-                    )
-                }
+            val sessionList = sessionListState.value
+            items(
+                items = sessionList,
+                key = { it.sessionId },
+                contentType = { it.javaClass.name }
+            ) { uiSessionContact ->
+                SessionContactItem(
+                    value = uiSessionContact,
+                    modifier = Modifier.fillParentMaxWidth(),
+                    onPrimaryMouseClick = { sessionItemClick(uiSessionContact) },
+                    onSecondaryMouseClick = {}
+                )
             }
         }
     }

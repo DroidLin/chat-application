@@ -154,42 +154,45 @@ fun SearchLauncherScreen(
                 }
             }
         )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+        val historyConfig by viewModel.historyConfig.collectAsStateWithLifecycle()
+        if (historyConfig.isNotEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(stringResource(Res.string.string_button_search_history))
-                Spacer(modifier = Modifier.weight(1f))
-                TextButton(
-                    onClick = {
-                        viewModel.clearAllHistory()
-                    },
-                    modifier = Modifier
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(stringResource(Res.string.string_button_clear_search_history))
-                }
-            }
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                val historyConfig by viewModel.historyConfig.collectAsStateWithLifecycle()
-                historyConfig.forEach { config ->
-                    AssistChip(
+                    Text(stringResource(Res.string.string_button_search_history))
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(
                         onClick = {
-                            viewModel.onInputChange(config.value)
-                            viewModel.onSearch(config.value)
-                            navigateToSearchResult(config.value)
+                            viewModel.clearAllHistory()
                         },
-                        label = {
-                            Text(text = config.value)
-                        }
-                    )
+                        modifier = Modifier
+                    ) {
+                        Text(stringResource(Res.string.string_button_clear_search_history))
+                    }
+                }
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    historyConfig.forEach { config ->
+                        AssistChip(
+                            onClick = {
+                                viewModel.onInputChange(config.value)
+                                viewModel.onSearch(config.value)
+                                navigateToSearchResult(config.value)
+                            },
+                            label = {
+                                Text(text = config.value)
+                            }
+                        )
+                    }
                 }
             }
         }

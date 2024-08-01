@@ -1,12 +1,10 @@
 package com.chat.compose.app.platform.ui
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chat.compose.app.metadata.isValid
@@ -26,21 +24,12 @@ fun FrameworkScreen() {
         derivedStateOf { profileState.value.isValid }
     }
 
-    AnimatedContent(
-        modifier = Modifier.fillMaxSize(),
-        targetState = isLogin,
-        contentAlignment = Alignment.Center,
-        transitionSpec = {
-            fadeIn() togetherWith fadeOut()
-        }
-    ) {
-        if (it) {
-            val profile by profileState
-            profile.ProfileProviderScope {
-                SharedElementLayoutProvider {
-                    AppScreen(modifier = Modifier.fillMaxSize())
-                }
+    if (isLogin) {
+        val profile by profileState
+        profile.ProfileProviderScope {
+            SharedElementLayoutProvider {
+                AppScreen(modifier = Modifier.fillMaxSize())
             }
-        } else LoginLogicScreen(modifier = Modifier.fillMaxSize())
-    }
+        }
+    } else LoginLogicScreen(modifier = Modifier.fillMaxSize())
 }

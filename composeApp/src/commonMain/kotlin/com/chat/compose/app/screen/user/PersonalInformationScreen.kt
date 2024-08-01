@@ -24,7 +24,6 @@ import com.chat.compose.app.ui.navigationComposable
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_logout_label
 import com.github.droidlin.composeapp.generated.resources.string_personal_info_title
-import com.mplayer.common.ui.OverScrollableLazyColumn
 import org.jetbrains.compose.resources.stringResource
 
 fun NavGraphBuilder.personalInformationScreen(
@@ -81,7 +80,7 @@ private fun LazyListContent(
     modifier: Modifier = Modifier,
     onConfirmLogout: () -> Unit,
 ) {
-    OverScrollableLazyColumn(
+    LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally

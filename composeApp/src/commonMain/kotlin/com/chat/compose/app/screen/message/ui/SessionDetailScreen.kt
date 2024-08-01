@@ -1,8 +1,13 @@
 package com.chat.compose.app.screen.message.ui
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -12,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -22,15 +28,14 @@ import com.chat.compose.app.di.koinViewModel
 import com.chat.compose.app.paging.collectAsLazyPagingItems
 import com.chat.compose.app.paging.itemContentType
 import com.chat.compose.app.paging.itemKey
+import com.chat.compose.app.screen.message.vm.ChatDetailUiState
 import com.chat.compose.app.screen.message.vm.SessionDetailViewModel
 import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.fastScrollToPosition
-import com.chat.compose.app.ui.framework.Box
-import com.chat.compose.app.ui.framework.Column
 import com.chat.compose.app.ui.ime.FocusClearMan
 import com.chat.compose.app.ui.messages.MessageUi
 import com.chat.compose.app.ui.navigationComposable
-import com.mplayer.common.ui.OverScrollableLazyColumn
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -67,7 +72,6 @@ fun NavGraphBuilder.chatDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionDetailScreen(
     sessionId: String,
@@ -76,20 +80,41 @@ fun SessionDetailScreen(
     navigateToUserBasicInfo: (Long) -> Unit,
 ) {
     val viewModel: SessionDetailViewModel = koinViewModel()
-    val uiState = viewModel.state.collectAsStateWithLifecycle()
-
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
 
-    val lazyPagingItems = remember(sessionId, sessionType) {
-        viewModel.openSession(sessionId, sessionType)
-    }.collectAsLazyPagingItems()
-
-    DisposableEffect(viewModel, sessionId, sessionType) {
+    DisposableEffect(viewModel, sessionId, sessionType, coroutineScope) {
+        coroutineScope.launch {
+            viewModel.openSession(sessionId, sessionType)
+        }
         onDispose {
             viewModel.saveDraft()
-            viewModel.release()
+            viewModel.closeSession()
         }
     }
+
+    SessionDetailContent(
+        uiState = uiState.value,
+        inputText = viewModel.inputText,
+        backPress = backPress,
+        navigateToUserBasicInfo = navigateToUserBasicInfo,
+        onSend = viewModel::onSendTextMessage,
+        onInputValueChange = viewModel::updateInputText
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SessionDetailContent(
+    uiState: ChatDetailUiState,
+    inputText: String,
+    backPress: () -> Unit,
+    navigateToUserBasicInfo: (Long) -> Unit,
+    onSend: () -> Unit,
+    onInputValueChange: (String) -> Unit,
+) {
+    val lazyPagingItems = uiState.flow.collectAsLazyPagingItems(Dispatchers.Default)
+    val coroutineScope = rememberCoroutineScope()
     FocusClearMan()
     Column(
         modifier = Modifier.fillMaxSize()
@@ -97,10 +122,9 @@ fun SessionDetailScreen(
     ) {
         TopAppBar(
             title = {
-                val title by remember { derivedStateOf { uiState.value.title } }
                 Text(
                     modifier = Modifier,
-                    text = title
+                    text = uiState.showingTitle
                 )
             },
             navigationIcon = {
@@ -114,7 +138,7 @@ fun SessionDetailScreen(
                 .graphicsLayer { clip = true }
         ) {
             val lazyListState = rememberLazyListState()
-            OverScrollableLazyColumn(
+            LazyColumn(
                 state = lazyListState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -162,14 +186,11 @@ fun SessionDetailScreen(
                 }
             }
         }
-        Box {
-            val inputText by remember { derivedStateOf { uiState.value.inputText } }
-            ChatInputArea(
-                text = inputText,
-                onTextChange = viewModel::updateInputText,
-                onSendClick = viewModel::onSendTextMessage,
-                modifier = Modifier,
-            )
-        }
+        ChatInputArea(
+            text = inputText,
+            onTextChange = onInputValueChange,
+            onSendClick = onSend,
+            modifier = Modifier,
+        )
     }
 }

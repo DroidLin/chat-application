@@ -31,12 +31,12 @@ class SearchHistoryUseCase {
     }
 
     val historyConfigList = this._historyConfigList
+        .map { historyConfigList -> historyConfigList.sortedByDescending { it.timestamp }.distinctBy { it.value } }
         .map { historyConfigList ->
             if (historyConfigList.size >= 10) {
                 historyConfigList.subList(0, 10)
             } else historyConfigList
         }
-        .map { historyConfigList -> historyConfigList.sortedByDescending { it.timestamp }.distinctBy { it.value } }
         .distinctUntilChanged()
 
     fun insertKeywordHistory(keyword: String) {

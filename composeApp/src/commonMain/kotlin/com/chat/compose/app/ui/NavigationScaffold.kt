@@ -1,15 +1,13 @@
 package com.chat.compose.app.ui
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationRail
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.chat.compose.app.platform.ui.LocalWindowAdaptiveInfo
 import com.chat.compose.app.ui.framework.Box
@@ -38,16 +36,12 @@ fun NavigationScaffold(
         val windowAdaptiveInfo = LocalWindowAdaptiveInfo.current
         val windowSizeClass = windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass
         if (windowSizeClass == WindowWidthSizeClass.MEDIUM) {
-            AnimatedVisibility(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .applyAppSafeArea(),
-                visible = showNavigationUpdated,
-                enter = slideInHorizontally { -it },
-                exit = slideOutHorizontally { -it }
-            ) {
+            if (showNavigationUpdated) {
                 NavigationRail(
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.CenterStart)
+                        .applyAppSafeArea(),
                     content = navigationRailContentUpdated
                 )
             }
@@ -59,15 +53,12 @@ fun NavigationScaffold(
             contentUpdated()
         }
         if (windowSizeClass == WindowWidthSizeClass.COMPACT) {
-            AnimatedVisibility(
-                modifier = Modifier.align(Alignment.BottomCenter)
-                    .applyAppSafeArea(),
-                visible = showNavigationUpdated,
-                enter = slideInVertically { it },
-                exit = slideOutVertically { it }
-            ) {
+            if (showNavigationUpdated) {
                 NavigationBar(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .applyAppSafeArea()
+                        .fillMaxWidth(),
                     content = navigationBarContentUpdated
                 )
             }

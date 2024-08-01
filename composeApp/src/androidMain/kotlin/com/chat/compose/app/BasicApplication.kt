@@ -15,11 +15,6 @@ class BasicApplication : Application() {
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
-//        Debug.startMethodTracingSampling(File(cacheDir, "profile.trace").absolutePath, 1 shl 20, 100)
-//        Looper.getMainLooper().queue.addIdleHandler {
-//            Debug.stopMethodTracing()
-//            false
-//        }
         initCore(this)
     }
 }

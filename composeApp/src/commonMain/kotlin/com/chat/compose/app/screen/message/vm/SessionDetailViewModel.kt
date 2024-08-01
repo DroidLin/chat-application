@@ -1,26 +1,25 @@
 package com.chat.compose.app.screen.message.vm
 
 import androidx.compose.runtime.Immutable
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.paging.PagingData
 import com.application.channel.im.draftMessage
 import com.application.channel.im.session.ChatSession
 import com.application.channel.message.SessionType
-import com.application.channel.message.metadata.RecentContact
 import com.chat.compose.app.metadata.UiMessageItem
-import com.chat.compose.app.metadata.toUiRecentContact
+import com.chat.compose.app.platform.viewmodel.AbstractStatefulViewModel
+import com.chat.compose.app.platform.viewmodel.Event
+import com.chat.compose.app.platform.viewmodel.State
 import com.chat.compose.app.usecase.CloseSessionUseCase
 import com.chat.compose.app.usecase.FetchChatDetailListUseCase
 import com.chat.compose.app.usecase.FetchRecentContactUseCase
 import com.chat.compose.app.usecase.OpenChatSessionUseCase
-import com.chat.compose.app.util.collect
 import com.chat.compose.app.util.mainCoroutineScope
-import com.chat.compose.app.util.onFirst
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import com.chat.compose.app.util.profile
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 /**
@@ -32,46 +31,31 @@ class SessionDetailViewModel constructor(
     private val closeSessionUseCase: CloseSessionUseCase,
     private val fetchRecentContactUseCase: FetchRecentContactUseCase,
     private val fetchChatDetailListUseCase: FetchChatDetailListUseCase,
-) : ViewModel() {
-
-    private val coroutineScope = CoroutineScope(this.viewModelScope.coroutineContext + Dispatchers.Default)
-
-    private val _state = MutableStateFlow(RecentDetailState())
-    val state: StateFlow<RecentDetailState> = this._state.asStateFlow()
+) : AbstractStatefulViewModel<ChatDetailUiState, ChatDetailEvent>() {
 
     private var chatSession: ChatSession? = null
-    private var observerJob: Job? = null
 
-    fun openSession(sessionId: String, sessionType: SessionType): StateFlow<PagingData<UiMessageItem>> {
-        this.observerJob?.cancel()
-        this.observerJob = this.fetchRecentContactUseCase
-            .fetchObservableRecentContactOrCreate(sessionId, sessionType)
-            .onFirst { recentContact ->
-                val draftMessage = recentContact.draftMessage
-                if (!draftMessage.isNullOrBlank()) {
-                    this._state.update { it.copy(inputText = draftMessage) }
-                }
-            }
-            .map { recentContact -> recentContact.toUiRecentContact() }
-            .filterNotNull()
-            .distinctUntilChanged()
-            .onEach { uiRecentContact ->
-                this._state.update { state -> state.copy(title = uiRecentContact.sessionContactName) }
-            }
-            .collect(this.coroutineScope)
+    override val initialState: ChatDetailUiState get() = ChatDetailUiState()
 
+    var inputText by mutableStateOf("")
+
+    suspend fun openSession(sessionId: String, sessionType: SessionType) {
         this.closeSession()
+        val recentContact = this.fetchRecentContactUseCase.fetchRecentContactOrCreate(sessionId, sessionType)
         val chatSession = this.openChatSessionUseCase.openChatSession(sessionId, sessionType)
-        try {
-            return this.fetchChatDetailListUseCase.openPagerListFlow(chatSession)
-                .stateIn(this.coroutineScope, SharingStarted.Lazily, PagingData.empty())
-        } finally {
-            this.chatSession = chatSession
+        val pagerListFlow = this.fetchChatDetailListUseCase.openPagerListFlow(chatSession)
+
+        this.inputText = recentContact?.draftMessage ?: ""
+        updateState {
+            ChatDetailUiState(
+                showingTitle = recentContact?.profile?.userInfo?.userName ?: "",
+                flow = pagerListFlow
+            )
         }
     }
 
     fun saveDraft() {
-        val inputText = this._state.value.inputText
+        val inputText = this.inputText
         val chatSession = this.chatSession ?: return
         mainCoroutineScope.launch {
             chatSession.saveDraftContent(inputText)
@@ -86,19 +70,13 @@ class SessionDetailViewModel constructor(
         this.chatSession = null
     }
 
-    fun release() {
-        this.closeSession()
-        this.observerJob?.cancel()
-        this.observerJob = null
-    }
-
     fun updateInputText(text: String) {
-        this._state.update { it.copy(inputText = text) }
+        this.inputText = text
     }
 
     fun onSendTextMessage() {
         val chatSession = this.chatSession ?: return
-        val inputText = this._state.getAndUpdate { it.copy(inputText = "") }.inputText
+        val inputText = this.inputText
         if (inputText.isBlank()) {
             return
         }
@@ -112,9 +90,10 @@ class SessionDetailViewModel constructor(
 }
 
 @Immutable
-data class RecentDetailState(
-    val isLoading: Boolean = false,
-    val recentContact: RecentContact? = null,
-    val title: String = "",
-    val inputText: String = "",
-)
+interface ChatDetailEvent : Event
+
+@Immutable
+data class ChatDetailUiState(
+    val showingTitle: String = "",
+    val flow: Flow<PagingData<UiMessageItem>> = flowOf(PagingData.empty())
+) : State.Success

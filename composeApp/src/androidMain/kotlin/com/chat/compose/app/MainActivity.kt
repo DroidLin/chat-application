@@ -21,7 +21,6 @@ val LocalActivity = staticCompositionLocalOf<ComponentActivity> { error("No acti
 
 class MainActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(this.window, false)
         super.onCreate(savedInstanceState)
@@ -30,7 +29,6 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalActivity provides this,
                 LocalAppSafeArea provides remember { AppSafeArea() },
-                LocalOverscrollConfiguration provides null,
             ) {
                 WindowAdaptiveInfoProvider {
                     AndroidMaterialTheme(

@@ -115,20 +115,10 @@ fun AppScreen(modifier: Modifier) {
                 }
             },
         ) {
-            AnimatedContent(
-                modifier = Modifier.fillMaxSize(),
-                targetState = homeEnum,
-                contentAlignment = Alignment.Center,
-                transitionSpec = {
-                    fadeIn() togetherWith fadeOut()
-                },
-                contentKey = { it }
-            ) {
-                when (it) {
-                    AppHomeEnum.Message -> MessageHomeScreen(confirmLogout)
-                    AppHomeEnum.Personal -> PersonalInfoHomeScreen(confirmLogout)
-                    else -> {}
-                }
+            when (homeEnum) {
+                AppHomeEnum.Message -> MessageHomeScreen(confirmLogout)
+                AppHomeEnum.Personal -> PersonalInfoHomeScreen(confirmLogout)
+                else -> {}
             }
         }
     }

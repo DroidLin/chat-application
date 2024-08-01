@@ -1,6 +1,7 @@
 package com.chat.compose.app.screen.user
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Face
@@ -18,14 +19,12 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.application.channel.message.SessionType
 import com.chat.compose.app.di.koinViewModel
-import com.chat.compose.app.route.LocalRouteAction
 import com.chat.compose.app.ui.NameAvatarImage
 import com.chat.compose.app.ui.NavRoute
 import com.chat.compose.app.ui.navigationComposable
 import com.github.droidlin.composeapp.generated.resources.Res
 import com.github.droidlin.composeapp.generated.resources.string_label_error
 import com.github.droidlin.composeapp.generated.resources.string_send_message_to_user
-import com.mplayer.common.ui.OverScrollableLazyColumn
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -149,7 +148,7 @@ private fun UserBasicInfoContent(
                 state.sessionId.isNotEmpty() && state.sessionType != SessionType.Unknown
             }
         }
-        OverScrollableLazyColumn(
+        LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,

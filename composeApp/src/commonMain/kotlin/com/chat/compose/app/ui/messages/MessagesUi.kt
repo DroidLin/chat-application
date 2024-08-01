@@ -9,7 +9,11 @@ import com.chat.compose.app.metadata.UiMessageItem
  * @since 2024/6/22 12:20
  */
 @Composable
-fun MessageUi(uiMessageItem: UiMessageItem, modifier: Modifier = Modifier, onAvatarClick: () -> Unit = {}) {
+fun MessageUi(
+    uiMessageItem: UiMessageItem,
+    modifier: Modifier = Modifier,
+    onAvatarClick: () -> Unit = {}
+) {
     val isSenderMessage = uiMessageItem.uiMessage.isSenderMessage
     val isReceiverMessage = uiMessageItem.uiMessage.isReceiverMessage
 
