@@ -1,9 +1,6 @@
 package com.application.channel.core.model
 
-import com.application.channel.core.DatagramChannelEventListener
-import com.application.channel.core.InitAdapter
-import com.application.channel.core.InitialAdapterBuilder
-import com.application.channel.core.SocketChannelEventListener
+import com.application.channel.core.*
 
 fun socketInitConfig(functionScope: SocketChannelInitScope.() -> Unit): SocketChannelInitConfig {
     return SocketChannelInitScope().apply(functionScope).build()
@@ -31,6 +28,19 @@ class SocketChannelInitScope internal constructor() {
 
         override fun handleException(ctx: ChannelContext, throwable: Throwable?) {
             this@SocketChannelInitScope.functionExceptionCreated?.invoke(ctx, throwable)
+        }
+    }
+
+    private var functionChannelAttached: ((ChannelContext) -> Unit)? = null
+    private var functionChannelDetached: ((ChannelContext) -> Unit)? = null
+
+    val channelLifecycleObserver = object : ChannelLifecycleObserver {
+        override fun onChannelAttached(channel: ChannelContext) {
+            this@SocketChannelInitScope.functionChannelAttached?.invoke(channel)
+        }
+
+        override fun onChannelDetached(channel: ChannelContext) {
+            this@SocketChannelInitScope.functionChannelDetached?.invoke(channel)
         }
     }
 
@@ -71,32 +81,22 @@ class SocketChannelInitScope internal constructor() {
         this.initAdapter = InitialAdapterBuilder().apply(function).build()
     }
 
+    fun channelAttached(function: (ChannelContext) -> Unit) {
+        this.functionChannelAttached = function
+    }
+
+    fun channelDetached(function: (ChannelContext) -> Unit) {
+        this.functionChannelDetached = function
+    }
+
     fun build(): SocketChannelInitConfig {
         return SocketChannelInitConfig(
             address = this.address,
             maxReConnectCount = this.maxReconnectCount,
             reConnectTimeInterval = this.reConnectTimeInterval,
             socketChannelEventListener = this.socketChannelEventListener,
-            initAdapter = this.initAdapter
+            initAdapter = requireNotNull(this.initAdapter)
         )
-    }
-}
-
-fun multiInitConfig(function: MultiInitScope.() -> Unit): MultiInitConfig {
-    return MultiInitScope().apply(function).build()
-}
-
-class MultiInitScope internal constructor() {
-
-    private val initConfigList: MutableList<InitConfig> = ArrayList()
-
-    fun socketInitConfig(functionScope: SocketChannelInitScope.() -> Unit) {
-        val initConfig = SocketChannelInitScope().apply(functionScope).build()
-        this.initConfigList += initConfig
-    }
-
-    fun build(): MultiInitConfig {
-        return MultiInitConfig(this.initConfigList)
     }
 }
 

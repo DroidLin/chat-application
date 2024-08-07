@@ -3,6 +3,7 @@ package com.app.channel.backend.server.room
 import androidx.room.*
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.app.channel.backend.server.room.dao.AccountDao
+import com.app.channel.backend.server.room.dao.ChatRoomDao
 import com.app.channel.backend.server.room.dao.SessionInfoDao
 import com.app.channel.backend.server.room.dao.UserInfoDao
 import java.io.File
@@ -15,6 +16,7 @@ interface AppBackendDatabase {
     val userInfoDao: UserInfoDao
     val sessionInfoDao: SessionInfoDao
     val accountDao: AccountDao
+    val chatRoomDao: ChatRoomDao
 
     suspend fun <T> withTransaction(readonly: Boolean, function: suspend Transaction<T>.() -> T): T
 
@@ -38,6 +40,7 @@ private class AppBackendDatabaseImpl(
     override val userInfoDao: UserInfoDao get() = this.database.userInfoDao
     override val sessionInfoDao: SessionInfoDao get() = this.database.sessionInfoDao
     override val accountDao: AccountDao get() = this.database.accountDao
+    override val chatRoomDao: ChatRoomDao get() = this.database.chatRoomDao
 
     override suspend fun <T> withTransaction(readonly: Boolean, function: suspend AppBackendDatabase.Transaction<T>.() -> T): T {
         val block: suspend (Transactor) -> T = { transactor: Transactor ->

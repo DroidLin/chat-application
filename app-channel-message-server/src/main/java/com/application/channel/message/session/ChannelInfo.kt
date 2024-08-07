@@ -1,5 +1,7 @@
 package com.application.channel.message.session
 
+import com.application.channel.message.SessionType
+
 /**
  * @author liuzhongao
  * @since 2024/5/30 22:15
@@ -7,6 +9,8 @@ package com.application.channel.message.session
 interface ChannelInfo {
 
     val sessionId: String
+
+    val sessionType: SessionType
 
     val updateTime: Long
 

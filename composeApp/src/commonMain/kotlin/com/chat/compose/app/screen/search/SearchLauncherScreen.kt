@@ -169,9 +169,7 @@ fun SearchLauncherScreen(
                     Text(stringResource(Res.string.string_button_search_history))
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(
-                        onClick = {
-                            viewModel.clearAllHistory()
-                        },
+                        onClick = viewModel::clearAllHistory,
                         modifier = Modifier
                     ) {
                         Text(stringResource(Res.string.string_button_clear_search_history))
@@ -179,10 +177,12 @@ fun SearchLauncherScreen(
                 }
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     historyConfig.forEach { config ->
                         AssistChip(
+                            modifier = Modifier,
                             onClick = {
                                 viewModel.onInputChange(config.value)
                                 viewModel.onSearch(config.value)
@@ -190,6 +190,19 @@ fun SearchLauncherScreen(
                             },
                             label = {
                                 Text(text = config.value)
+                            },
+                            trailingIcon = {
+                                Icon(
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .clickable(
+                                            onClick = { viewModel.deleteHistoryConfig(config) },
+                                            interactionSource = null,
+                                            indication = null,
+                                        ),
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = null
+                                )
                             }
                         )
                     }

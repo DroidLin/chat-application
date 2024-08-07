@@ -1,7 +1,5 @@
 package com.app.channel.backend.server.metadata
 
-import com.application.channel.message.SessionType
-
 /**
  * @author liuzhongao
  * @since 2024/6/30 01:26

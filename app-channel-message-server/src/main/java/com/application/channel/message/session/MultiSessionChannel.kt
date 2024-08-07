@@ -1,6 +1,4 @@
-package com.application.channel.message
-
-import com.application.channel.message.session.SessionChannel
+package com.application.channel.message.session
 
 /**
  * @author liuzhongao
@@ -8,7 +6,12 @@ import com.application.channel.message.session.SessionChannel
  */
 interface MultiSessionChannel : SessionChannel {
 
-    val anyPointAlive: Boolean
+    val isAllAlive: Boolean
+
+    /**
+     * returns true while any client is alive
+     */
+    override val isAlive: Boolean
 
     fun addChannel(channel: SessionChannel)
 

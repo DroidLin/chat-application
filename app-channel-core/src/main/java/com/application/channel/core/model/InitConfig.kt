@@ -34,14 +34,14 @@ data class SocketChannelInitConfig @JvmOverloads constructor(
 
     val socketChannelEventListener: SocketChannelEventListener? = null,
 
-    val initAdapter: InitAdapter? = null
+    val initAdapter: InitAdapter
 ) : InitConfig {
 
     var nowReConnectCount: Int = 0
 
     var isRunning: Boolean = false
 
-    val socketAddress: SocketAddress? by lazy { parseNetworkAddress(this.address) }
+    val socketAddress: SocketAddress by lazy { parseNetworkAddress(this.address) }
 }
 
 data class MultiInitConfig constructor(

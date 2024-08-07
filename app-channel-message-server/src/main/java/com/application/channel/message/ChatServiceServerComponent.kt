@@ -24,7 +24,8 @@ import javax.inject.Singleton
         MessageParserModule::class
     ],
     dependencies = [
-        ChannelServerComponent::class
+        ChannelServerComponent::class,
+//        SessionOptimizeComponent::class
     ]
 )
 interface ChatServiceServerComponent {

@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @author liuzhongao
@@ -40,22 +41,34 @@ class SearchHistoryUseCase {
         .distinctUntilChanged()
 
     fun insertKeywordHistory(keyword: String) {
-        val historyConfigList = this._historyConfigList.value.toMutableList()
-        historyConfigList += SearchHistoryConfig(keyword, System.currentTimeMillis())
+        updateSearchHistoryConfig {
+            this += SearchHistoryConfig(keyword, System.currentTimeMillis())
+        }
+    }
+
+    fun deleteHistoryConfig(historyConfig: SearchHistoryConfig) {
+        updateSearchHistoryConfig {
+            this -= historyConfig
+        }
+    }
+
+    private fun updateSearchHistoryConfig(function: MutableList<SearchHistoryConfig>.() -> Unit) {
         this.coroutineScope.launch {
-            val distinctList = historyConfigList.sortedByDescending { it.timestamp }.distinctBy { it.value }
-            this@SearchHistoryUseCase._historyConfigList.update { distinctList }
-            this@SearchHistoryUseCase.userPreference.putString(KEY_SEARCH_HISTORY, distinctList.toJson())
-            this@SearchHistoryUseCase.userPreference.flush()
+            this@SearchHistoryUseCase._historyConfigList.update { historyConfigList ->
+                historyConfigList.toMutableList()
+                    .apply(function)
+                    .also { mutableList ->
+                        withContext(Dispatchers.IO) {
+                            this@SearchHistoryUseCase.userPreference.putString(KEY_SEARCH_HISTORY, mutableList.toJson())
+                            this@SearchHistoryUseCase.userPreference.flush()
+                        }
+                    }
+            }
         }
     }
 
     fun clearAllHistory() {
-        this.coroutineScope.launch {
-            this@SearchHistoryUseCase._historyConfigList.update { emptyList() }
-            this@SearchHistoryUseCase.userPreference.putString(KEY_SEARCH_HISTORY, emptyList<SearchHistoryConfig>().toJson())
-            this@SearchHistoryUseCase.userPreference.flush()
-        }
+        updateSearchHistoryConfig { clear() }
     }
 
     companion object {

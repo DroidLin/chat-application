@@ -1,9 +1,6 @@
 package com.app.channel.backend.server.room.metadata
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 /**
  * @author liuzhongao
@@ -22,6 +19,9 @@ import androidx.room.PrimaryKey
             parentColumns = ["account_id"],
             childColumns = ["account_id"],
         )
+    ],
+    indices = [
+        Index(value = ["session_id", "session_type"], unique = true),
     ]
 )
 data class LocalSessionInfo(

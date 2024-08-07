@@ -8,6 +8,8 @@ import com.application.channel.core.model.ChannelContext
 import com.application.channel.core.model.StringWritable
 import com.application.channel.core.model.socketInitConfig
 import com.application.channel.core.server.ChannelServer
+import com.application.channel.core.server.InnerChannelHolder
+import com.application.channel.core.server.InnerChannelInitConfig
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.MessageToMessageEncoder
 
@@ -16,6 +18,7 @@ import io.netty.handler.codec.MessageToMessageEncoder
  * @since 2024/5/8 22:24
  */
 fun main() {
+    var innerChannelHolder: InnerChannelHolder? = null
     val chatServer = ChannelServer()
     val initConfig = socketInitConfig {
         address("http://localhost:8081")
@@ -50,6 +53,11 @@ fun main() {
             }
         }
     }
+    val innerChannelInitConfig = InnerChannelInitConfig(
+        initAdapter = initConfig.initAdapter,
+        socketAddress = initConfig.socketAddress
+    )
+    innerChannelHolder = InnerChannelHolder(innerChannelInitConfig)
     chatServer.start(initConfig)
 }
 

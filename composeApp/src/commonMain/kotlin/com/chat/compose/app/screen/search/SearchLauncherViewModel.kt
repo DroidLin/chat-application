@@ -3,6 +3,7 @@ package com.chat.compose.app.screen.search
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chat.compose.app.usecase.SearchHistoryConfig
 import com.chat.compose.app.usecase.SearchHistoryUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -29,6 +30,10 @@ class SearchLauncherViewModel(
         val input = keyword ?: this._uiState.value.searchInputKeyword
         if (input.isEmpty()) return
         this.searchHistoryUserCase.insertKeywordHistory(input)
+    }
+
+    fun deleteHistoryConfig(historyConfig: SearchHistoryConfig) {
+        this.searchHistoryUserCase.deleteHistoryConfig(historyConfig)
     }
 
     fun clearAllHistory() {

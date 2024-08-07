@@ -16,8 +16,7 @@ data class SessionInfo(
     val sessionTypeCode: Int = 0,
 ) : Serializable {
 
-    val sessionType: SessionType
-        get() = SessionType.fromValue(this.sessionTypeCode)
+    val sessionType: SessionType = SessionType.fromValue(this.sessionTypeCode)
 
     companion object {
         private const val serialVersionUID: Long = 9022488129018406015L

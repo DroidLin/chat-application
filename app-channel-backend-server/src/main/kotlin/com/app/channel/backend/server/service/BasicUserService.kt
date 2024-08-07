@@ -19,7 +19,7 @@ import java.util.*
  * @since 2024/6/28 01:17
  */
 @Component
-class ApiUserService(
+class BasicUserService(
     private val appBackendDatabase: AppBackendDatabase,
     private val userInfoDao: UserInfoDao,
     private val accountDao: AccountDao,
@@ -89,12 +89,12 @@ class ApiUserService(
                 updateTime = System.currentTimeMillis(),
                 passwordHash = passwordHash
             )
-            this@ApiUserService.accountDao.insertAccount(account)
-            this@ApiUserService.userInfoDao.insertUserInfo(LocalUserInfo(userId = 0, userAccount = userAccount, userName = userName))
-            val userInfo = this@ApiUserService.userInfoDao.fetchUserInfoByAccount(account.accountId)
+            this@BasicUserService.accountDao.insertAccount(account)
+            this@BasicUserService.userInfoDao.insertUserInfo(LocalUserInfo(userId = 0, userAccount = userAccount, userName = userName))
+            val userInfo = this@BasicUserService.userInfoDao.fetchUserInfoByAccount(account.accountId)
                 ?: throw BizException(code = CodeConst.CODE_INTERNAL_ERROR, message = "server internal error.")
             val sessionInfo = LocalSessionInfo(UUID.randomUUID().toString(), userInfo.userId, account.accountId, SessionType.P2P.value)
-            this@ApiUserService.sessionInfoDao.insertSessionInfo(sessionInfo)
+            this@BasicUserService.sessionInfoDao.insertSessionInfo(sessionInfo)
             ProfileDTO(
                 userInfo = userInfo.toUserInfoVO(),
                 account = account.toAccountVO(),

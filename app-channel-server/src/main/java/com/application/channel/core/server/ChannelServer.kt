@@ -3,17 +3,13 @@ package com.application.channel.core.server
 import com.application.channel.core.ChannelContextMatcher
 import com.application.channel.core.Listener
 import com.application.channel.core.WriteToChannelJob
-import com.application.channel.core.initializer.ChannelInitializerFactory
 import com.application.channel.core.model.*
 import io.netty.bootstrap.AbstractBootstrap
-import io.netty.bootstrap.Bootstrap
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.ChannelFuture
-import io.netty.channel.group.ChannelGroup
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.util.concurrent.GlobalEventExecutor
-import org.koin.core.context.GlobalContext
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -65,9 +61,6 @@ internal class ChannelServerImpl @Inject constructor() : ChannelServer {
                 this._initConfigFutureMap[initConfig] = channelFuture
             }
         }
-        ChannelInitializerFactory.create(this.channelGroup, initConfig)
-            .also { initializer -> initializer.initialize(ServerBootstrap().group(this._parentEventLoop, this._childEventLoop), initFunction) }
-            .also { initializer -> initializer.initialize(Bootstrap().group(this._parentEventLoop), initFunction) }
     }
 
     private fun scheduleInEventLoop(job: () -> Unit) {

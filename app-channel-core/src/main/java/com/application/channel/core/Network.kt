@@ -23,12 +23,12 @@ private val NetworkInterface.isValid: Boolean
 private val InetAddress.isValid: Boolean
     get() = this is Inet4Address && this.isSiteLocalAddress && !this.isLoopbackAddress
 
-fun parseNetworkAddress(address: String): SocketAddress? {
+fun parseNetworkAddress(address: String): SocketAddress {
     val uri = URI.create(address)
     val host: String? = uri.host
     val port = uri.port
     if (host.isNullOrBlank() || port == -1) {
-        return null
+        throw RuntimeException("Malformed IP address")
     }
     return InetSocketAddress(host, port)
 }

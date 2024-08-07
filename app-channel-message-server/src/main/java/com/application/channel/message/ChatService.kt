@@ -1,12 +1,14 @@
 package com.application.channel.message
 
+import com.application.channel.core.ChannelLifecycleHandler
 import com.application.channel.core.SimpleDataHandler
 import com.application.channel.core.handler.encoder.ByteArrayToByteBufEncoder
 import com.application.channel.core.handler.encoder.ByteBufToByteArrayDecoder
 import com.application.channel.core.model.socketInitConfig
 import com.application.channel.core.server.ChannelServer
 import com.application.channel.core.server.DaggerChannelServerComponent
-import com.application.channel.message.KeyModule.EncryptReleaseKey
+import com.application.channel.core.server.InnerChannelHolder
+import com.application.channel.core.server.InnerChannelInitConfig
 import com.application.channel.message.controller.Controller
 import com.application.channel.message.encryptor.DecryptorDecoder
 import com.application.channel.message.encryptor.EncryptorEncoder
@@ -31,22 +33,19 @@ interface ChatService {
 }
 
 fun ChatService(): ChatService {
-    val channelServerComponent = DaggerChannelServerComponent.create()
     return DaggerChatServiceServerComponent
         .builder()
-        .channelServerComponent(channelServerComponent)
+        .channelServerComponent(DaggerChannelServerComponent.create())
         .build()
         .chatService()
 }
 
 internal class ChatServiceImpl @Inject constructor(
-    private val channelServer: ChannelServer,
-    private val authorizationMapping: AuthorizationMapping,
     private val controller: Controller<Message>,
     private val messageParser: MessageParser,
 ) : ChatService {
 
-    override val chatServiceController = ChatServiceControllerImpl(this.channelServer, this.authorizationMapping)
+    override val chatServiceController = ChatServiceControllerImpl(this::innerChannelHolder)
 
     private val initConfig = socketInitConfig {
         address("http://0.0.0.0:8081")
@@ -62,7 +61,9 @@ internal class ChatServiceImpl @Inject constructor(
         onExceptionCreated { _, throwable ->
             throwable?.printStackTrace()
         }
-        onConnectionLoss(this@ChatServiceImpl.authorizationMapping::removeAuthContext)
+//        onConnectionLoss(this@ChatServiceImpl.authorizationMapping::removeAuthContext)
+        channelAttached {}
+        channelDetached {}
         initAdapter {
             val decoderFactories = listOf(
                 ByteBufToByteArrayDecoder(),
@@ -76,7 +77,8 @@ internal class ChatServiceImpl @Inject constructor(
                 ObjectToByteArrayEncoder()
             )
             val handlerFactories = listOf(
-                SimpleDataHandler(this@socketInitConfig.socketChannelEventListener)
+                SimpleDataHandler(this@socketInitConfig.socketChannelEventListener),
+                ChannelLifecycleHandler(this@socketInitConfig.channelLifecycleObserver)
             )
             decoderFactories { decoderFactories }
             encoderFactories { encoderFactories }
@@ -84,11 +86,21 @@ internal class ChatServiceImpl @Inject constructor(
         }
     }
 
+    private var innerChannelHolder: InnerChannelHolder? = null
+
     override fun startService() {
-        this.channelServer.start(this.initConfig)
+        if (this.innerChannelHolder != null) return
+
+        val innerChannelConfig = InnerChannelInitConfig(
+            initAdapter = this.initConfig.initAdapter,
+            socketAddress = this.initConfig.socketAddress
+        )
+        this.innerChannelHolder = InnerChannelHolder(initConfig = innerChannelConfig)
+        this.innerChannelHolder?.initChannelServer()
     }
 
     override fun stopService() {
-        this.channelServer.shutDown()
+        this.innerChannelHolder?.stopChannelServer()
+        this.innerChannelHolder = null
     }
 }

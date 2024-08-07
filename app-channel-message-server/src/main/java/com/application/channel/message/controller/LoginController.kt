@@ -1,11 +1,9 @@
 package com.application.channel.message.controller
 
-import com.application.channel.message.Account
-import com.application.channel.message.AuthorizationMapping
-import com.application.channel.message.Callback
-import com.application.channel.message.Context
+import com.application.channel.message.*
 import com.application.channel.message.meta.LoginMessage
 import com.application.channel.message.meta.Messages
+import com.application.channel.message.session.autoRegistration
 import java.util.logging.Logger
 import javax.inject.Inject
 
@@ -14,7 +12,6 @@ import javax.inject.Inject
  * @since 2024/6/1 12:35
  */
 internal class LoginController @Inject constructor(
-    private val authorizationMapping: AuthorizationMapping,
     private val logger: Logger
 ) : Controller<LoginMessage> {
 
@@ -26,12 +23,17 @@ internal class LoginController @Inject constructor(
         // todo: verify sessionId and accountId
         val authorized = sessionId.isNotEmpty() && accountId.isNotEmpty()
         val loginResultMessage = Messages.buildLoginResultMessage(
-            account = Account(sessionId = sessionId, accountId = accountId),
+            account = Account(
+                sessionId = sessionId,
+                accountId = accountId
+            ),
             authorized = authorized
         )
         if (authorized) {
             this.logger.info { "client: ${ctx.channelContext.channelRemoteAddress} authorized success." }
-            this.authorizationMapping.putAuthContext(sessionId, ctx.channelContext)
+            val singleSessionChannel = SessionChannelUserPool.newSingleSessionChannel(sessionId, ctx.channelContext)
+            singleSessionChannel.autoRegistration()
+            SessionChannelUserPool.getSessionChannelOrCreate(sessionId).addChannel(singleSessionChannel)
         }
         chatServiceController.writeMessageWithContext(loginResultMessage, ctx.channelContext, Callback)
     }

@@ -46,6 +46,7 @@ class SessionDetailViewModel constructor(
         val pagerListFlow = this.fetchChatDetailListUseCase.openPagerListFlow(chatSession)
 
         this.inputText = recentContact?.draftMessage ?: ""
+        this.chatSession = chatSession
         updateState {
             ChatDetailUiState(
                 showingTitle = recentContact?.profile?.userInfo?.userName ?: "",
@@ -81,6 +82,7 @@ class SessionDetailViewModel constructor(
             return
         }
         chatSession.sendTextMessage(inputText)
+        this.inputText = ""
     }
 
     override fun onCleared() {

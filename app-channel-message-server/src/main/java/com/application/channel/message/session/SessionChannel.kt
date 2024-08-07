@@ -14,6 +14,8 @@ interface SessionChannel {
      */
     val channelInfo: ChannelInfo
 
+    val isAlive: Boolean
+
     /**
      * write message to current channel with success or failure callback attached.
      */

@@ -2,6 +2,7 @@ package com.app.channel.backend.server.component
 
 import com.app.channel.backend.server.room.AppBackendDatabase
 import com.app.channel.backend.server.room.dao.AccountDao
+import com.app.channel.backend.server.room.dao.ChatRoomDao
 import com.app.channel.backend.server.room.dao.SessionInfoDao
 import com.app.channel.backend.server.room.dao.UserInfoDao
 import org.springframework.context.annotation.Bean
@@ -27,5 +28,8 @@ class DatabaseComponent {
 
     @Bean
     fun accountDao(appBackendDatabase: AppBackendDatabase): AccountDao = appBackendDatabase.accountDao
+
+    @Bean
+    fun chatRoomDao(appBackendDatabase: AppBackendDatabase): ChatRoomDao = appBackendDatabase.chatRoomDao
 }
 
